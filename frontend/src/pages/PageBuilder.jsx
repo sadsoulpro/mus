@@ -287,48 +287,35 @@ export default function PageBuilder() {
         const albumIdMatch = scanInput.match(/\/album\/[^/]+\/(\d+)/);
         const albumId = albumIdMatch ? albumIdMatch[1] : null;
         
-        // Fetch cover art from iTunes API using album ID
+        // Use backend proxy for iTunes API to avoid CORS
         try {
-          let itunesUrl;
+          let response;
           if (albumId) {
-            // Use album ID for lookup - most reliable
-            itunesUrl = `https://itunes.apple.com/lookup?id=${albumId}`;
+            response = await api.get(`/lookup/itunes?id=${albumId}`);
           } else {
-            // Fallback to search
-            itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(searchQuery)}&media=music&limit=1`;
+            response = await api.get(`/lookup/itunes?term=${encodeURIComponent(searchQuery)}`);
           }
           
-          const itunesResponse = await fetch(itunesUrl);
-          if (itunesResponse.ok) {
-            const itunesData = await itunesResponse.json();
-            if (itunesData.results && itunesData.results[0]) {
-              // Get high resolution artwork (600x600)
-              const artwork = itunesData.results[0].artworkUrl100 || itunesData.results[0].artworkUrl60;
-              if (artwork) {
-                coverArtUrl = artwork.replace(/\d+x\d+/, "600x600");
-              }
-              // Also get track name if available
-              if (itunesData.results[0].trackName) {
-                searchQuery = `${itunesData.results[0].artistName} ${itunesData.results[0].trackName}`;
-              }
-            }
+          if (response.data.artwork) {
+            coverArtUrl = response.data.artwork;
+          }
+          if (response.data.trackName) {
+            searchQuery = `${response.data.artistName} ${response.data.trackName}`;
+          } else if (response.data.collectionName) {
+            searchQuery = `${response.data.artistName} ${response.data.collectionName}`;
           }
         } catch (e) {
-          console.log("Could not fetch iTunes cover art");
+          console.log("Could not fetch iTunes cover art:", e);
         }
       } else {
-        // UPC/ISRC code - search iTunes
+        // UPC/ISRC code - search via backend proxy
         try {
-          const itunesResponse = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(scanInput.trim())}&media=music&limit=1`);
-          if (itunesResponse.ok) {
-            const itunesData = await itunesResponse.json();
-            if (itunesData.results && itunesData.results[0]) {
-              const artwork = itunesData.results[0].artworkUrl100;
-              if (artwork) {
-                coverArtUrl = artwork.replace(/\d+x\d+/, "600x600");
-              }
-              searchQuery = `${itunesData.results[0].artistName} ${itunesData.results[0].trackName}`;
-            }
+          const response = await api.get(`/lookup/itunes?term=${encodeURIComponent(scanInput.trim())}`);
+          if (response.data.artwork) {
+            coverArtUrl = response.data.artwork;
+          }
+          if (response.data.trackName) {
+            searchQuery = `${response.data.artistName} ${response.data.trackName}`;
           }
         } catch (e) {
           console.log("Could not search iTunes");
