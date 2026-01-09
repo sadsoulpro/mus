@@ -609,11 +609,11 @@ export default function PageBuilder() {
                 <span className="text-sm font-medium">Scan Source</span>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Enter an Apple Music link or UPC/ISRC code to auto-populate platform links
+                Enter a Spotify link, Apple Music link, or UPC/ISRC code to auto-populate platform links and cover art
               </p>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Apple Music link or UPC/ISRC code..."
+                  placeholder="Spotify or Apple Music link, UPC/ISRC..."
                   value={scanInput}
                   onChange={(e) => setScanInput(e.target.value)}
                   data-testid="scan-source-input"
