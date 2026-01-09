@@ -232,7 +232,7 @@ export default function PublicPage() {
                     <span className="font-medium">{platform.name}</span>
                   </div>
                   <ExternalLink className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-colors" />
-                <motion.button>
+                </motion.button>
               );
             })}
             
