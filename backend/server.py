@@ -115,7 +115,7 @@ def decode_token(token: str) -> dict:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-async def get_current_user(authorization: str = None):
+async def get_current_user(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Not authenticated")
     token = authorization.split(" ")[1]
@@ -127,7 +127,7 @@ async def get_current_user(authorization: str = None):
         raise HTTPException(status_code=403, detail="Account blocked")
     return user
 
-async def get_admin_user(authorization: str = None):
+async def get_admin_user(authorization: str = Header(None)):
     user = await get_current_user(authorization)
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
