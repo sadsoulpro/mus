@@ -1,4 +1,4 @@
-# BandLink MVP - Product Requirements Document
+# MyTrack MVP - Product Requirements Document
 
 ## Original Problem Statement
 Build a minimal band.link-like smart link web service for musicians. Focus on MVP only. No overengineering.
@@ -8,6 +8,7 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - **Authentication**: JWT-based custom auth
 - **Theme**: Dark theme (modern, music-industry feel)
 - **Admin Account**: admin@example.com / admin123
+- **Language**: Russian (full UI localization)
 
 ## User Personas
 
@@ -66,7 +67,7 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - [x] Block / unblock user
 - [x] Disable / enable page
 
-## What's Been Implemented (January 9, 2026)
+## What's Been Implemented
 
 ### Backend (FastAPI + MongoDB)
 - Complete REST API with all endpoints
@@ -76,15 +77,21 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - Admin routes with role-based access
 - Database indexes for performance
 - Default admin user creation on startup
+- Backend proxy for iTunes/Spotify API (CORS bypass)
 
 ### Frontend (React + Tailwind CSS)
 - Dark theme with neon purple accents
 - Glassmorphism design for public pages
 - Responsive sidebar layout for dashboard
 - Live preview in page builder
-- Platform icons with brand colors
+- Platform icons with brand colors (including Yandex Music, VK Music)
 - Framer Motion animations
 - Toast notifications via Sonner
+- QR code generation with download
+- Scan Source feature (auto-populate from Spotify/Apple Music)
+- Dynamic OG meta tags for public pages
+- Link reordering with up/down buttons
+- **Full Russian localization** (January 9, 2026)
 
 ### Database Collections
 - users: authentication and profile
@@ -122,14 +129,13 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 ### P1 (Next Phase)
 - Custom themes/colors for pages
 - Image optimization
-- Social preview (OG tags)
 - Email verification
 
 ### P2 (Future)
-- QR code generation
 - Pre-save campaigns
 - Email capture forms
 - Multiple page themes
+- Analytics charts
 
 ## Out of Scope
 - Payments/subscriptions
@@ -147,3 +153,14 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - Backend: 90.5% pass rate
 - Frontend: 95% functional
 - All core flows working
+
+## Localization Status (January 9, 2026)
+**Russian Translation Complete:**
+- ✅ Login page
+- ✅ Register page
+- ✅ Dashboard
+- ✅ Admin Panel
+- ✅ PageBuilder (all sections)
+- ✅ Toast messages
+- ✅ Form labels and placeholders
+- ✅ Buttons and navigation
