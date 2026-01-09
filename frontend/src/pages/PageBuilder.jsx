@@ -222,6 +222,148 @@ export default function PageBuilder() {
     }
   };
 
+  // Scan source to auto-detect platform links
+  const scanSource = async () => {
+    if (!scanInput.trim()) {
+      toast.error("Please enter an Apple Music link or UPC/ISRC code");
+      return;
+    }
+
+    setScanningSource(true);
+    
+    try {
+      // Detect if input is Apple Music link
+      const isAppleMusicLink = scanInput.includes("music.apple.com") || scanInput.includes("itunes.apple.com");
+      const isUpcIsrc = /^[A-Z0-9]{12,14}$/i.test(scanInput.trim());
+
+      if (!isAppleMusicLink && !isUpcIsrc) {
+        toast.error("Please enter a valid Apple Music link or UPC/ISRC code");
+        setScanningSource(false);
+        return;
+      }
+
+      // Extract track/album info from Apple Music link or use code
+      let trackId = "";
+      let searchQuery = "";
+
+      if (isAppleMusicLink) {
+        // Parse Apple Music URL to get identifiers
+        const urlParts = scanInput.split("/");
+        const albumIndex = urlParts.findIndex(p => p === "album");
+        if (albumIndex > -1 && urlParts[albumIndex + 1]) {
+          searchQuery = urlParts[albumIndex + 1].replace(/-/g, " ");
+          // Get track ID if present (after ?i=)
+          const trackMatch = scanInput.match(/[?&]i=(\d+)/);
+          trackId = trackMatch ? trackMatch[1] : "";
+        }
+      } else {
+        // UPC/ISRC code
+        trackId = scanInput.trim();
+        searchQuery = trackId;
+      }
+
+      // Generate platform links based on the source
+      const detectedLinks = [];
+      
+      // Add Apple Music link if it was the source
+      if (isAppleMusicLink) {
+        const existingApple = links.find(l => l.platform === "apple");
+        if (!existingApple) {
+          detectedLinks.push({ platform: "apple", url: scanInput.trim() });
+        }
+      }
+
+      // Generate suggested links for other platforms
+      const platformUrls = {
+        spotify: `https://open.spotify.com/search/${encodeURIComponent(searchQuery)}`,
+        youtube: `https://music.youtube.com/search?q=${encodeURIComponent(searchQuery)}`,
+        deezer: `https://www.deezer.com/search/${encodeURIComponent(searchQuery)}`,
+        tidal: `https://listen.tidal.com/search?q=${encodeURIComponent(searchQuery)}`,
+        soundcloud: `https://soundcloud.com/search?q=${encodeURIComponent(searchQuery)}`,
+        yandex: `https://music.yandex.com/search?text=${encodeURIComponent(searchQuery)}`,
+        vk: `https://vk.com/audio?q=${encodeURIComponent(searchQuery)}`,
+      };
+
+      // Add links for platforms that don't exist yet
+      for (const [platform, url] of Object.entries(platformUrls)) {
+        const existing = links.find(l => l.platform === platform);
+        if (!existing) {
+          detectedLinks.push({ platform, url });
+        }
+      }
+
+      if (detectedLinks.length === 0) {
+        toast.info("All platforms already have links");
+        setScanningSource(false);
+        return;
+      }
+
+      // Add detected links
+      for (const linkData of detectedLinks) {
+        if (isEditing) {
+          try {
+            const response = await api.post(`/pages/${pageId}/links`, {
+              platform: linkData.platform,
+              url: linkData.url,
+              active: true
+            });
+            setLinks(prev => [...prev, response.data]);
+          } catch (error) {
+            console.error(`Failed to add ${linkData.platform} link`);
+          }
+        } else {
+          setLinks(prev => [...prev, {
+            id: Date.now().toString() + linkData.platform,
+            platform: linkData.platform,
+            url: linkData.url,
+            active: true,
+            clicks: 0
+          }]);
+        }
+      }
+
+      toast.success(`Added ${detectedLinks.length} platform links`);
+      setScanInput("");
+    } catch (error) {
+      toast.error("Failed to scan source");
+    } finally {
+      setScanningSource(false);
+    }
+  };
+
+  // Download QR code as PNG
+  const downloadQRCode = () => {
+    if (!qrRef.current) return;
+    
+    const svg = qrRef.current.querySelector("svg");
+    if (!svg) return;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const data = new XMLSerializer().serializeToString(svg);
+    const img = new Image();
+    
+    canvas.width = 512;
+    canvas.height = 512;
+    
+    img.onload = () => {
+      ctx.fillStyle = "#18181b";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      const link = document.createElement("a");
+      link.download = `${formData.slug || "qrcode"}-mytrack.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    };
+    
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(data)));
+  };
+
+  const getPublicUrl = () => {
+    return `${window.location.origin}/${formData.slug}`;
+  };
+
   const getPlatformInfo = (platformId) => {
     return PLATFORMS.find(p => p.id === platformId) || PLATFORMS[PLATFORMS.length - 1];
   };
