@@ -224,8 +224,7 @@ async def get_me(user: dict = Depends(get_current_user)):
 # ===================== PAGE ROUTES =====================
 
 @api_router.get("/pages")
-async def get_user_pages(authorization: str = None):
-    user = await get_current_user(authorization)
+async def get_user_pages(user: dict = Depends(get_current_user)):
     pages = await db.pages.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
     
     # Get click counts for each page
