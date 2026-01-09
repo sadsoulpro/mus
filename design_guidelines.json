@@ -1,0 +1,128 @@
+{
+  "identity": {
+    "name": "BandLink MVP",
+    "persona": "E1 - The Anti-AI Designer",
+    "tone": "Modern, Dark, High-Contrast, Music Industry Professional",
+    "theme_mode": "dark"
+  },
+  "typography": {
+    "primary_font": "Manrope",
+    "secondary_font": "Anton",
+    "mono_font": "JetBrains Mono",
+    "usage": {
+      "headings": "font-secondary tracking-tight uppercase",
+      "body": "font-primary text-zinc-400",
+      "ui_elements": "font-primary font-medium tracking-wide"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#09090b",
+      "foreground": "#fafafa",
+      "card": "#18181b",
+      "card_foreground": "#fafafa",
+      "popover": "#09090b",
+      "popover_foreground": "#fafafa",
+      "primary": "#d946ef",
+      "primary_foreground": "#ffffff",
+      "secondary": "#27272a",
+      "secondary_foreground": "#fafafa",
+      "muted": "#27272a",
+      "muted_foreground": "#a1a1aa",
+      "accent": "#27272a",
+      "accent_foreground": "#fafafa",
+      "destructive": "#ef4444",
+      "destructive_foreground": "#fafafa",
+      "border": "#27272a",
+      "input": "#27272a",
+      "ring": "#d946ef"
+    },
+    "gradients": {
+      "hero_glow": "bg-gradient-to-tr from-fuchsia-500/20 via-purple-500/10 to-transparent",
+      "card_hover": "hover:bg-zinc-800/50 transition-colors duration-300"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+    "neon_glow": "shadow-[0_0_20px_rgba(217,70,239,0.3)]",
+    "noise_texture": "opacity-20 mix-blend-overlay pointer-events-none fixed inset-0 z-50 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]",
+    "border_radius": "rounded-xl"
+  },
+  "layout_strategies": {
+    "smart_link_page": {
+      "structure": "mobile-first-centered",
+      "components": [
+        "Blurred Background Cover",
+        "Profile/Cover Image (Square or Circle)",
+        "Artist Name (Large, Anton)",
+        "Release Title (Medium, Manrope)",
+        "Link Stack (Vertical list of buttons)",
+        "Social Icons Row",
+        "Footer (Powered by BandLink)"
+      ]
+    },
+    "dashboard": {
+      "structure": "sidebar-layout",
+      "grid": "bento-grid",
+      "spacing": "generous (p-6 to p-10)"
+    },
+    "landing_page": {
+      "structure": "tetris-grid",
+      "hero": "Large typography + 3D/Abstract visual"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-full px-8 py-6 text-lg font-bold transition-all hover:scale-105",
+      "secondary": "bg-secondary text-white hover:bg-secondary/80 rounded-full px-6 py-4 font-medium border border-white/5",
+      "platform_link": "w-full flex items-center justify-between bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 hover:border-primary/50 text-white p-4 rounded-xl transition-all group"
+    },
+    "cards": {
+      "dashboard_stat": "bg-zinc-900/50 border border-white/5 p-6 rounded-2xl hover:border-white/10 transition-colors",
+      "music_card": "group relative overflow-hidden rounded-2xl aspect-square bg-zinc-800"
+    },
+    "inputs": {
+      "default": "bg-zinc-950 border-zinc-800 focus:border-primary focus:ring-primary/20 rounded-lg h-12"
+    }
+  },
+  "image_urls": {
+    "backgrounds": [
+      "https://images.unsplash.com/photo-1671432403854-cbe798eb44fb?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1569521597715-0e0c4e22e0e4?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1752572515417-8448a893b7ae?crop=entropy&cs=srgb&fm=jpg&q=85"
+    ],
+    "covers": [
+      "https://images.unsplash.com/photo-1581084349663-7ab88c58d362?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1655183860132-29701027de04?crop=entropy&cs=srgb&fm=jpg&q=85"
+    ],
+    "portraits": [
+      "https://images.unsplash.com/photo-1762160768012-5d014e74346a?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1762160766669-1e7bd4625ae1?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1547881337-8b0e85edd0eb?crop=entropy&cs=srgb&fm=jpg&q=85"
+    ],
+    "logos": {
+      "spotify": "https://images.unsplash.com/photo-1658489958427-325ded050829?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "apple_music": "https://images.unsplash.com/photo-1683105020625-5f7c8dd746bf?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "youtube": "https://images.unsplash.com/photo-1683201681321-1415b8794e73?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react' and 'react-icons' immediately.",
+    "2. THEME: Force dark mode in 'tailwind.config.js' and 'index.css'. Do not create a light mode toggle for MVP.",
+    "3. FONTS: Import 'Manrope' and 'Anton' from Google Fonts in 'index.css'.",
+    "4. LAYOUT: For the Public Smart Link Page (/artist/:slug), use a 'min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden' container.",
+    "5. BLUR: Use the artist's cover image as a full-screen background with 'blur-3xl opacity-30 scale-110' to create the atmosphere.",
+    "6. GLASS: The main content container should use the 'glassmorphism' utility defined above.",
+    "7. BUTTONS: Platform links must be highly tappable (min-height 60px) and use brand colors if possible (Spotify Green, YouTube Red) or the monochrome style defined in 'components.buttons.platform_link'.",
+    "8. DASHBOARD: Use a sidebar layout. The main content area should use a 'Bento Grid' for stats (Total Views, CTR, Top Platform).",
+    "9. PAGE BUILDER: Split screen. Left side: Form (Shadcn). Right side: Live Mobile Preview (Phone mockup frame).",
+    "10. IMAGES: Use the provided Unsplash URLs for placeholders. Do not leave empty image src."
+  ],
+  "universal_guidelines": [
+    "Avoid generic AI layouts. Use asymmetry where possible.",
+    "Dark mode is mandatory. No white backgrounds.",
+    "Use 'sonner' for toasts.",
+    "All interactive elements must have 'data-testid'.",
+    "Use 'framer-motion' for subtle entrance animations (fade-in-up) on the smart link page buttons."
+  ]
+}
