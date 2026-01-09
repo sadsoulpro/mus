@@ -75,7 +75,7 @@ export default function PageBuilder() {
       setLinks(response.data.links || []);
       setQrEnabled(response.data.qr_enabled !== false);
     } catch (error) {
-      toast.error("Failed to load page");
+      toast.error("Не удалось загрузить страницу");
       navigate("/dashboard");
     } finally {
       setLoading(false);
@@ -106,9 +106,9 @@ export default function PageBuilder() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       setFormData(prev => ({ ...prev, cover_image: response.data.cover_url }));
-      toast.success("Image uploaded");
+      toast.success("Изображение загружено");
     } catch (error) {
-      toast.error("Failed to upload image");
+      toast.error("Не удалось загрузить изображение");
     } finally {
       setUploading(false);
     }
@@ -123,7 +123,7 @@ export default function PageBuilder() {
       
       if (isEditing) {
         await api.put(`/pages/${pageId}`, pageData);
-        toast.success("Page updated");
+        toast.success("Страница обновлена");
       } else {
         const response = await api.post("/pages", pageData);
         // Add links if any
@@ -134,12 +134,12 @@ export default function PageBuilder() {
             active: link.active ?? true
           });
         }
-        toast.success("Page created");
+        toast.success("Страница создана");
         navigate(`/page/${response.data.id}/edit`);
         return;
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to save page");
+      toast.error(error.response?.data?.detail || "Не удалось сохранить страницу");
     } finally {
       setSaving(false);
     }
@@ -147,7 +147,7 @@ export default function PageBuilder() {
 
   const addLink = async () => {
     if (!newLink.url) {
-      toast.error("Please enter a URL");
+      toast.error("Пожалуйста, введите URL");
       return;
     }
     
@@ -160,9 +160,9 @@ export default function PageBuilder() {
         });
         setLinks(prev => [...prev, response.data]);
         setNewLink({ platform: "spotify", url: "" });
-        toast.success("Link added");
+        toast.success("Ссылка добавлена");
       } catch (error) {
-        toast.error("Failed to add link");
+        toast.error("Не удалось добавить ссылку");
       }
     } else {
       setLinks(prev => [...prev, { 
@@ -182,7 +182,7 @@ export default function PageBuilder() {
         await api.put(`/pages/${pageId}/links/${linkId}`, { active: !active });
         setLinks(prev => prev.map(l => l.id === linkId ? { ...l, active: !active } : l));
       } catch (error) {
-        toast.error("Failed to update link");
+        toast.error("Не удалось обновить ссылку");
       }
     } else {
       setLinks(prev => prev.map(l => l.id === linkId ? { ...l, active: !active } : l));
@@ -194,9 +194,9 @@ export default function PageBuilder() {
       try {
         await api.delete(`/pages/${pageId}/links/${linkId}`);
         setLinks(prev => prev.filter(l => l.id !== linkId));
-        toast.success("Link removed");
+        toast.success("Ссылка удалена");
       } catch (error) {
-        toast.error("Failed to remove link");
+        toast.error("Не удалось удалить ссылку");
       }
     } else {
       setLinks(prev => prev.filter(l => l.id !== linkId));
@@ -218,7 +218,7 @@ export default function PageBuilder() {
         const linkIds = newLinks.map(l => l.id);
         await api.put(`/pages/${pageId}/links/reorder`, { link_ids: linkIds });
       } catch (error) {
-        toast.error("Failed to save order");
+        toast.error("Не удалось сохранить порядок");
         // Revert on error
         setLinks(links);
       }
@@ -228,7 +228,7 @@ export default function PageBuilder() {
   // Scan source to auto-detect platform links
   const scanSource = async () => {
     if (!scanInput.trim()) {
-      toast.error("Please enter an Apple Music link, Spotify link, or UPC/ISRC code");
+      toast.error("Введите ссылку Apple Music, Spotify или код UPC/ISRC");
       return;
     }
 
@@ -241,7 +241,7 @@ export default function PageBuilder() {
       const isUpcIsrc = /^[A-Z0-9]{12,14}$/i.test(scanInput.trim());
 
       if (!isAppleMusicLink && !isSpotifyLink && !isUpcIsrc) {
-        toast.error("Please enter a valid Apple Music link, Spotify link, or UPC/ISRC code");
+        toast.error("Введите корректную ссылку Apple Music, Spotify или код UPC/ISRC");
         setScanningSource(false);
         return;
       }
@@ -330,7 +330,7 @@ export default function PageBuilder() {
       // Always update cover image from the scanned track
       if (coverArtUrl) {
         setFormData(prev => ({ ...prev, cover_image: coverArtUrl }));
-        toast.success("Cover art from track applied!");
+        toast.success("Обложка трека применена!");
       }
 
       // Generate platform links based on the source
@@ -375,7 +375,7 @@ export default function PageBuilder() {
       }
 
       if (detectedLinks.length === 0) {
-        toast.info("All platforms already have links");
+        toast.info("Все платформы уже имеют ссылки");
         setScanningSource(false);
         return;
       }
@@ -404,10 +404,10 @@ export default function PageBuilder() {
         }
       }
 
-      toast.success(`Added ${detectedLinks.length} platform links`);
+      toast.success(`Добавлено ${detectedLinks.length} ссылок`);
       setScanInput("");
     } catch (error) {
-      toast.error("Failed to scan source");
+      toast.error("Не удалось сканировать источник");
     } finally {
       setScanningSource(false);
     }
@@ -469,14 +469,14 @@ export default function PageBuilder() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="font-semibold">{isEditing ? "Edit Page" : "Create New Page"}</h1>
+            <h1 className="font-semibold">{isEditing ? "Редактирование страницы" : "Создание новой страницы"}</h1>
           </div>
           <div className="flex items-center gap-3">
             {isEditing && formData.slug && (
               <a href={`/${formData.slug}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="rounded-full" data-testid="view-public-page-btn">
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  View Public Page
+                  Открыть страницу
                 </Button>
               </a>
             )}
@@ -487,7 +487,7 @@ export default function PageBuilder() {
               data-testid="save-page-btn"
             >
               <Save className="w-4 h-4 mr-2" />
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Сохранение..." : "Сохранить"}
             </Button>
           </div>
         </div>
@@ -498,14 +498,14 @@ export default function PageBuilder() {
         <div className="space-y-8">
           {/* Basic Info */}
           <section>
-            <h2 className="text-lg font-semibold mb-4">Basic Info</h2>
+            <h2 className="text-lg font-semibold mb-4">Основная информация</h2>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Page Title</Label>
+                <Label htmlFor="title">Название страницы</Label>
                 <Input
                   id="title"
                   name="title"
-                  placeholder="My New Single"
+                  placeholder="Мой новый сингл"
                   value={formData.title}
                   onChange={handleChange}
                   required
@@ -515,13 +515,13 @@ export default function PageBuilder() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug</Label>
+                <Label htmlFor="slug">URL-адрес</Label>
                 <div className="flex items-center">
                   <span className="text-muted-foreground text-sm mr-2">/</span>
                   <Input
                     id="slug"
                     name="slug"
-                    placeholder="my-new-single"
+                    placeholder="moy-novyy-singl"
                     value={formData.slug}
                     onChange={handleChange}
                     required
@@ -533,11 +533,11 @@ export default function PageBuilder() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="artist_name">Artist Name</Label>
+                  <Label htmlFor="artist_name">Имя артиста</Label>
                   <Input
                     id="artist_name"
                     name="artist_name"
-                    placeholder="Your Name"
+                    placeholder="Ваше имя"
                     value={formData.artist_name}
                     onChange={handleChange}
                     required
@@ -546,11 +546,11 @@ export default function PageBuilder() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="release_title">Release Title</Label>
+                  <Label htmlFor="release_title">Название релиза</Label>
                   <Input
                     id="release_title"
                     name="release_title"
-                    placeholder="Song or Album Name"
+                    placeholder="Название песни или альбома"
                     value={formData.release_title}
                     onChange={handleChange}
                     required
@@ -561,11 +561,11 @@ export default function PageBuilder() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="description">Description (Optional)</Label>
+                <Label htmlFor="description">Описание (необязательно)</Label>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Tell fans about this release..."
+                  placeholder="Расскажите о релизе..."
                   value={formData.description}
                   onChange={handleChange}
                   data-testid="description-input"
@@ -577,7 +577,7 @@ export default function PageBuilder() {
           
           {/* Cover Image */}
           <section>
-            <h2 className="text-lg font-semibold mb-4">Cover Image</h2>
+            <h2 className="text-lg font-semibold mb-4">Обложка</h2>
             <div className="space-y-4">
               <div 
                 className="relative w-40 h-40 rounded-2xl bg-zinc-800 overflow-hidden border-2 border-dashed border-zinc-700 hover:border-primary/50 transition-colors cursor-pointer group"
@@ -592,7 +592,7 @@ export default function PageBuilder() {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">Upload</span>
+                    <span className="text-sm text-muted-foreground">Загрузить</span>
                   </div>
                 )}
                 {uploading && (
@@ -610,27 +610,27 @@ export default function PageBuilder() {
                 data-testid="cover-upload-input"
               />
               <p className="text-sm text-muted-foreground">
-                Recommended: 1000x1000px, JPG or PNG
+                Рекомендуется: 1000x1000px, JPG или PNG
               </p>
             </div>
           </section>
           
           {/* Links */}
           <section>
-            <h2 className="text-lg font-semibold mb-4">Platform Links</h2>
+            <h2 className="text-lg font-semibold mb-4">Ссылки на платформы</h2>
             
             {/* Scan Source */}
             <div className="mb-6 p-4 rounded-xl bg-zinc-900/50 border border-white/5">
               <div className="flex items-center gap-2 mb-3">
                 <Search className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Scan Source</span>
+                <span className="text-sm font-medium">Сканировать источник</span>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Enter a Spotify link, Apple Music link, or UPC/ISRC code to auto-populate platform links and cover art
+                Введите ссылку Spotify, Apple Music или код UPC/ISRC для автозаполнения ссылок и обложки
               </p>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Spotify or Apple Music link, UPC/ISRC..."
+                  placeholder="Ссылка Spotify, Apple Music или UPC/ISRC..."
                   value={scanInput}
                   onChange={(e) => setScanInput(e.target.value)}
                   data-testid="scan-source-input"
@@ -748,7 +748,7 @@ export default function PageBuilder() {
               
               {links.length === 0 && (
                 <p className="text-center text-muted-foreground py-8 border border-dashed border-zinc-800 rounded-xl">
-                  No links added yet. Add your first platform link above.
+                  Ссылок пока нет. Добавьте первую ссылку выше.
                 </p>
               )}
             </div>
@@ -759,11 +759,11 @@ export default function PageBuilder() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-semibold">QR Code</h2>
+                <h2 className="text-lg font-semibold">QR-код</h2>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {qrEnabled ? "Enabled" : "Disabled"}
+                  {qrEnabled ? "Включен" : "Отключен"}
                 </span>
                 <Switch
                   checked={qrEnabled}
@@ -796,7 +796,7 @@ export default function PageBuilder() {
                   </div>
                   <div className="flex-1 text-center sm:text-left">
                     <p className="text-sm text-muted-foreground mb-2">
-                      Scan to open your page
+                      Сканируйте для открытия страницы
                     </p>
                     <p className="text-xs text-zinc-500 mb-4 font-mono break-all">
                       {getPublicUrl()}
@@ -808,7 +808,7 @@ export default function PageBuilder() {
                       data-testid="download-qr-btn"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Download PNG
+                      Скачать PNG
                     </Button>
                   </div>
                 </div>
@@ -817,13 +817,13 @@ export default function PageBuilder() {
             
             {qrEnabled && !formData.slug && (
               <p className="text-center text-muted-foreground py-6 border border-dashed border-zinc-800 rounded-xl">
-                Enter a URL slug above to generate QR code
+                Введите URL-адрес выше для генерации QR-кода
               </p>
             )}
             
             {!qrEnabled && (
               <p className="text-center text-muted-foreground py-6 border border-dashed border-zinc-800 rounded-xl">
-                QR code is disabled
+                QR-код отключен
               </p>
             )}
           </section>
@@ -831,7 +831,7 @@ export default function PageBuilder() {
         
         {/* Live Preview */}
         <div className="hidden lg:block sticky top-24 h-fit">
-          <h2 className="text-lg font-semibold mb-4">Live Preview</h2>
+          <h2 className="text-lg font-semibold mb-4">Предпросмотр</h2>
           <div className="relative mx-auto w-[300px]">
             {/* Phone Frame */}
             <div className="rounded-[40px] border-4 border-zinc-800 bg-zinc-900 p-2 shadow-2xl">
@@ -867,10 +867,10 @@ export default function PageBuilder() {
                   </div>
                   
                   <h3 className="font-display text-lg uppercase">
-                    {formData.artist_name || "Artist Name"}
+                    {formData.artist_name || "Имя артиста"}
                   </h3>
                   <p className="text-sm text-zinc-400 mb-6">
-                    {formData.release_title || "Release Title"}
+                    {formData.release_title || "Название релиза"}
                   </p>
                   
                   {/* Links Preview */}
@@ -892,7 +892,7 @@ export default function PageBuilder() {
                     
                     {links.filter(l => l.active).length === 0 && (
                       <div className="py-3 px-4 rounded-xl border border-dashed border-white/10 text-xs text-muted-foreground">
-                        Links will appear here
+                        Здесь появятся ссылки
                       </div>
                     )}
                   </div>
