@@ -235,7 +235,7 @@ async def get_user_pages(user: dict = Depends(get_current_user)):
     # Get click counts for each page
     for page in pages:
         total_clicks = 0
-        links = await db.links.find({"page_id": page["id"]}, {"_id": 0}).to_list(100)
+        links = await db.links.find({"page_id": page["id"]}, {"_id": 0}).sort("order", 1).to_list(100)
         for link in links:
             total_clicks += link.get("clicks", 0)
         page["total_clicks"] = total_clicks
