@@ -223,19 +223,19 @@ export default function Dashboard() {
               </Link>
             </motion.div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {pages.map((page, i) => (
                 <motion.div
                   key={page.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-colors"
+                  className="p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-colors w-full overflow-hidden"
                   data-testid={`page-card-${page.id}`}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     {/* Cover Image */}
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-lg sm:rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0">
                       {page.cover_image ? (
                         <img 
                           src={page.cover_image.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${page.cover_image}` : page.cover_image} 
@@ -244,27 +244,27 @@ export default function Dashboard() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Music className="w-8 h-8 text-muted-foreground" />
+                          <Music className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
                         </div>
                       )}
                     </div>
                     
                     {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate">{page.title}</h3>
-                      <p className="text-sm text-muted-foreground truncate mb-2">
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h3 className="font-semibold text-sm sm:text-base truncate">{page.title}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate mb-1 sm:mb-2">
                         {page.artist_name} • {page.release_title}
                       </p>
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
                         <span className="flex items-center gap-1 text-muted-foreground">
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           {page.views || 0}
                         </span>
                         <span className="flex items-center gap-1 text-muted-foreground">
-                          <MousePointer className="w-4 h-4" />
+                          <MousePointer className="w-3 h-3 sm:w-4 sm:h-4" />
                           {page.total_clicks || 0}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs ${
                           page.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                         }`}>
                           {page.status}
@@ -272,32 +272,40 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
+                    {/* Actions - Responsive */}
+                    <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 flex-shrink-0">
                       <Button 
                         variant="ghost" 
                         size="icon"
+                        className="h-8 w-8 sm:h-9 sm:w-9"
                         onClick={() => copyLink(page.slug)}
                         data-testid={`copy-link-${page.id}`}
                       >
-                        <Copy className="w-4 h-4" />
+                        <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                       <a 
                         href={`/${page.slug}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
+                        className="hidden xs:block"
                       >
-                        <Button variant="ghost" size="icon" data-testid={`view-page-${page.id}`}>
-                          <ExternalLink className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" data-testid={`view-page-${page.id}`}>
+                          <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
                       </a>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" data-testid={`page-menu-${page.id}`}>
-                            <MoreVertical className="w-4 h-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" data-testid={`page-menu-${page.id}`}>
+                            <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+                          <DropdownMenuItem asChild className="xs:hidden">
+                            <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                              <ExternalLink className="w-4 h-4" />
+                              View Page
+                            </a>
+                          </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link to={`/page/${page.id}/edit`} className="flex items-center gap-2">
                               <Edit className="w-4 h-4" />
