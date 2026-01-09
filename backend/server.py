@@ -373,6 +373,23 @@ async def delete_link(page_id: str, link_id: str, user: dict = Depends(get_curre
     
     return {"message": "Link deleted"}
 
+@api_router.put("/pages/{page_id}/links/reorder")
+async def reorder_links(page_id: str, data: LinkReorder, user: dict = Depends(get_current_user)):
+    page = await db.pages.find_one({"id": page_id, "user_id": user["id"]})
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    # Update order for each link
+    for index, link_id in enumerate(data.link_ids):
+        await db.links.update_one(
+            {"id": link_id, "page_id": page_id},
+            {"$set": {"order": index}}
+        )
+    
+    # Return updated links in new order
+    links = await db.links.find({"page_id": page_id}, {"_id": 0}).sort("order", 1).to_list(100)
+    return links
+
 # ===================== PUBLIC ROUTES =====================
 
 @api_router.get("/artist/{slug}")
