@@ -49,6 +49,10 @@ export default function PageBuilder() {
   
   const [links, setLinks] = useState([]);
   const [newLink, setNewLink] = useState({ platform: "spotify", url: "" });
+  const [qrEnabled, setQrEnabled] = useState(true);
+  const [scanningSource, setScanningSource] = useState(false);
+  const [scanInput, setScanInput] = useState("");
+  const qrRef = useRef(null);
 
   useEffect(() => {
     if (isEditing) {
