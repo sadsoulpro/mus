@@ -296,8 +296,7 @@ async def update_page(page_id: str, data: PageUpdate, user: dict = Depends(get_c
     return updated
 
 @api_router.delete("/pages/{page_id}")
-async def delete_page(page_id: str, authorization: str = None):
-    user = await get_current_user(authorization)
+async def delete_page(page_id: str, user: dict = Depends(get_current_user)):
     result = await db.pages.delete_one({"id": page_id, "user_id": user["id"]})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Page not found")
