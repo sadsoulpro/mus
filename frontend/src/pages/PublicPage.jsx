@@ -5,6 +5,7 @@ import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk } f
 import { SiTidal } from "react-icons/si";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { QRCodeSVG } from "qrcode.react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
