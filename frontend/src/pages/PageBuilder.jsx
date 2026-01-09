@@ -119,11 +119,13 @@ export default function PageBuilder() {
     setSaving(true);
     
     try {
+      const pageData = { ...formData, qr_enabled: qrEnabled };
+      
       if (isEditing) {
-        await api.put(`/pages/${pageId}`, formData);
+        await api.put(`/pages/${pageId}`, pageData);
         toast.success("Page updated");
       } else {
-        const response = await api.post("/pages", formData);
+        const response = await api.post("/pages", pageData);
         // Add links if any
         for (const link of links) {
           await api.post(`/pages/${response.data.id}/links`, {
