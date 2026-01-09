@@ -164,3 +164,6 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - ✅ Toast messages
 - ✅ Form labels and placeholders
 - ✅ Buttons and navigation
+- ✅ Forgot Password page
+- ✅ Reset Password page
+- ✅ Password reset email template (Russian)
