@@ -12,7 +12,7 @@ import {
   GripVertical, ExternalLink, Save
 } from "lucide-react";
 import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink } from "react-icons/fa";
-import { SiTidal, SiDeezer } from "react-icons/si";
+import { SiTidal } from "react-icons/si";
 import { motion } from "framer-motion";
 
 const PLATFORMS = [
