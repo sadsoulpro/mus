@@ -265,7 +265,7 @@ async def create_page(data: PageCreate, authorization: str = None):
     }
     
     await db.pages.insert_one(page)
-    del page["_id"] if "_id" in page else None
+    page.pop("_id", None)
     return page
 
 @api_router.get("/pages/{page_id}")
@@ -343,7 +343,7 @@ async def create_link(page_id: str, data: LinkCreate, authorization: str = None)
     }
     
     await db.links.insert_one(link)
-    del link["_id"] if "_id" in link else None
+    link.pop("_id", None)
     return link
 
 @api_router.put("/pages/{page_id}/links/{link_id}")
