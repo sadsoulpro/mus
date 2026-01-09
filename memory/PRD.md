@@ -126,6 +126,7 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 - ✅ Public smart link pages
 - ✅ Click tracking
 - ✅ Admin panel
+- ✅ Password reset with email (Resend)
 
 ### P1 (Next Phase)
 - Custom themes/colors for pages
