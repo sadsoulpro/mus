@@ -7,6 +7,8 @@ import axios from "axios";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/Dashboard";
 import PageBuilder from "@/pages/PageBuilder";
 import PublicPage from "@/pages/PublicPage";
