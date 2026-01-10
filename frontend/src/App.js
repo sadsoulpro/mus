@@ -13,6 +13,7 @@ import Dashboard from "@/pages/Dashboard";
 import PageBuilder from "@/pages/PageBuilder";
 import PublicPage from "@/pages/PublicPage";
 import Analytics from "@/pages/Analytics";
+import GlobalAnalytics from "@/pages/GlobalAnalytics";
 import AdminPanel from "@/pages/AdminPanel";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
