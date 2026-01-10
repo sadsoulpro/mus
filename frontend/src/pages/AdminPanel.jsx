@@ -166,127 +166,54 @@ export default function AdminPanel() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
-      </div>
+      <Sidebar>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+        </div>
+      </Sidebar>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-zinc-900/50 border-r border-white/5 p-6 hidden lg:flex flex-col">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-            <Music className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-display text-xl">MYTRACK</span>
-        </div>
-        
-        <nav className="flex-1 space-y-2">
-          <Link 
-            to="/multilinks" 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="nav-multilinks"
-          >
-            <BarChart3 className="w-5 h-5" />
-            Мультиссылки
-          </Link>
-          
-          <Link 
-            to="/analytics" 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Eye className="w-5 h-5" />
-            Аналитика
-          </Link>
-          
-          <Link 
-            to="/admin" 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-foreground"
-            data-testid="nav-admin"
-          >
-            <Shield className="w-5 h-5" />
-            Админ-панель
-          </Link>
-          
-          <Link 
-            to="/settings" 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-            Настройки
-          </Link>
-          
-          <Link 
-            to="/verification" 
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <BadgeCheck className="w-5 h-5" />
-            Верификация
-          </Link>
-        </nav>
-        
-        <div className="pt-6 border-t border-white/5">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-muted-foreground hover:text-foreground"
-            onClick={() => { logout(); window.location.href = '/'; }}
-            data-testid="logout-btn"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Выйти
-          </Button>
-        </div>
-      </aside>
-      
-      {/* Main Content */}
-      <main className="lg:ml-64 p-6 lg:p-10">
-        {/* Mobile Header */}
-        <div className="flex items-center gap-4 mb-8 lg:hidden">
-          <Link to="/multilinks">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <h1 className="text-xl font-semibold">Админ-панель</h1>
-        </div>
-        
+    <Sidebar>
+      <div className="p-4 sm:p-6 lg:p-10">
         {/* Header */}
-        <div className="hidden lg:block mb-10">
-          <h1 className="text-2xl font-semibold mb-1">Админ-панель</h1>
-          <p className="text-muted-foreground">Управление пользователями, страницами и мониторинг системы</p>
+        <div className="mb-6 sm:mb-10">
+          <h1 className="text-xl sm:text-2xl font-semibold mb-1">Админ-панель</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Управление пользователями, страницами и мониторинг</p>
         </div>
         
         {/* Tabs */}
         <Tabs defaultValue="analytics" className="w-full">
-          <TabsList className="bg-zinc-900 border border-white/5 mb-6">
-            <TabsTrigger value="analytics" data-testid="tab-analytics">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Глобальная аналитика
-            </TabsTrigger>
-            <TabsTrigger value="system" data-testid="tab-system">
-              <Server className="w-4 h-4 mr-2" />
-              Мониторинг VPS
-            </TabsTrigger>
-            <TabsTrigger value="verification" data-testid="tab-verification">
-              <BadgeCheck className="w-4 h-4 mr-2" />
-              Верификация
-              {verificationRequests.filter(r => r.status === 'pending').length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-xs">
-                  {verificationRequests.filter(r => r.status === 'pending').length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="users" data-testid="tab-users">
-              <Users className="w-4 h-4 mr-2" />
-              Пользователи
-            </TabsTrigger>
-            <TabsTrigger value="pages" data-testid="tab-pages">
-              <FileText className="w-4 h-4 mr-2" />
-              Страницы
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-4 sm:mb-6">
+            <TabsList className="bg-zinc-900 border border-white/5 inline-flex min-w-max">
+              <TabsTrigger value="analytics" data-testid="tab-analytics" className="text-xs sm:text-sm">
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Глобальная </span>Аналитика
+              </TabsTrigger>
+              <TabsTrigger value="system" data-testid="tab-system" className="text-xs sm:text-sm">
+                <Server className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Мониторинг </span>VPS
+              </TabsTrigger>
+              <TabsTrigger value="verification" data-testid="tab-verification" className="text-xs sm:text-sm">
+                <BadgeCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Верификация
+                {verificationRequests.filter(r => r.status === 'pending').length > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-[10px] sm:text-xs">
+                    {verificationRequests.filter(r => r.status === 'pending').length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="users" data-testid="tab-users" className="text-xs sm:text-sm">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Пользователи
+              </TabsTrigger>
+              <TabsTrigger value="pages" data-testid="tab-pages" className="text-xs sm:text-sm">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Страницы
+              </TabsTrigger>
+            </TabsList>
+          </div>
           
           {/* Global Analytics Tab */}
           <TabsContent value="analytics">
