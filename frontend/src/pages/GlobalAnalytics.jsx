@@ -72,7 +72,7 @@ export default function GlobalAnalytics() {
             className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
           >
             <BarChart3 className="w-5 h-5" />
-            Панель
+            Мультиссылки
           </Link>
           
           <Link 

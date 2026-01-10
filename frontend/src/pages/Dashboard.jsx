@@ -81,7 +81,7 @@ export default function Dashboard() {
             data-testid="nav-dashboard"
           >
             <BarChart3 className="w-5 h-5" />
-            Панель
+            Мультиссылки
           </Link>
           
           <Link 

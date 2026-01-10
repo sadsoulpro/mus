@@ -137,7 +137,7 @@ export default function AdminPanel() {
             data-testid="nav-dashboard"
           >
             <BarChart3 className="w-5 h-5" />
-            Панель
+            Мультиссылки
           </Link>
           
           <Link 

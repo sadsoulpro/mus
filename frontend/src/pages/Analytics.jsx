@@ -182,7 +182,7 @@ export default function Analytics() {
             
             {(!analytics.links || analytics.links.length === 0) && (
               <p className="text-center text-muted-foreground py-8 border border-dashed border-zinc-800 rounded-xl">
-                No platform data yet. Add links to your page to start tracking.
+                Данные по платформе пока отсутствуют. Добавьте ссылки на свою страницу, чтобы начать отслеживание.
               </p>
             )}
           </div>
