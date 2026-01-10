@@ -80,16 +80,27 @@ export default function PublicPage() {
   };
 
   const goToPreviousPage = () => {
-    if (currentPageIndex > 0) {
-      const prevPage = userPages[currentPageIndex - 1];
-      navigate(`/${prevPage.slug}`);
-    }
+    if (userPages.length < 2) return;
+    // Бесконечная прокрутка - если на первой, перейти на последнюю
+    const prevIndex = currentPageIndex <= 0 ? userPages.length - 1 : currentPageIndex - 1;
+    const prevPage = userPages[prevIndex];
+    navigate(`/${prevPage.slug}`);
   };
 
   const goToNextPage = () => {
-    if (currentPageIndex < userPages.length - 1) {
-      const nextPage = userPages[currentPageIndex + 1];
-      navigate(`/${nextPage.slug}`);
+    if (userPages.length < 2) return;
+    // Бесконечная прокрутка - если на последней, перейти на первую
+    const nextIndex = currentPageIndex >= userPages.length - 1 ? 0 : currentPageIndex + 1;
+    const nextPage = userPages[nextIndex];
+    navigate(`/${nextPage.slug}`);
+  };
+
+  const goBack = () => {
+    // Вернуться на предыдущую страницу в истории или на главную
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
     }
   };
 
