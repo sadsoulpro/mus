@@ -134,6 +134,9 @@ function App() {
           <Route path="/verification" element={
             <ProtectedRoute><Verification /></ProtectedRoute>
           } />
+          <Route path="/faq" element={
+            <ProtectedRoute><FAQ /></ProtectedRoute>
+          } />
           <Route path="/page/new" element={
             <ProtectedRoute><PageBuilder /></ProtectedRoute>
           } />
