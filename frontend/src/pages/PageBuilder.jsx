@@ -569,14 +569,14 @@ export default function PageBuilder() {
             <div className="mb-6 p-4 rounded-xl bg-zinc-900/50 border border-white/5">
               <div className="flex items-center gap-2 mb-3">
                 <Search className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Сканировать источник</span>
+                <span className="text-sm font-medium">Автозаполнение через Odesli</span>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Введите ссылку Spotify, Apple Music или код UPC/ISRC для автозаполнения ссылок и обложки
+                Вставьте ссылку Spotify, Apple Music, YouTube, Deezer, Tidal или SoundCloud — ссылки на все платформы заполнятся автоматически
               </p>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Ссылка Spotify, Apple Music или UPC/ISRC..."
+                  placeholder="Вставьте ссылку из любой музыкальной платформы..."
                   value={scanInput}
                   onChange={(e) => setScanInput(e.target.value)}
                   data-testid="scan-source-input"
