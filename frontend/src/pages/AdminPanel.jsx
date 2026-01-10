@@ -183,7 +183,7 @@ export default function AdminPanel() {
       <main className="lg:ml-64 p-6 lg:p-10">
         {/* Mobile Header */}
         <div className="flex items-center gap-4 mb-8 lg:hidden">
-          <Link to="/dashboard">
+          <Link to="/multilinks">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-5 h-5" />
             </Button>
