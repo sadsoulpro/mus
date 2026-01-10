@@ -876,7 +876,7 @@ export default function AdminPanel() {
             </div>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </div>
+    </Sidebar>
   );
 }
