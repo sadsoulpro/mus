@@ -21,6 +21,10 @@ import FAQ from "@/pages/FAQ";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Storage keys
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
+
 // Auth Context
 const AuthContext = createContext(null);
 
@@ -30,14 +34,55 @@ export const api = axios.create({
   baseURL: API,
 });
 
-// Add auth header interceptor
+// Add auth header interceptor - automatically adds token to all requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// Add response interceptor - handle 401 errors (expired/invalid token)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid - clear storage
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Helper functions for localStorage
+const saveAuthData = (token, user) => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+const clearAuthData = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+};
+
+const getStoredUser = () => {
+  try {
+    const userStr = localStorage.getItem(USER_KEY);
+    return userStr ? JSON.parse(userStr) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredToken = () => {
+  return localStorage.getItem(TOKEN_KEY);
+};
 
 // Protected Route
 const ProtectedRoute = ({ children, adminOnly = false }) => {
