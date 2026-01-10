@@ -12,21 +12,55 @@ import {
   GripVertical, ExternalLink, Save, ChevronUp, ChevronDown,
   QrCode, Download, Search, Loader2
 } from "lucide-react";
-import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk } from "react-icons/fa";
-import { SiTidal } from "react-icons/si";
+import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
+import { SiTidal, SiDeezer } from "react-icons/si";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 
+// Custom SVG icons for platforms without react-icons support
+const ZvukIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+  </svg>
+);
+
+const MtsIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.08 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z"/>
+  </svg>
+);
+
+// Platform order for auto-fill sorting (lower index = higher priority)
+const PLATFORM_ORDER = [
+  "yandex",    // 1. Яндекс Музыка
+  "youtube",   // 2. YouTube
+  "apple",     // 3. Apple Music
+  "itunes",    // 4. iTunes
+  "spotify",   // 5. Spotify
+  "vk",        // 6. VK Music
+  "deezer",    // 7. Deezer
+  "zvuk",      // 8. Звук
+  "mts",       // 9. МТС Музыка
+  "amazon",    // 10. Amazon Music
+  "tidal",     // 11. Tidal
+  "soundcloud",// 12. SoundCloud
+  "custom",    // 13. Custom
+];
+
 const PLATFORMS = [
-  { id: "spotify", name: "Spotify", icon: FaSpotify, color: "#1DB954" },
-  { id: "apple", name: "Apple Music", icon: FaApple, color: "#FA233B" },
+  { id: "yandex", name: "Яндекс Музыка", icon: FaYandex, color: "#FFCC00" },
   { id: "youtube", name: "YouTube", icon: FaYoutube, color: "#FF0000" },
-  { id: "soundcloud", name: "SoundCloud", icon: FaSoundcloud, color: "#FF5500" },
+  { id: "apple", name: "Apple Music", icon: FaApple, color: "#FA233B" },
+  { id: "itunes", name: "iTunes", icon: FaItunes, color: "#EA4CC0" },
+  { id: "spotify", name: "Spotify", icon: FaSpotify, color: "#1DB954" },
+  { id: "vk", name: "VK Музыка", icon: FaVk, color: "#4C75A3" },
+  { id: "deezer", name: "Deezer", icon: SiDeezer, color: "#00C7F2" },
+  { id: "zvuk", name: "Звук", icon: ZvukIcon, color: "#6B4EFF" },
+  { id: "mts", name: "МТС Музыка", icon: MtsIcon, color: "#E30611" },
+  { id: "amazon", name: "Amazon Music", icon: FaAmazon, color: "#FF9900" },
   { id: "tidal", name: "Tidal", icon: SiTidal, color: "#000000" },
-  { id: "deezer", name: "Deezer", icon: FaLink, color: "#00C7F2" },
-  { id: "yandex", name: "Yandex Music", icon: FaYandex, color: "#FF0000" },
-  { id: "vk", name: "VK Music", icon: FaVk, color: "#4C75A3" },
-  { id: "custom", name: "Custom Link", icon: FaLink, color: "#888888" },
+  { id: "soundcloud", name: "SoundCloud", icon: FaSoundcloud, color: "#FF5500" },
+  { id: "custom", name: "Другая ссылка", icon: FaLink, color: "#888888" },
 ];
 
 export default function PageBuilder() {
