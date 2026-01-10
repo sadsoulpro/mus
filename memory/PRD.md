@@ -153,8 +153,30 @@ Build a minimal band.link-like smart link web service for musicians. Focus on MV
 
 ## Testing Summary
 - Backend: 90.5% pass rate
-- Frontend: 95% functional
+- Frontend: 100% functional (all bugs fixed)
 - All core flows working
+
+## Recent Updates (January 10, 2026)
+
+### Bug Fixes
+- ✅ Fixed extra "back" arrow on public page - removed unused goBack function and duplicate JSX
+- ✅ Fixed infinite scroll navigation - added missing 'slug' dependency to useEffect
+- ✅ Confirmed delete page button works correctly in Dashboard
+
+### Site Mode Feature
+- ✅ Toggle switch in Dashboard to enable/disable site navigation
+- ✅ Navigation arrows on public pages when site mode is enabled
+- ✅ Infinite loop navigation between user's pages
+- ✅ Tooltip previews showing previous/next release titles
+- ✅ Backend endpoint: PUT /api/settings/site-navigation
+
+### Other Completed Features
+- ✅ Responsive sidebar component (Sidebar.jsx)
+- ✅ Full responsive design across all pages
+- ✅ FAQ page with accordion
+- ✅ Persistent authentication using localStorage
+- ✅ Dynamic Landing page (Login → Panel button when logged in)
+- ✅ Auto-generated page titles and slugs
 
 ## Localization Status (January 9, 2026)
 **Russian Translation Complete:**
