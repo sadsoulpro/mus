@@ -643,7 +643,7 @@ export default function PageBuilder() {
           </section>
           
           {/* Links */}
-          <section>
+          <section className="overflow-hidden">
             <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Ссылки на платформы</h2>
             
             {/* Scan Source */}
