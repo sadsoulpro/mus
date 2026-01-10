@@ -119,7 +119,7 @@ export default function PageBuilder() {
       setQrEnabled(response.data.qr_enabled !== false);
     } catch (error) {
       toast.error("Не удалось загрузить страницу");
-      navigate("/dashboard");
+      navigate("/multilinks");
     } finally {
       setLoading(false);
     }
