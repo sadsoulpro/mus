@@ -522,33 +522,85 @@ export default function PageBuilder() {
       
       <div className="max-w-7xl mx-auto p-4 sm:p-6 grid lg:grid-cols-2 gap-6 lg:gap-10 overflow-hidden">
         {/* Form */}
-        <div className="space-y-8">
-          {/* Basic Info */}
+        <div className="space-y-6 sm:space-y-8">
+          
+          {/* 1. Автозаполнение через Odesli - ПЕРВЫМ */}
+          <section className="overflow-hidden">
+            <div className="p-3 sm:p-4 rounded-xl bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <Search className="w-4 h-4 text-primary" />
+                <span className="text-xs sm:text-sm font-medium">Автозаполнение через Odesli</span>
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mb-2 sm:mb-3">
+                Вставьте ссылку из Spotify, Apple Music, YouTube или другой платформы — данные заполнятся автоматически
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Вставьте ссылку..."
+                  value={scanInput}
+                  onChange={(e) => setScanInput(e.target.value)}
+                  data-testid="scan-source-input"
+                  className="h-9 sm:h-10 bg-zinc-800 border-zinc-700 flex-1 text-xs sm:text-sm"
+                />
+                <Button 
+                  onClick={scanSource}
+                  disabled={scanningSource}
+                  className="h-9 sm:h-10 bg-primary hover:bg-primary/90 px-3"
+                  data-testid="scan-source-btn"
+                >
+                  {scanningSource ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Search className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </section>
+          
+          {/* 2. Основная информация */}
           <section>
             <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Основная информация</h2>
             <div className="space-y-3 sm:space-y-4">
+              {/* Имя артиста */}
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm">Название страницы</Label>
+                <Label htmlFor="artist_name" className="text-sm">Имя артиста</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  placeholder="Мой новый сингл"
-                  value={formData.title}
+                  id="artist_name"
+                  name="artist_name"
+                  placeholder="Ваше имя или псевдоним"
+                  value={formData.artist_name}
                   onChange={handleChange}
                   required
-                  data-testid="page-title-input"
+                  data-testid="artist-name-input"
                   className="h-10 sm:h-12 bg-zinc-900 border-zinc-800"
                 />
               </div>
               
+              {/* Название релиза */}
               <div className="space-y-2">
-                <Label htmlFor="slug" className="text-sm">URL-адрес</Label>
+                <Label htmlFor="release_title" className="text-sm">Название релиза</Label>
+                <Input
+                  id="release_title"
+                  name="release_title"
+                  placeholder="Название песни или альбома"
+                  value={formData.release_title}
+                  onChange={handleChange}
+                  required
+                  data-testid="release-title-input"
+                  className="h-10 sm:h-12 bg-zinc-900 border-zinc-800"
+                />
+              </div>
+              
+              {/* URL-адрес */}
+              <div className="space-y-2">
+                <Label htmlFor="slug" className="text-sm">URL-адрес страницы</Label>
                 <div className="flex items-center">
                   <span className="text-muted-foreground text-sm mr-2">/</span>
                   <Input
                     id="slug"
                     name="slug"
-                    placeholder="moy-novyy-singl"
+                    placeholder="my-track"
                     value={formData.slug}
                     onChange={handleChange}
                     required
@@ -556,37 +608,12 @@ export default function PageBuilder() {
                     className="h-10 sm:h-12 bg-zinc-900 border-zinc-800"
                   />
                 </div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  Генерируется автоматически из названия
+                </p>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="artist_name" className="text-sm">Имя артиста</Label>
-                  <Input
-                    id="artist_name"
-                    name="artist_name"
-                    placeholder="Ваше имя"
-                    value={formData.artist_name}
-                    onChange={handleChange}
-                    required
-                    data-testid="artist-name-input"
-                    className="h-10 sm:h-12 bg-zinc-900 border-zinc-800"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="release_title" className="text-sm">Название релиза</Label>
-                  <Input
-                    id="release_title"
-                    name="release_title"
-                    placeholder="Название песни или альбома"
-                    value={formData.release_title}
-                    onChange={handleChange}
-                    required
-                    data-testid="release-title-input"
-                    className="h-10 sm:h-12 bg-zinc-900 border-zinc-800"
-                  />
-                </div>
-              </div>
-              
+              {/* Описание */}
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm">Описание (необязательно)</Label>
                 <Textarea
@@ -602,7 +629,7 @@ export default function PageBuilder() {
             </div>
           </section>
           
-          {/* Cover Image */}
+          {/* 3. Обложка */}
           <section>
             <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Обложка</h2>
             <div className="space-y-3 sm:space-y-4">
@@ -636,13 +663,13 @@ export default function PageBuilder() {
                 className="hidden"
                 data-testid="cover-upload-input"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Рекомендуется: 1000x1000px, JPG или PNG
               </p>
             </div>
           </section>
           
-          {/* Links */}
+          {/* 4. Ссылки на платформы */}
           <section className="overflow-hidden">
             <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Ссылки на платформы</h2>
             
