@@ -293,7 +293,9 @@ export default function PublicPage() {
                     </div>
                     <span className="font-medium">{platform.name}</span>
                   </div>
-                  <ExternalLink className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-colors" />
+                  <span className="text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    Слушать
+                  </span>
                 </motion.button>
               );
             })}
