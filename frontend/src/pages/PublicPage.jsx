@@ -234,7 +234,7 @@ export default function PublicPage() {
           <Music className="w-10 h-10 text-muted-foreground" />
         </div>
         <h1 className="text-2xl font-semibold mb-2">Page Not Found</h1>
-        <p className="text-muted-foreground">This smart link doesn't exist or has been disabled.</p>
+        <p className="text-muted-foreground">This smart link does not exist or has been disabled.</p>
       </div>
     );
   }
