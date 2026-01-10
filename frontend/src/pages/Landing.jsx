@@ -2,8 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Music, Link2, BarChart3, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/App";
 
 export default function Landing() {
+  const { user, isAuthenticated } = useAuth();
+  
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Gradient Background */}
@@ -19,14 +22,29 @@ export default function Landing() {
         </div>
         
         <div className="flex items-center gap-2 sm:gap-4">
-          <Link to="/login">
-            <Button variant="ghost" data-testid="nav-login-btn" className="px-3 sm:px-4">Войти</Button>
-          </Link>
-          <Link to="/register">
-            <Button data-testid="nav-signup-btn" className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-6 text-sm sm:text-base">
-              Начать
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link to={user?.role === 'admin' ? '/admin' : '/multilinks'}>
+                <Button variant="ghost" data-testid="nav-panel-btn" className="px-3 sm:px-4">Панель</Button>
+              </Link>
+              <Link to="/page/new">
+                <Button data-testid="nav-create-btn" className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-6 text-sm sm:text-base">
+                  Создать
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" data-testid="nav-login-btn" className="px-3 sm:px-4">Войти</Button>
+              </Link>
+              <Link to="/register">
+                <Button data-testid="nav-signup-btn" className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-6 text-sm sm:text-base">
+                  Начать
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
       
