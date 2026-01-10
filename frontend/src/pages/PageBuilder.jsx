@@ -636,7 +636,7 @@ export default function PageBuilder() {
               
               {/* URL-адрес */}
               <div className="space-y-2">
-                <Label htmlFor="slug" className="text-sm">URL-адрес страницы</Label>
+                <Label htmlFor="slug" className="text-sm">Вид ссылки</Label>
                 <div className="flex items-center">
                   <span className="text-muted-foreground text-sm mr-2">/</span>
                   <Input
