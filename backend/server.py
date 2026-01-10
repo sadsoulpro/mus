@@ -676,7 +676,7 @@ async def lookup_spotify(url: str):
         return {"artwork": "", "title": "", "provider": "spotify"}
 
 @api_router.get("/lookup/odesli")
-async def lookup_odesli(url: str, country: Optional[str] = "US"):
+async def lookup_odesli(url: str, country: Optional[str] = "RU"):
     """Proxy endpoint for Odesli (song.link) API to get links for all platforms"""
     try:
         async with httpx.AsyncClient() as client:
@@ -696,19 +696,24 @@ async def lookup_odesli(url: str, country: Optional[str] = "US"):
             platform_mapping = {
                 "spotify": "spotify",
                 "appleMusic": "apple",
+                "itunes": "itunes",
                 "youtube": "youtube",
                 "youtubeMusic": "youtube",
                 "soundcloud": "soundcloud",
                 "tidal": "tidal",
                 "deezer": "deezer",
                 "yandex": "yandex",
+                "amazonMusic": "amazon",
+                "amazonStore": "amazon",
             }
             
             result_links = {}
             for odesli_platform, link_info in links_by_platform.items():
                 our_platform = platform_mapping.get(odesli_platform)
                 if our_platform and link_info.get("url"):
-                    result_links[our_platform] = link_info["url"]
+                    # Don't overwrite if we already have this platform
+                    if our_platform not in result_links:
+                        result_links[our_platform] = link_info["url"]
             
             # Get entity info for metadata
             entity_unique_id = data.get("entityUniqueId", "")
