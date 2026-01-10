@@ -8,15 +8,16 @@ import { api, useAuth } from "@/App";
 import { toast } from "sonner";
 import { 
   Music, BadgeCheck, BarChart3, Eye, Shield, Settings, LogOut,
-  Clock, CheckCircle, XCircle, Send, Info
+  Clock, CheckCircle, XCircle, Send, Info, ToggleLeft, ToggleRight
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Verification() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [badgeLoading, setBadgeLoading] = useState(false);
   
   const [form, setForm] = useState({
     artist_name: "",
