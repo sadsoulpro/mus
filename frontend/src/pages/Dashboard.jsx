@@ -81,7 +81,7 @@ export default function Dashboard() {
             data-testid="nav-dashboard"
           >
             <BarChart3 className="w-5 h-5" />
-            Мультиссылки
+            Панель
           </Link>
           
           <Link 
@@ -99,10 +99,19 @@ export default function Dashboard() {
               className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
               data-testid="nav-admin"
             >
-              <Settings className="w-5 h-5" />
+              <Shield className="w-5 h-5" />
               Админ-панель
             </Link>
           )}
+          
+          <Link 
+            to="/settings" 
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
+            data-testid="nav-settings"
+          >
+            <Settings className="w-5 h-5" />
+            Настройки
+          </Link>
         </nav>
         
         <div className="pt-6 border-t border-white/5">
