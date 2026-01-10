@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Music, ExternalLink } from "lucide-react";
+import { Music, ExternalLink, Share2, Copy, Check } from "lucide-react";
 import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
 import { SiTidal } from "react-icons/si";
 import { motion } from "framer-motion";
