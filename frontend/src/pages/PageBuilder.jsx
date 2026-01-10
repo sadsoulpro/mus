@@ -719,11 +719,11 @@ export default function PageBuilder() {
                     key={link.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-zinc-900/50 border border-white/5"
+                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-zinc-900/50 border border-white/5 overflow-hidden"
                     data-testid={`link-item-${link.id}`}
                   >
                     {/* Move Up/Down Buttons */}
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -751,11 +751,11 @@ export default function PageBuilder() {
                     >
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-xs sm:text-sm">{platform.name}</p>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{link.url}</p>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p className="font-medium text-xs sm:text-sm truncate">{platform.name}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate max-w-full">{link.url}</p>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                       <Switch
                         checked={link.active}
                         onCheckedChange={() => toggleLink(link.id, link.active)}
