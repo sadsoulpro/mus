@@ -4,18 +4,17 @@ import { Button } from "@/components/ui/button";
 import { api, useAuth } from "@/App";
 import { toast } from "sonner";
 import { 
-  Music, Users, FileText, ArrowLeft, Shield, 
-  Ban, Check, Eye, ExternalLink, BarChart3, LogOut,
+  Users, FileText, Shield, Ban, Check, Eye, ExternalLink,
   Globe, MapPin, MousePointer, Share2, QrCode, Cpu, 
-  HardDrive, Activity, TrendingUp, Server, Settings,
+  HardDrive, Activity, TrendingUp, Server,
   BadgeCheck, X, Award
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
-  ResponsiveContainer, AreaChart, Area
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts";
+import Sidebar from "@/components/Sidebar";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
