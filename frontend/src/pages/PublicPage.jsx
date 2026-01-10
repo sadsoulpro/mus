@@ -65,7 +65,7 @@ export default function PublicPage() {
     if (page?.site_navigation_enabled && page?.user_id) {
       fetchUserPages();
     }
-  }, [page?.site_navigation_enabled, page?.user_id]);
+  }, [page?.site_navigation_enabled, page?.user_id, slug]);
 
   const fetchUserPages = async () => {
     try {
