@@ -23,7 +23,7 @@ export default function AdminPanel() {
   const [globalAnalytics, setGlobalAnalytics] = useState(null);
   const [systemMetrics, setSystemMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { logout } = useAuth();
+  useAuth();
 
   useEffect(() => {
     fetchData();
