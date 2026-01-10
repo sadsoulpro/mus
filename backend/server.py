@@ -675,6 +675,64 @@ async def lookup_spotify(url: str):
         logging.error(f"Spotify lookup error: {e}")
         return {"artwork": "", "title": "", "provider": "spotify"}
 
+@api_router.get("/lookup/odesli")
+async def lookup_odesli(url: str, country: Optional[str] = "US"):
+    """Proxy endpoint for Odesli (song.link) API to get links for all platforms"""
+    try:
+        async with httpx.AsyncClient() as client:
+            odesli_url = f"https://api.song.link/v1-alpha.1/links?url={url}&userCountry={country}"
+            response = await client.get(odesli_url, timeout=15.0)
+            
+            if response.status_code != 200:
+                logging.error(f"Odesli API error: {response.status_code}")
+                return {"error": "Failed to fetch from Odesli", "links": {}}
+            
+            data = response.json()
+            
+            # Extract platform links
+            links_by_platform = data.get("linksByPlatform", {})
+            
+            # Map Odesli platform names to our platform IDs
+            platform_mapping = {
+                "spotify": "spotify",
+                "appleMusic": "apple",
+                "youtube": "youtube",
+                "youtubeMusic": "youtube",
+                "soundcloud": "soundcloud",
+                "tidal": "tidal",
+                "deezer": "deezer",
+                "yandex": "yandex",
+            }
+            
+            result_links = {}
+            for odesli_platform, link_info in links_by_platform.items():
+                our_platform = platform_mapping.get(odesli_platform)
+                if our_platform and link_info.get("url"):
+                    result_links[our_platform] = link_info["url"]
+            
+            # Get entity info for metadata
+            entity_unique_id = data.get("entityUniqueId", "")
+            entities_by_unique_id = data.get("entitiesByUniqueId", {})
+            entity_info = entities_by_unique_id.get(entity_unique_id, {})
+            
+            # Get artwork URL (prefer high resolution)
+            artwork_url = ""
+            thumbnail_url = entity_info.get("thumbnailUrl", "")
+            if thumbnail_url:
+                # Try to get higher resolution image
+                artwork_url = thumbnail_url.replace("100x100", "600x600").replace("300x300", "600x600")
+            
+            return {
+                "links": result_links,
+                "pageUrl": data.get("pageUrl", ""),
+                "title": entity_info.get("title", ""),
+                "artistName": entity_info.get("artistName", ""),
+                "thumbnailUrl": artwork_url or thumbnail_url
+            }
+    except Exception as e:
+        logging.error(f"Odesli lookup error: {e}")
+        return {"error": str(e), "links": {}}
+
 # ===================== FILE UPLOAD =====================
 
 @api_router.post("/upload")
