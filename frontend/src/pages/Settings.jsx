@@ -7,13 +7,16 @@ import { api, useAuth } from "@/App";
 import { toast } from "sonner";
 import { 
   Music, Settings as SettingsIcon, User, Mail, Lock, Trash2, 
-  BarChart3, Eye, Shield, LogOut, AlertTriangle
+  BarChart3, Eye, Shield, LogOut, AlertTriangle, BadgeCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
+  
+  // Badge toggle state
+  const [badgeLoading, setBadgeLoading] = useState(false);
   
   // Profile form state
   const [profileForm, setProfileForm] = useState({
