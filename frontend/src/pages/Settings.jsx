@@ -15,9 +15,6 @@ export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
   
-  // Badge toggle state
-  const [badgeLoading, setBadgeLoading] = useState(false);
-  
   // Profile form state
   const [profileForm, setProfileForm] = useState({
     username: user?.username || "",
