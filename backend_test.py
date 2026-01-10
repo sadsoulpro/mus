@@ -399,6 +399,64 @@ class BandLinkAPITester:
         )
         return success
 
+    def test_odesli_integration(self):
+        """Test Odesli API integration with real Spotify URL"""
+        # Test with Shape of You by Ed Sheeran
+        spotify_url = "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT"
+        
+        success, response = self.run_test(
+            "Odesli API Integration",
+            "GET",
+            f"lookup/odesli?url={spotify_url}",
+            200
+        )
+        
+        if not success:
+            return False
+            
+        # Verify response structure
+        required_fields = ['links', 'title', 'artistName', 'thumbnailUrl']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing required field: {field}")
+                return False
+        
+        # Verify we have platform links
+        links = response.get('links', {})
+        if not links:
+            print("❌ No platform links returned")
+            return False
+            
+        # Check for expected platforms
+        expected_platforms = ['spotify', 'apple', 'youtube', 'soundcloud', 'tidal', 'deezer']
+        found_platforms = []
+        
+        for platform in expected_platforms:
+            if platform in links and links[platform]:
+                found_platforms.append(platform)
+                print(f"   ✅ Found {platform}: {links[platform]}")
+        
+        if not found_platforms:
+            print("❌ No valid platform links found")
+            return False
+            
+        # Verify metadata
+        title = response.get('title', '')
+        artist = response.get('artistName', '')
+        thumbnail = response.get('thumbnailUrl', '')
+        
+        print(f"   📝 Title: {title}")
+        print(f"   🎤 Artist: {artist}")
+        print(f"   🖼️ Thumbnail: {thumbnail}")
+        
+        # Basic validation - should have title and artist for this well-known track
+        if not title or not artist:
+            print("❌ Missing title or artist information")
+            return False
+            
+        print(f"   ✅ Found {len(found_platforms)} platform links")
+        return True
+
 def main():
     print("🚀 Starting BandLink API Tests...")
     print(f"Testing against: https://project-viewer-27.preview.emergentagent.com/api")
