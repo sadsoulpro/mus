@@ -127,13 +127,27 @@ export default function PageBuilder() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Auto-generate slug from title
-    if (name === "title" && !isEditing) {
-      const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-      setFormData(prev => ({ ...prev, slug }));
-    }
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      
+      // Auto-generate title and slug from artist_name and release_title
+      if ((name === "artist_name" || name === "release_title") && !isEditing) {
+        const artist = name === "artist_name" ? value : prev.artist_name;
+        const release = name === "release_title" ? value : prev.release_title;
+        
+        if (artist || release) {
+          const title = [artist, release].filter(Boolean).join(" - ");
+          const slug = title.toLowerCase()
+            .replace(/[^a-z0-9а-яё]+/gi, "-")
+            .replace(/(^-|-$)/g, "")
+            .substring(0, 50);
+          updated.title = title;
+          updated.slug = slug;
+        }
+      }
+      
+      return updated;
+    });
   };
 
   const handleUpload = async (e) => {
