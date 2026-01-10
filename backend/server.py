@@ -348,6 +348,92 @@ async def get_me(user: dict = Depends(get_current_user)):
         "created_at": user["created_at"]
     }
 
+# ===================== USER SETTINGS ROUTES =====================
+
+class UpdateProfileRequest(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.put("/settings/profile")
+async def update_profile(data: UpdateProfileRequest, user: dict = Depends(get_current_user)):
+    """Update user profile (username, email)"""
+    update_data = {}
+    
+    if data.username and data.username != user["username"]:
+        # Check if username is taken
+        existing = await db.users.find_one({"username": data.username, "id": {"$ne": user["id"]}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Это имя пользователя уже занято")
+        update_data["username"] = data.username
+    
+    if data.email and data.email != user["email"]:
+        # Check if email is taken
+        existing = await db.users.find_one({"email": data.email, "id": {"$ne": user["id"]}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Этот email уже используется")
+        update_data["email"] = data.email
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Нет данных для обновления")
+    
+    await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+    
+    # Return updated user
+    updated_user = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password_hash": 0})
+    return {"message": "Профиль обновлён", "user": updated_user}
+
+@api_router.put("/settings/password")
+async def change_password(data: ChangePasswordRequest, user: dict = Depends(get_current_user)):
+    """Change user password"""
+    # Verify current password
+    if not verify_password(data.current_password, user["password_hash"]):
+        raise HTTPException(status_code=400, detail="Неверный текущий пароль")
+    
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Новый пароль должен содержать минимум 6 символов")
+    
+    if data.current_password == data.new_password:
+        raise HTTPException(status_code=400, detail="Новый пароль должен отличаться от текущего")
+    
+    # Update password
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"password_hash": hash_password(data.new_password)}}
+    )
+    
+    return {"message": "Пароль успешно изменён"}
+
+@api_router.delete("/settings/account")
+async def delete_account(user: dict = Depends(get_current_user)):
+    """Delete user account (not allowed for admins)"""
+    if user["role"] == "admin":
+        raise HTTPException(status_code=403, detail="Администратор не может удалить свой аккаунт")
+    
+    user_id = user["id"]
+    
+    # Get all user pages
+    pages = await db.pages.find({"user_id": user_id}, {"id": 1}).to_list(1000)
+    page_ids = [p["id"] for p in pages]
+    
+    # Delete all related data
+    if page_ids:
+        await db.links.delete_many({"page_id": {"$in": page_ids}})
+        await db.clicks.delete_many({"page_id": {"$in": page_ids}})
+        await db.views.delete_many({"page_id": {"$in": page_ids}})
+        await db.shares.delete_many({"page_id": {"$in": page_ids}})
+    
+    # Delete pages
+    await db.pages.delete_many({"user_id": user_id})
+    
+    # Delete user
+    await db.users.delete_one({"id": user_id})
+    
+    return {"message": "Аккаунт и все связанные данные удалены"}
+
 # ===================== PAGE ROUTES =====================
 
 @api_router.get("/pages")
