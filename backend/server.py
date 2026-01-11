@@ -272,6 +272,69 @@ def decode_token(token: str) -> dict:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+# ===================== RBAC HELPERS =====================
+
+def has_role_permission(user_role: str, required_role: str) -> bool:
+    """Check if user role has permission based on hierarchy"""
+    user_level = ROLE_HIERARCHY.get(user_role, 0)
+    required_level = ROLE_HIERARCHY.get(required_role, 0)
+    return user_level >= required_level
+
+async def get_plan_config(plan_name: str) -> dict:
+    """Get plan configuration from database or default"""
+    config = await db.plan_configs.find_one({"plan_name": plan_name}, {"_id": 0})
+    if config:
+        return config
+    return DEFAULT_PLAN_CONFIGS.get(plan_name, DEFAULT_PLAN_CONFIGS["free"])
+
+async def check_access(user: dict, requirement: str, value: any = None) -> bool:
+    """
+    Check if user has access to a feature/action.
+    In LAUNCH_MODE, returns True for all active (non-banned) users.
+    
+    Requirements:
+    - max_pages: Check if user can create more pages
+    - custom_design: Check if user can use custom design
+    - analytics: Check if user has analytics access
+    - advanced_analytics: Check if user has advanced analytics
+    - remove_branding: Check if user can remove branding
+    - role_min: Check if user has minimum role level
+    """
+    # Check if user is banned
+    if user.get("is_banned", False):
+        return False
+    
+    # In launch mode, allow everything for active users
+    if LAUNCH_MODE:
+        return True
+    
+    # Get plan config
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    
+    if requirement == "max_pages":
+        max_limit = plan_config.get("max_pages_limit", 3)
+        if max_limit == -1:  # unlimited
+            return True
+        current_pages = value or 0
+        return current_pages < max_limit
+    
+    elif requirement == "custom_design":
+        return plan_config.get("can_use_custom_design", False)
+    
+    elif requirement == "analytics":
+        return plan_config.get("has_analytics", True)
+    
+    elif requirement == "advanced_analytics":
+        return plan_config.get("has_advanced_analytics", False)
+    
+    elif requirement == "remove_branding":
+        return plan_config.get("can_remove_branding", False)
+    
+    elif requirement == "role_min":
+        return has_role_permission(user.get("role", "user"), value)
+    
+    return True
+
 async def get_current_user(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -280,14 +343,29 @@ async def get_current_user(authorization: str = Header(None)):
     user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    if user["status"] == "blocked":
+    
+    # Check if user is banned (403 for any request)
+    if user.get("is_banned", False):
+        raise HTTPException(status_code=403, detail="Аккаунт заблокирован. Обратитесь в поддержку.")
+    
+    # Legacy status check
+    if user.get("status") == "blocked":
         raise HTTPException(status_code=403, detail="Account blocked")
+    
     return user
 
 async def get_admin_user(authorization: str = Header(None)):
+    """Require at least moderator role"""
     user = await get_current_user(authorization)
-    if user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
+    if not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Доступ запрещён. Требуется роль модератора или выше.")
+    return user
+
+async def get_owner_user(authorization: str = Header(None)):
+    """Require owner role"""
+    user = await get_current_user(authorization)
+    if user.get("role") != "owner":
+        raise HTTPException(status_code=403, detail="Доступ запрещён. Требуется роль владельца.")
     return user
 
 def generate_blurred_background(input_path: str, output_path: str):
