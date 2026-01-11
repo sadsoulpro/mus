@@ -182,17 +182,27 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "RBAC + Dynamic Plan Limits System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implemented Odesli integration. Please test the /api/lookup/odesli endpoint with a Spotify or Apple Music URL to verify it returns correct platform links."
-  - agent: "testing"
-    message: "✅ COMPLETED - Odesli API integration testing successful. The /api/lookup/odesli endpoint is working correctly and returns platform links for all major music platforms. All backend tests passed except for 2 cleanup tests that failed due to user account being blocked during admin testing (expected behavior). Ready for main agent to summarize and finish."
-  - agent: "main"
-    message: "Added IP geolocation for analytics. Please test track_click, track_page_view endpoints to verify they now return real country/city based on IP address instead of 'Unknown'. The geolocation uses ip-api.com free service. Test by: 1) Creating a page with links, 2) Clicking links via /api/click/{link_id}, 3) Checking analytics at /api/analytics/global/summary to see if by_country and by_city arrays have real locations."
-  - agent: "testing"
-    message: "✅ COMPLETED - IP Geolocation feature testing successful! All test scenarios completed: Created test user/page/link, tested clicks with multiple public IPs (US, Russian, Cloudflare, OpenDNS), verified real geolocation data appears in analytics (США/Ашберн, Россия/Москва, Гонконг/Гонконг, США/Сан-Хосе), confirmed localhost returns 'Неизвестно', tested all tracking endpoints. The ip-api.com integration works perfectly with Russian localization and proper caching. All backend functionality is working as expected. Ready for main agent to summarize and finish."
+    message: |
+      Implemented RBAC + Dynamic Plan Limits system. Please test:
+      
+      1. Auto-owner assignment: Register user with thedrumepic@gmail.com - should get role=owner, plan=ultimate
+      2. Ban functionality: PUT /api/admin/users/{id}/ban with {"is_banned": true} - user should get 403 on all requests
+      3. Role management (owner only): PUT /api/admin/users/{id}/role with {"role": "moderator"}
+      4. Plan management: PUT /api/admin/users/{id}/plan with {"plan": "pro"}
+      5. Verify user: PUT /api/admin/users/{id}/verify with {"is_verified": true}
+      6. Plan config update: PUT /api/admin/plan-configs/free with {"max_pages_limit": 10}
+      7. Access check: GET /api/check-access/max_pages?value=5
+      8. My limits: GET /api/my-limits
+      9. Admin users list: GET /api/admin/users/list
+      
+      Admin credentials: admin@example.com / admin123 (role=admin)
+      Test that moderator/user cannot change roles (403)
+      Test that banned user gets 403 on all endpoints
