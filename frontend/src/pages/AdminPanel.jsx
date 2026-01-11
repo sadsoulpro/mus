@@ -870,61 +870,64 @@ export default function AdminPanel() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 flex items-center justify-between"
+                  className="p-3 sm:p-4 rounded-xl bg-zinc-900/50 border border-white/5"
                   data-testid={`page-row-${page.id}`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-zinc-800 overflow-hidden">
-                      {page.cover_image ? (
-                        <img 
-                          src={page.cover_image.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${page.cover_image}` : page.cover_image}
-                          alt={page.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Music className="w-6 h-6 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{page.title}</p>
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${
-                          page.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {page.status}
-                        </span>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
+                        {page.cover_image ? (
+                          <img 
+                            src={page.cover_image.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${page.cover_image}` : page.cover_image}
+                            alt={page.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Music className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground" />
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        by {page.user?.username || "Unknown"} • /{page.slug}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm font-medium flex items-center gap-1">
-                        <Eye className="w-4 h-4" /> {page.views || 0}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{page.total_clicks || 0} кликов</p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-sm sm:text-base truncate max-w-[150px] sm:max-w-none">{page.title}</p>
+                          <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs flex-shrink-0 ${
+                            page.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {page.status}
+                          </span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                          by {page.user?.username || "Unknown"} • /{page.slug}
+                        </p>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </a>
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pl-[52px] sm:pl-0">
+                      <div className="text-left sm:text-right">
+                        <p className="text-xs sm:text-sm font-medium flex items-center gap-1">
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4" /> {page.views || 0}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{page.total_clicks || 0} кликов</p>
+                      </div>
                       
-                      <Button
-                        variant={page.status === "active" ? "destructive" : "default"}
-                        size="sm"
-                        onClick={() => togglePageStatus(page.id)}
-                        data-testid={`toggle-page-${page.id}`}
-                      >
-                        {page.status === "active" ? "Отключить" : "Включить"}
-                      </Button>
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                        <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
+                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </Button>
+                        </a>
+                        
+                        <Button
+                          variant={page.status === "active" ? "destructive" : "default"}
+                          size="sm"
+                          onClick={() => togglePageStatus(page.id)}
+                          data-testid={`toggle-page-${page.id}`}
+                          className="text-xs sm:text-sm"
+                        >
+                          {page.status === "active" ? "Отключить" : "Включить"}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
