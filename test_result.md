@@ -119,6 +119,17 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Odesli API integration working correctly. Tested with Spotify URL and successfully returned platform links for 6 platforms (spotify, apple, youtube, soundcloud, tidal, deezer, yandex). Response includes all required fields: links, title, artistName, thumbnailUrl. All platform links are direct links (not search URLs). API responds correctly with 200 status and proper JSON structure. Note: The test URL provided (4cOdK2wGLETKBW3PvgPWqT) returns 'Never Gonna Give You Up' by Rick Astley, not 'Shape of You' by Ed Sheeran as mentioned in review request, but this appears to be a URL mismatch issue, not an API problem."
+  - task: "IP Geolocation for Analytics"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added IP geolocation using ip-api.com (free, no API key needed). Functions get_geo_from_ip() and get_client_ip() now determine real country/city from visitor IP. Updated track_click, track_page_view, track_share, track_qr_scan endpoints. Results cached in memory to reduce API calls. Returns Russian localized names (e.g. 'Россия', 'Москва')."
 
 frontend:
   - task: "Odesli Auto-fill Feature in PageBuilder"
