@@ -2110,11 +2110,40 @@ async def startup_event():
             "password_hash": hash_password("admin123"),
             "role": "admin",
             "status": "active",
-            "plan": "free",
+            "plan": "ultimate",
+            "is_verified": True,
+            "is_banned": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(admin_user)
         logging.info("Default admin created: admin@example.com / admin123")
+    
+    # Check and create/update owner account
+    owner = await db.users.find_one({"email": OWNER_EMAIL})
+    if owner and owner.get("role") != "owner":
+        await db.users.update_one(
+            {"email": OWNER_EMAIL},
+            {"$set": {"role": "owner", "plan": "ultimate", "is_verified": True, "is_banned": False}}
+        )
+        logging.info(f"Owner role assigned to: {OWNER_EMAIL}")
+    
+    # Initialize default plan configs if not exist
+    for plan_name, config in DEFAULT_PLAN_CONFIGS.items():
+        existing = await db.plan_configs.find_one({"plan_name": plan_name})
+        if not existing:
+            await db.plan_configs.insert_one({
+                **config,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            logging.info(f"Created default plan config: {plan_name}")
+    
+    # Migrate existing users to have new RBAC fields
+    users_migration = await db.users.update_many(
+        {"is_banned": {"$exists": False}},
+        {"$set": {"is_banned": False, "is_verified": False}}
+    )
+    if users_migration.modified_count > 0:
+        logging.info(f"Migrated {users_migration.modified_count} users with RBAC fields")
     
     # Create indexes
     await db.users.create_index("email", unique=True)
@@ -2123,6 +2152,7 @@ async def startup_event():
     await db.pages.create_index("user_id")
     await db.links.create_index("page_id")
     await db.clicks.create_index("link_id")
+    await db.plan_configs.create_index("plan_name", unique=True)
     
     # Migrate old "Unknown" entries to "Неизвестно" for consistency
     migration_result = await db.clicks.update_many(
@@ -2147,6 +2177,8 @@ async def startup_event():
     )
     if shares_result.modified_count > 0:
         logging.info(f"Migrated {shares_result.modified_count} share records with Unknown values")
+    
+    logging.info(f"RBAC System initialized. Launch mode: {LAUNCH_MODE}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
