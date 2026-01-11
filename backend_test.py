@@ -1009,6 +1009,14 @@ def main():
         ("User Login", tester.test_auth_login_user),
         ("Get Current User", tester.test_auth_me),
         
+        # RBAC + Dynamic Plan Limits tests (HIGH PRIORITY)
+        ("Auto Owner Assignment", tester.test_auto_owner_assignment),
+        ("Plan Config APIs", tester.test_plan_config_apis),
+        ("User Management APIs", tester.test_user_management_apis),
+        ("Ban Functionality", tester.test_ban_functionality),
+        ("Role Permission Check", tester.test_role_permission_check),
+        ("Access Check API", tester.test_access_check_api),
+        
         # API Integration tests (high priority)
         ("Odesli API Integration", tester.test_odesli_integration),
         
