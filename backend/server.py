@@ -1027,7 +1027,7 @@ async def get_global_analytics(user: dict = Depends(get_current_user)):
     ])
     by_country = []
     async for doc in clicks_cursor:
-        by_country.append({"country": doc["_id"] or "Unknown", "clicks": doc["count"]})
+        by_country.append({"country": doc["_id"] or "Неизвестно", "clicks": doc["count"]})
     
     # Get clicks by city
     city_cursor = db.clicks.aggregate([
@@ -1038,7 +1038,7 @@ async def get_global_analytics(user: dict = Depends(get_current_user)):
     ])
     by_city = []
     async for doc in city_cursor:
-        by_city.append({"city": doc["_id"] or "Unknown", "clicks": doc["count"]})
+        by_city.append({"city": doc["_id"] or "Неизвестно", "clicks": doc["count"]})
     
     # Get timeline (last 30 days)
     thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
