@@ -699,6 +699,302 @@ class BandLinkAPITester:
         
         return success
 
+    # ===================== RBAC + DYNAMIC PLAN LIMITS TESTS =====================
+
+    def test_auto_owner_assignment(self):
+        """Test auto-owner assignment for thedrumepic@gmail.com"""
+        timestamp = int(time.time())
+        owner_data = {
+            "email": "thedrumepic@gmail.com",
+            "username": f"thedrumepic{timestamp}",
+            "password": "ownerpass123"
+        }
+        
+        success, response = self.run_test(
+            "Auto Owner Assignment",
+            "POST",
+            "auth/register",
+            200,
+            data=owner_data
+        )
+        
+        if not success:
+            return False
+            
+        # Verify owner role and ultimate plan
+        user = response.get('user', {})
+        if user.get('role') != 'owner':
+            print(f"❌ Expected role 'owner', got '{user.get('role')}'")
+            return False
+            
+        if user.get('plan') != 'ultimate':
+            print(f"❌ Expected plan 'ultimate', got '{user.get('plan')}'")
+            return False
+            
+        if not user.get('is_verified'):
+            print(f"❌ Expected is_verified=true, got {user.get('is_verified')}")
+            return False
+            
+        print(f"   ✅ Owner role: {user.get('role')}")
+        print(f"   ✅ Ultimate plan: {user.get('plan')}")
+        print(f"   ✅ Auto-verified: {user.get('is_verified')}")
+        return True
+
+    def test_plan_config_apis(self):
+        """Test Plan Config APIs"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        # Test GET all plan configs
+        success, response = self.run_test(
+            "Get All Plan Configs",
+            "GET",
+            "admin/plan-configs",
+            200,
+            use_admin=True
+        )
+        
+        if not success or not isinstance(response, list):
+            return False
+            
+        # Should have 3 plans (free, pro, ultimate)
+        plan_names = [config.get('plan_name') for config in response]
+        expected_plans = ['free', 'pro', 'ultimate']
+        
+        for plan in expected_plans:
+            if plan not in plan_names:
+                print(f"❌ Missing plan config: {plan}")
+                return False
+                
+        print(f"   ✅ Found plans: {plan_names}")
+        
+        # Test UPDATE plan config
+        update_data = {"max_pages_limit": 10}
+        success, response = self.run_test(
+            "Update Free Plan Config",
+            "PUT",
+            "admin/plan-configs/free",
+            200,
+            data=update_data,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        if response.get('max_pages_limit') != 10:
+            print(f"❌ Plan config not updated correctly")
+            return False
+            
+        print(f"   ✅ Updated free plan max_pages_limit to 10")
+        return True
+
+    def test_user_management_apis(self):
+        """Test User Management APIs"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        # Test GET users list
+        success, response = self.run_test(
+            "Get Users List",
+            "GET",
+            "admin/users/list",
+            200,
+            use_admin=True
+        )
+        
+        if not success or not isinstance(response, list):
+            return False
+            
+        # Should have page_count field
+        if response and 'page_count' not in response[0]:
+            print("❌ Missing page_count in user data")
+            return False
+            
+        print(f"   ✅ Found {len(response)} users with page_count")
+        
+        # Create test user for management tests
+        timestamp = int(time.time())
+        test_user_data = {
+            "email": f"testmanage{timestamp}@example.com",
+            "username": f"testmanage{timestamp}",
+            "password": "testpass123"
+        }
+        
+        success, reg_response = self.run_test(
+            "Create Test User for Management",
+            "POST",
+            "auth/register",
+            200,
+            data=test_user_data
+        )
+        
+        if not success:
+            return False
+            
+        test_user_id = reg_response['user']['id']
+        
+        # Test UPDATE user plan
+        success, response = self.run_test(
+            "Update User Plan",
+            "PUT",
+            f"admin/users/{test_user_id}/plan",
+            200,
+            data={"plan": "pro"},
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ Updated user plan to pro")
+        
+        # Test VERIFY user
+        success, response = self.run_test(
+            "Verify User",
+            "PUT",
+            f"admin/users/{test_user_id}/verify",
+            200,
+            data={"is_verified": True},
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ Verified user")
+        return True
+
+    def test_ban_functionality(self):
+        """Test Ban Functionality"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        # Create test user for banning
+        timestamp = int(time.time())
+        ban_user_data = {
+            "email": f"testban{timestamp}@example.com",
+            "username": f"testban{timestamp}",
+            "password": "testpass123"
+        }
+        
+        success, reg_response = self.run_test(
+            "Create Test User for Banning",
+            "POST",
+            "auth/register",
+            200,
+            data=ban_user_data
+        )
+        
+        if not success:
+            return False
+            
+        test_user_id = reg_response['user']['id']
+        test_user_token = reg_response['token']
+        
+        # Ban the user
+        success, response = self.run_test(
+            "Ban User",
+            "PUT",
+            f"admin/users/{test_user_id}/ban",
+            200,
+            data={"is_banned": True},
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ User banned successfully")
+        
+        # Try to login as banned user - should get 403
+        success, response = self.run_test(
+            "Login as Banned User",
+            "POST",
+            "auth/login",
+            403,  # Should be forbidden
+            data={"email": ban_user_data["email"], "password": ban_user_data["password"]}
+        )
+        
+        if not success:
+            print("❌ Banned user login should return 403")
+            return False
+            
+        print(f"   ✅ Banned user correctly blocked from login")
+        return True
+
+    def test_role_permission_check(self):
+        """Test Role Permission Check - Admin should NOT be able to change roles"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ No admin token or test user ID available")
+            return False
+            
+        # Admin should NOT be able to change roles (403 - only owner can)
+        success, response = self.run_test(
+            "Admin Try Change Role (Should Fail)",
+            "PUT",
+            f"admin/users/{self.test_user_id}/role",
+            403,  # Should be forbidden
+            data={"role": "moderator"},
+            use_admin=True
+        )
+        
+        if not success:
+            print("❌ Admin should get 403 when trying to change roles")
+            return False
+            
+        print(f"   ✅ Admin correctly blocked from changing roles (403)")
+        return True
+
+    def test_access_check_api(self):
+        """Test Access Check API"""
+        if not self.token:
+            print("❌ No user token available")
+            return False
+            
+        # Test GET my-limits
+        success, response = self.run_test(
+            "Get My Limits",
+            "GET",
+            "my-limits",
+            200
+        )
+        
+        if not success:
+            return False
+            
+        # Should have plan limits and usage
+        required_fields = ['plan', 'limits', 'usage']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing field in my-limits: {field}")
+                return False
+                
+        print(f"   ✅ Plan: {response.get('plan')}")
+        print(f"   ✅ Limits: {response.get('limits')}")
+        print(f"   ✅ Usage: {response.get('usage')}")
+        
+        # Test GET check-access (should return has_access=true in launch mode)
+        success, response = self.run_test(
+            "Check Access Max Pages",
+            "GET",
+            "check-access/max_pages?value=5",
+            200
+        )
+        
+        if not success:
+            return False
+            
+        if not response.get('has_access'):
+            print(f"❌ Expected has_access=true in launch mode, got {response.get('has_access')}")
+            return False
+            
+        print(f"   ✅ Access check returned has_access=true (launch mode)")
+        return True
+
 def main():
     print("🚀 Starting BandLink API Tests...")
     print(f"Testing against: https://git-analyzer-8.preview.emergentagent.com/api")
