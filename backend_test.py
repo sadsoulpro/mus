@@ -811,9 +811,13 @@ class BandLinkAPITester:
             return False
             
         # Should have page_count field
-        if response and 'page_count' not in response[0]:
-            print("❌ Missing page_count in user data")
-            return False
+        if response and len(response) > 0:
+            first_user = response[0]
+            if 'page_count' not in first_user:
+                print("❌ Missing page_count in user data")
+                return False
+        else:
+            print("⚠️ No users found in response")
             
         print(f"   ✅ Found {len(response)} users with page_count")
         
