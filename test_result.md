@@ -119,20 +119,26 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Odesli API integration working correctly. Tested with Spotify URL and successfully returned platform links for 6 platforms (spotify, apple, youtube, soundcloud, tidal, deezer, yandex). Response includes all required fields: links, title, artistName, thumbnailUrl. All platform links are direct links (not search URLs). API responds correctly with 200 status and proper JSON structure. Note: The test URL provided (4cOdK2wGLETKBW3PvgPWqT) returns 'Never Gonna Give You Up' by Rick Astley, not 'Shape of You' by Ed Sheeran as mentioned in review request, but this appears to be a URL mismatch issue, not an API problem."
-  - task: "IP Geolocation for Analytics"
+  - task: "RBAC + Dynamic Plan Limits System"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Added IP geolocation using ip-api.com (free, no API key needed). Functions get_geo_from_ip() and get_client_ip() now determine real country/city from visitor IP. Updated track_click, track_page_view, track_share, track_qr_scan endpoints. Results cached in memory to reduce API calls. Returns Russian localized names (e.g. 'Россия', 'Москва')."
-      - working: true
-        agent: "testing"
-        comment: "✅ PASSED - IP Geolocation feature working perfectly! Comprehensive testing completed: 1) Created test user, page, and link with valid Spotify URL. 2) Tested clicks with multiple public IPs (8.8.8.8, 77.88.8.8, 1.1.1.1, 208.67.222.222) - all correctly returned real country/city data in Russian localization (США/Ашберн, Россия/Москва, Гонконг/Гонконг, США/Сан-Хосе). 3) Localhost IP (127.0.0.1) correctly returns 'Неизвестно' as expected. 4) All tracking endpoints (/api/click/{link_id}, /api/track/view/{page_id}, /api/track/share/{page_id}) properly capture and store geolocation data. 5) Analytics endpoint /api/analytics/global/summary correctly displays by_country and by_city arrays with real location data. The ip-api.com integration is working flawlessly with proper caching and Russian localization. All test scenarios from review request completed successfully."
+        comment: |
+          Implemented full RBAC system with:
+          1. User model updated: role (owner/admin/moderator/user), plan (free/pro/ultimate), is_verified, is_banned
+          2. PlanConfig collection with dynamic limits per plan
+          3. Auto owner role for thedrumepic@gmail.com
+          4. Admin APIs: /api/admin/users/list, /api/admin/users/{id}/role, /api/admin/users/{id}/plan, /api/admin/users/{id}/ban, /api/admin/users/{id}/verify
+          5. Plan config APIs: /api/admin/plan-configs, PUT /api/admin/plan-configs/{plan}
+          6. check_access function (returns True in LAUNCH_MODE)
+          7. Banned users get 403 on all requests
+          8. Role hierarchy: owner > admin > moderator > user
 
 frontend:
   - task: "Odesli Auto-fill Feature in PageBuilder"
