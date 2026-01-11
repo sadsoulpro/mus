@@ -727,6 +727,14 @@ def main():
         ("Get Page Links", tester.test_get_links),
         ("Update Link", tester.test_update_link),
         
+        # IP Geolocation tests (high priority - new feature)
+        ("IP Geolocation - US IP", tester.test_ip_geolocation_us_ip),
+        ("IP Geolocation - Russian IP", tester.test_ip_geolocation_russia_ip),
+        ("IP Geolocation - Localhost", tester.test_ip_geolocation_localhost),
+        ("Track Page View with Geo", tester.test_track_page_view_geolocation),
+        ("Track Share with Geo", tester.test_track_share_geolocation),
+        ("Track QR Scan with Geo", tester.test_qr_scan_geolocation),
+        
         # Public access tests
         ("Public Page Access", tester.test_public_page),
         ("Analytics", tester.test_analytics),
