@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from "@/App";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, MousePointer, TrendingUp } from "lucide-react";
+import { ArrowLeft, Eye, MousePointer, TrendingUp, Globe, MapPin } from "lucide-react";
 import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
 import { SiTidal } from "react-icons/si";
 import { motion } from "framer-motion";
