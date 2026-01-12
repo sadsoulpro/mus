@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { api } from "@/App";
+import { api, useAuth } from "@/App";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, MousePointer, TrendingUp, Globe, MapPin } from "lucide-react";
+import { 
+  ArrowLeft, Eye, MousePointer, TrendingUp, Globe, MapPin, 
+  Lock, Crown, Calendar, Clock, BarChart3, Users, Zap
+} from "lucide-react";
 import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
 import { SiTidal } from "react-icons/si";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell
+} from "recharts";
 
 // Custom icons
 const ZvukIcon = (props) => (
@@ -45,14 +51,12 @@ const PLATFORMS = {
   custom: { name: "Другая ссылка", icon: FaLink, color: "#888888" },
 };
 
-// Маппинг стран к флагам
 const COUNTRY_FLAGS = {
   "Россия": "🇷🇺", "США": "🇺🇸", "Украина": "🇺🇦", "Беларусь": "🇧🇾",
   "Казахстан": "🇰🇿", "Германия": "🇩🇪", "ФРГ": "🇩🇪", "Великобритания": "🇬🇧",
   "Франция": "🇫🇷", "Италия": "🇮🇹", "Испания": "🇪🇸", "Польша": "🇵🇱",
   "Нидерланды": "🇳🇱", "Канада": "🇨🇦", "Австралия": "🇦🇺", "Китай": "🇨🇳",
   "Япония": "🇯🇵", "Индия": "🇮🇳", "Бразилия": "🇧🇷", "Турция": "🇹🇷",
-  "Швеция": "🇸🇪", "Норвегия": "🇳🇴", "Финляндия": "🇫🇮", "Израиль": "🇮🇱",
   "Гонконг": "🇭🇰", "Сингапур": "🇸🇬", "Латвия": "🇱🇻", "Литва": "🇱🇹",
   "Эстония": "🇪🇪", "Грузия": "🇬🇪", "Армения": "🇦🇲", "Азербайджан": "🇦🇿",
   "Узбекистан": "🇺🇿", "Молдова": "🇲🇩", "Сербия": "🇷🇸",
@@ -61,13 +65,22 @@ const COUNTRY_FLAGS = {
 
 const getCountryFlag = (country) => COUNTRY_FLAGS[country] || "🌍";
 
+const COLORS = ['#d946ef', '#8b5cf6', '#3b82f6', '#22c55e', '#eab308', '#ef4444', '#06b6d4', '#f97316'];
+
 export default function Analytics() {
   const { pageId } = useParams();
+  const { user } = useAuth();
   const [analytics, setAnalytics] = useState(null);
+  const [userLimits, setUserLimits] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Check if user has advanced analytics
+  const hasAdvancedAnalytics = userLimits?.limits?.has_advanced_analytics || 
+    user?.plan === 'pro' || user?.plan === 'ultimate';
 
   useEffect(() => {
     fetchAnalytics();
+    fetchUserLimits();
   }, [pageId]);
 
   const fetchAnalytics = async () => {
@@ -81,6 +94,15 @@ export default function Analytics() {
     }
   };
 
+  const fetchUserLimits = async () => {
+    try {
+      const response = await api.get("/my-limits");
+      setUserLimits(response.data);
+    } catch (error) {
+      console.error("Failed to fetch limits");
+    }
+  };
+
   const getPlatformInfo = (platformId) => {
     return PLATFORMS[platformId] || PLATFORMS.custom;
   };
@@ -89,10 +111,23 @@ export default function Analytics() {
     ? ((analytics.total_clicks / analytics.views) * 100).toFixed(1)
     : 0;
 
+  // Prepare chart data
+  const platformData = analytics?.links?.map(link => ({
+    name: getPlatformInfo(link.platform).name,
+    value: link.clicks || 0,
+    color: getPlatformInfo(link.platform).color
+  })).filter(d => d.value > 0) || [];
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+            <BarChart3 className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
       </div>
     );
   }
@@ -106,34 +141,49 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-          <Link to="/multilinks">
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <h1 className="font-semibold text-sm sm:text-base truncate">Статистика страницы</h1>
+      <header className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link to="/multilinks">
+              <Button variant="ghost" size="icon" className="flex-shrink-0 rounded-xl">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="font-semibold text-sm sm:text-base">Аналитика страницы</h1>
+              <p className="text-xs text-muted-foreground">
+                {hasAdvancedAnalytics ? "Расширенная" : "Базовая"} статистика
+              </p>
+            </div>
+          </div>
+          {!hasAdvancedAnalytics && (
+            <Link to="/settings">
+              <Button size="sm" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-xs">
+                <Crown className="w-3 h-3 mr-1" />
+                Улучшить
+              </Button>
+            </Link>
+          )}
         </div>
       </header>
       
-      <main className="max-w-4xl mx-auto p-4 sm:p-6">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-10">
+      <main className="max-w-5xl mx-auto p-4 sm:p-6">
+        {/* Stats Overview - Basic Analytics */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/20"
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground">Просмотры</span>
             </div>
-            <p className="text-2xl sm:text-4xl font-semibold" data-testid="page-views">
+            <p className="text-2xl sm:text-3xl font-bold" data-testid="page-views">
               {analytics.views.toLocaleString()}
             </p>
           </motion.div>
@@ -142,15 +192,15 @@ export default function Analytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20"
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <MousePointer className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <MousePointer className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground">Клики</span>
             </div>
-            <p className="text-2xl sm:text-4xl font-semibold" data-testid="total-clicks">
+            <p className="text-2xl sm:text-3xl font-bold" data-testid="page-clicks">
               {analytics.total_clicks.toLocaleString()}
             </p>
           </motion.div>
@@ -159,62 +209,63 @@ export default function Analytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20"
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground">CTR</span>
             </div>
-            <p className="text-2xl sm:text-4xl font-semibold" data-testid="click-rate">
+            <p className="text-2xl sm:text-3xl font-bold" data-testid="page-ctr">
               {ctr}%
             </p>
           </motion.div>
         </div>
-        
-        {/* Clicks by Platform */}
-        <section>
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Клики по платформам</h2>
-          <div className="space-y-2 sm:space-y-3">
-            {analytics.links?.map((link, i) => {
+
+        {/* Platform Clicks - Basic Analytics */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-6"
+        >
+          <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-yellow-400" />
+            Клики по платформам
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {analytics.links?.filter(l => l.clicks > 0).map((link, idx) => {
               const platform = getPlatformInfo(link.platform);
               const Icon = platform.icon;
-              const percentage = analytics.total_clicks > 0 
-                ? ((link.clicks / analytics.total_clicks) * 100).toFixed(1)
-                : 0;
+              const maxClicks = Math.max(...analytics.links.map(l => l.clicks || 0));
+              const percentage = maxClicks > 0 ? ((link.clicks / maxClicks) * 100) : 0;
               
               return (
                 <motion.div
                   key={link.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="p-3 sm:p-4 rounded-xl bg-zinc-900/50 border border-white/5"
-                  data-testid={`platform-stat-${link.platform}`}
+                  transition={{ delay: 0.4 + idx * 0.05 }}
+                  className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all"
                 >
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div 
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: platform.color }}
-                      >
-                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                      </div>
-                      <span className="font-medium text-sm sm:text-base">{platform.name}</span>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${platform.color}20` }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: platform.color }} />
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-sm sm:text-base">{link.clicks.toLocaleString()}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{percentage}%</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{platform.name}</p>
+                      <p className="text-xs text-muted-foreground">{link.clicks} кликов</p>
                     </div>
                   </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="h-1.5 sm:h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 0.5, delay: 0.3 + i * 0.05 }}
+                      transition={{ duration: 0.6, delay: 0.5 + idx * 0.05 }}
                       className="h-full rounded-full"
                       style={{ backgroundColor: platform.color }}
                     />
@@ -223,113 +274,203 @@ export default function Analytics() {
               );
             })}
             
-            {(!analytics.links || analytics.links.length === 0) && (
-              <p className="text-center text-muted-foreground text-sm py-6 sm:py-8 border border-dashed border-zinc-800 rounded-xl">
-                Данные по платформам пока отсутствуют. Добавьте ссылки на свою страницу.
-              </p>
+            {(!analytics.links || analytics.links.filter(l => l.clicks > 0).length === 0) && (
+              <div className="col-span-full text-center py-10 text-muted-foreground border border-dashed border-zinc-800 rounded-xl">
+                <MousePointer className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                <p>Пока нет кликов</p>
+              </div>
             )}
           </div>
-        </section>
+        </motion.section>
         
-        {/* Geography Section */}
-        <section className="mt-6 sm:mt-10">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">География кликов</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Countries */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-5 h-5 text-muted-foreground" />
-                <h3 className="font-semibold">По странам</h3>
-              </div>
-              {analytics.by_country?.length > 0 ? (
-                <div className="space-y-3">
-                  {analytics.by_country.slice(0, 5).map((item, i) => {
-                    const maxClicks = analytics.by_country[0]?.clicks || 1;
-                    const percentage = ((item.clicks / maxClicks) * 100).toFixed(0);
-                    return (
-                      <div key={i} className="flex items-center gap-3">
-                        <span className="text-lg w-6">{getCountryFlag(item.country)}</span>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="font-medium">{item.country}</span>
-                            <span className="text-muted-foreground">{item.clicks}</span>
-                          </div>
-                          <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${percentage}%` }}
-                              transition={{ duration: 0.5, delay: 0.4 + i * 0.05 }}
-                              className="h-full bg-primary rounded-full"
-                            />
-                          </div>
+        {/* Advanced Analytics Section */}
+        <AnimatePresence>
+          {hasAdvancedAnalytics ? (
+            <>
+              {/* Geography - Advanced */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="mb-6"
+              >
+                <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-400" />
+                  География кликов
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 font-normal ml-2">
+                    PRO
+                  </span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Countries */}
+                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                    <h3 className="font-medium mb-4 flex items-center gap-2 text-sm">
+                      <Globe className="w-4 h-4 text-muted-foreground" />
+                      По странам
+                    </h3>
+                    {analytics.by_country?.length > 0 ? (
+                      <div className="space-y-3">
+                        {analytics.by_country.slice(0, 5).map((item, i) => {
+                          const maxClicks = analytics.by_country[0]?.clicks || 1;
+                          const percentage = ((item.clicks / maxClicks) * 100);
+                          return (
+                            <div key={i} className="flex items-center gap-3">
+                              <span className="text-lg w-7">{getCountryFlag(item.country)}</span>
+                              <div className="flex-1">
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="font-medium">{item.country}</span>
+                                  <span className="text-muted-foreground">{item.clicks}</span>
+                                </div>
+                                <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${percentage}%` }}
+                                    transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
+                                    className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="h-[150px] flex items-center justify-center text-muted-foreground text-sm">
+                        <div className="text-center">
+                          <Globe className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                          <p>Нет данных</p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="h-[120px] flex items-center justify-center text-muted-foreground text-sm">
-                  <div className="text-center">
-                    <Globe className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет данных</p>
+                    )}
+                  </div>
+                  
+                  {/* Cities */}
+                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                    <h3 className="font-medium mb-4 flex items-center gap-2 text-sm">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      По городам
+                    </h3>
+                    {analytics.by_city?.length > 0 ? (
+                      <div className="space-y-3">
+                        {analytics.by_city.slice(0, 5).map((item, i) => {
+                          const maxClicks = analytics.by_city[0]?.clicks || 1;
+                          const percentage = ((item.clicks / maxClicks) * 100);
+                          return (
+                            <div key={i} className="flex items-center gap-3">
+                              <div className="w-7 h-7 rounded bg-zinc-800 flex items-center justify-center text-xs font-medium">{i + 1}</div>
+                              <div className="flex-1">
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="font-medium">{item.city}</span>
+                                  <span className="text-muted-foreground">{item.clicks}</span>
+                                </div>
+                                <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${percentage}%` }}
+                                    transition={{ duration: 0.5, delay: 0.6 + i * 0.05 }}
+                                    className="h-full bg-blue-500 rounded-full"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="h-[150px] flex items-center justify-center text-muted-foreground text-sm">
+                        <div className="text-center">
+                          <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                          <p>Нет данных</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
+              </motion.section>
+
+              {/* Platform Distribution Chart - Advanced */}
+              {platformData.length > 0 && (
+                <motion.section
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mb-6"
+                >
+                  <h2 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-purple-400" />
+                    Распределение по платформам
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 font-normal ml-2">
+                      PRO
+                    </span>
+                  </h2>
+                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie
+                          data={platformData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={4}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                        >
+                          {platformData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }}
+                          formatter={(value) => [`${value} кликов`, 'Клики']}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </motion.section>
               )}
-            </motion.div>
-            
-            {/* Cities */}
-            <motion.div
+            </>
+          ) : (
+            /* Locked Section for Free Users */
+            <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+              className="mb-6"
             >
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-muted-foreground" />
-                <h3 className="font-semibold">По городам</h3>
-              </div>
-              {analytics.by_city?.length > 0 ? (
-                <div className="space-y-3">
-                  {analytics.by_city.slice(0, 5).map((item, i) => {
-                    const maxClicks = analytics.by_city[0]?.clicks || 1;
-                    const percentage = ((item.clicks / maxClicks) * 100).toFixed(0);
-                    return (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded bg-zinc-800 flex items-center justify-center text-xs font-medium">{i + 1}</div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="font-medium">{item.city}</span>
-                            <span className="text-muted-foreground">{item.clicks}</span>
-                          </div>
-                          <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${percentage}%` }}
-                              transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
-                              className="h-full bg-blue-500 rounded-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="h-[120px] flex items-center justify-center text-muted-foreground text-sm">
-                  <div className="text-center">
-                    <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет данных</p>
+              <div className="relative p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 border border-white/5 overflow-hidden">
+                {/* Blur overlay */}
+                <div className="absolute inset-0 backdrop-blur-sm bg-zinc-950/60 flex items-center justify-center z-10">
+                  <div className="text-center p-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
+                      <Lock className="w-7 h-7 text-purple-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Расширенная аналитика</h3>
+                    <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+                      География кликов, детальные графики и экспорт данных доступны в тарифах Pro и Ultimate
+                    </p>
+                    <Link to="/settings">
+                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                        <Crown className="w-4 h-4 mr-2" />
+                        Перейти на Pro
+                      </Button>
+                    </Link>
                   </div>
                 </div>
-              )}
-            </motion.div>
-          </div>
-        </section>
+                
+                {/* Blurred preview content */}
+                <div className="opacity-30 pointer-events-none">
+                  <h2 className="text-lg font-semibold mb-4">География кликов</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-40 rounded-xl bg-zinc-800/50"></div>
+                    <div className="h-40 rounded-xl bg-zinc-800/50"></div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
