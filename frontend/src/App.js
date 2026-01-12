@@ -220,6 +220,29 @@ function App() {
   // Check if user is authenticated
   const isAuthenticated = !!user && !!getStoredToken();
 
+  // If on subdomain, show SubdomainPage only
+  if (subdomain) {
+    return (
+      <AuthContext.Provider value={{ 
+        user, 
+        login, 
+        register, 
+        logout, 
+        loading, 
+        refreshUser,
+        isAuthenticated 
+      }}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<SubdomainPage />} />
+            <Route path="/:slug" element={<SubdomainPage />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" richColors />
+      </AuthContext.Provider>
+    );
+  }
+
   return (
     <AuthContext.Provider value={{ 
       user, 
