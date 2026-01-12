@@ -29,14 +29,11 @@ const adminItems = [
 // Reusable navigation content
 function NavContent({ currentPath, user, onLogout, onNavigate }) {
   const isAdminRole = user?.role === "admin" || user?.role === "owner" || user?.role === "moderator";
-  const allItems = isAdminRole 
-    ? [...navItems.slice(0, 2), ...adminItems, ...navItems.slice(2)]
-    : navItems;
 
   return (
     <>
       <nav className="flex-1 space-y-2">
-        {allItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPath === item.path || 
             (item.path === "/multilinks" && currentPath === "/multilinks") ||
@@ -62,6 +59,22 @@ function NavContent({ currentPath, user, onLogout, onNavigate }) {
       </nav>
       
       <div className="pt-6 border-t border-white/5">
+        {/* Admin Panel link - at bottom before user info */}
+        {isAdminRole && (
+          <Link
+            to="/admin"
+            onClick={onNavigate}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors mb-4 ${
+              currentPath === "/admin"
+                ? "bg-white/5 text-foreground"
+                : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
+            }`}
+            data-testid="nav-admin"
+          >
+            <Shield className="w-5 h-5" />
+            Админ-панель
+          </Link>
+        )}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
             <span className="text-primary font-semibold">
