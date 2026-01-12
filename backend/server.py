@@ -1948,6 +1948,248 @@ async def api_check_access(requirement: str, value: Optional[int] = None, user: 
         "plan_config": plan_config
     }
 
+# ===================== SUBDOMAIN MANAGEMENT API =====================
+
+# Reserved subdomains that cannot be used
+RESERVED_SUBDOMAINS = {"www", "api", "admin", "app", "mail", "ftp", "smtp", "pop", "imap", "cdn", "static", "assets", "beta", "dev", "test", "staging", "preview"}
+
+@api_router.get("/subdomains")
+async def get_user_subdomains(user: dict = Depends(get_current_user)):
+    """Get all subdomains for current user"""
+    subdomains = await db.subdomains.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    
+    # Get plan limits
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    max_limit = plan_config.get("max_subdomains_limit", 1)
+    
+    return {
+        "subdomains": subdomains,
+        "count": len(subdomains),
+        "max_limit": max_limit,
+        "can_add": max_limit == -1 or len(subdomains) < max_limit
+    }
+
+@api_router.get("/subdomains/check/{subdomain}")
+async def check_subdomain_availability(subdomain: str, user: dict = Depends(get_current_user)):
+    """Check if subdomain is available"""
+    subdomain = subdomain.lower().strip()
+    
+    # Check reserved
+    if subdomain in RESERVED_SUBDOMAINS:
+        return {"available": False, "reason": "Зарезервировано системой"}
+    
+    # Check format
+    if len(subdomain) < 3:
+        return {"available": False, "reason": "Минимум 3 символа"}
+    if len(subdomain) > 32:
+        return {"available": False, "reason": "Максимум 32 символа"}
+    if not subdomain.replace("-", "").isalnum():
+        return {"available": False, "reason": "Только буквы, цифры и дефисы"}
+    if subdomain.startswith("-") or subdomain.endswith("-"):
+        return {"available": False, "reason": "Не может начинаться/заканчиваться дефисом"}
+    
+    # Check if exists
+    existing = await db.subdomains.find_one({"subdomain": subdomain})
+    if existing:
+        return {"available": False, "reason": "Уже занят"}
+    
+    return {"available": True, "reason": None}
+
+@api_router.post("/subdomains")
+async def create_subdomain(data: SubdomainCreate, user: dict = Depends(get_current_user)):
+    """Create a new subdomain"""
+    subdomain = data.subdomain.lower().strip()
+    
+    # Check reserved
+    if subdomain in RESERVED_SUBDOMAINS:
+        raise HTTPException(status_code=400, detail="Этот поддомен зарезервирован системой")
+    
+    # Check if exists
+    existing = await db.subdomains.find_one({"subdomain": subdomain})
+    if existing:
+        raise HTTPException(status_code=400, detail="Этот поддомен уже занят")
+    
+    # Check plan limits
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    max_limit = plan_config.get("max_subdomains_limit", 1)
+    current_count = await db.subdomains.count_documents({"user_id": user["id"]})
+    
+    if max_limit != -1 and current_count >= max_limit:
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Лимит поддоменов исчерпан ({max_limit}). Обновите тариф для добавления новых."
+        )
+    
+    # Create subdomain
+    subdomain_doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "subdomain": subdomain,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.subdomains.insert_one(subdomain_doc)
+    
+    logging.info(f"Subdomain created: {subdomain} by {user['email']}")
+    
+    return {k: v for k, v in subdomain_doc.items() if k != "_id"}
+
+@api_router.put("/subdomains/{subdomain_id}")
+async def update_subdomain(subdomain_id: str, data: SubdomainUpdate, user: dict = Depends(get_current_user)):
+    """Update subdomain (toggle active status)"""
+    subdomain = await db.subdomains.find_one({"id": subdomain_id, "user_id": user["id"]})
+    if not subdomain:
+        raise HTTPException(status_code=404, detail="Поддомен не найден")
+    
+    await db.subdomains.update_one(
+        {"id": subdomain_id},
+        {"$set": {"is_active": data.is_active, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True, "is_active": data.is_active}
+
+@api_router.delete("/subdomains/{subdomain_id}")
+async def delete_subdomain(subdomain_id: str, user: dict = Depends(get_current_user)):
+    """Delete a subdomain"""
+    subdomain = await db.subdomains.find_one({"id": subdomain_id, "user_id": user["id"]})
+    if not subdomain:
+        raise HTTPException(status_code=404, detail="Поддомен не найден")
+    
+    await db.subdomains.delete_one({"id": subdomain_id})
+    
+    logging.info(f"Subdomain deleted: {subdomain['subdomain']} by {user['email']}")
+    
+    return {"success": True}
+
+# --- Admin Subdomain Management ---
+
+@api_router.get("/admin/subdomains")
+async def admin_list_subdomains(
+    skip: int = 0,
+    limit: int = 50,
+    search: Optional[str] = None,
+    user: dict = Depends(get_admin_user)
+):
+    """List all subdomains in system - Admin only"""
+    query = {}
+    if search:
+        query["subdomain"] = {"$regex": search, "$options": "i"}
+    
+    subdomains = await db.subdomains.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.subdomains.count_documents(query)
+    
+    # Add user info for each subdomain
+    for sub in subdomains:
+        owner = await db.users.find_one({"id": sub["user_id"]}, {"_id": 0, "username": 1, "email": 1})
+        sub["owner"] = owner
+    
+    return {
+        "subdomains": subdomains,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
+
+@api_router.put("/admin/subdomains/{subdomain_id}/toggle")
+async def admin_toggle_subdomain(subdomain_id: str, data: SubdomainUpdate, user: dict = Depends(get_admin_user)):
+    """Force toggle subdomain status - Admin only"""
+    subdomain = await db.subdomains.find_one({"id": subdomain_id})
+    if not subdomain:
+        raise HTTPException(status_code=404, detail="Поддомен не найден")
+    
+    await db.subdomains.update_one(
+        {"id": subdomain_id},
+        {"$set": {
+            "is_active": data.is_active, 
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "disabled_by_admin": not data.is_active,
+            "disabled_by": user["id"] if not data.is_active else None
+        }}
+    )
+    
+    action = "включен" if data.is_active else "выключен"
+    logging.info(f"Subdomain {action} by admin: {subdomain['subdomain']} by {user['email']}")
+    
+    return {"success": True, "is_active": data.is_active}
+
+@api_router.delete("/admin/subdomains/{subdomain_id}")
+async def admin_delete_subdomain(subdomain_id: str, user: dict = Depends(get_admin_user)):
+    """Force delete subdomain - Admin only"""
+    subdomain = await db.subdomains.find_one({"id": subdomain_id})
+    if not subdomain:
+        raise HTTPException(status_code=404, detail="Поддомен не найден")
+    
+    await db.subdomains.delete_one({"id": subdomain_id})
+    
+    logging.info(f"Subdomain force deleted: {subdomain['subdomain']} by {user['email']}")
+    
+    return {"success": True}
+
+# --- Subdomain Resolution API ---
+
+@api_router.get("/resolve/{subdomain}")
+async def resolve_subdomain(subdomain: str):
+    """Resolve subdomain to user - for middleware"""
+    subdomain = subdomain.lower().strip()
+    
+    subdomain_doc = await db.subdomains.find_one({"subdomain": subdomain}, {"_id": 0})
+    if not subdomain_doc:
+        raise HTTPException(status_code=404, detail="Subdomain not found")
+    
+    if not subdomain_doc.get("is_active", True):
+        raise HTTPException(status_code=410, detail="Domain is inactive")
+    
+    # Get user info
+    user = await db.users.find_one({"id": subdomain_doc["user_id"]}, {"_id": 0, "id": 1, "username": 1, "is_banned": 1})
+    if not user or user.get("is_banned"):
+        raise HTTPException(status_code=410, detail="Domain is inactive")
+    
+    return {
+        "subdomain": subdomain_doc,
+        "user_id": subdomain_doc["user_id"],
+        "username": user.get("username")
+    }
+
+@api_router.get("/resolve/{subdomain}/page/{path}")
+async def resolve_subdomain_page(subdomain: str, path: str):
+    """Resolve subdomain + path to a specific page"""
+    subdomain = subdomain.lower().strip()
+    
+    # Check subdomain
+    subdomain_doc = await db.subdomains.find_one({"subdomain": subdomain}, {"_id": 0})
+    if not subdomain_doc:
+        raise HTTPException(status_code=404, detail="Subdomain not found")
+    
+    if not subdomain_doc.get("is_active", True):
+        raise HTTPException(status_code=410, detail="Domain is inactive")
+    
+    # Check user
+    user = await db.users.find_one({"id": subdomain_doc["user_id"]}, {"_id": 0})
+    if not user or user.get("is_banned"):
+        raise HTTPException(status_code=410, detail="Domain is inactive")
+    
+    # Find page by slug belonging to this user
+    page = await db.pages.find_one(
+        {"slug": path, "user_id": subdomain_doc["user_id"], "status": "active"},
+        {"_id": 0}
+    )
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    # Increment view count
+    await db.pages.update_one({"id": page["id"]}, {"$inc": {"views": 1}})
+    
+    # Get links
+    links = await db.links.find({"page_id": page["id"], "active": True}, {"_id": 0}).sort("order", 1).to_list(100)
+    page["links"] = links
+    
+    # Get plan config for branding
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    page["can_remove_branding"] = plan_config.get("can_remove_branding", False)
+    page["user_verified"] = user.get("verified", False) and user.get("show_verification_badge", True)
+    
+    return page
+
 @api_router.get("/my-limits")
 async def get_my_limits(user: dict = Depends(get_current_user)):
     """Get current user's plan limits and usage"""
