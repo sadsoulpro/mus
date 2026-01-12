@@ -479,23 +479,25 @@ export default function PublicPage() {
           )}
         </div>
         
-        {/* Footer */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 text-center"
-        >
-          <a 
-            href="/" 
-            className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-400 transition-colors text-sm"
+        {/* Branding Footer - hidden if user has can_remove_branding */}
+        {!page.can_remove_branding && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-8 text-center"
           >
-            <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center">
-              <Music className="w-3 h-3 text-primary" />
-            </div>
-            Powered by MyTrack
-          </a>
-        </motion.div>
+            <a 
+              href="/" 
+              className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-400 transition-colors text-sm"
+            >
+              <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center">
+                <Music className="w-3 h-3 text-primary" />
+              </div>
+              Powered by MyTrack
+            </a>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );
