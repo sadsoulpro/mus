@@ -154,6 +154,40 @@ def get_client_ip(request: Request) -> str:
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# ===================== SUBDOMAIN MIDDLEWARE =====================
+
+# Main domain (without subdomain)
+MAIN_DOMAIN = os.environ.get('MAIN_DOMAIN', 'mytrack.cc')
+
+class SubdomainMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to handle subdomain routing.
+    Extracts subdomain from Host header and adds it to request state.
+    Example: music.mytrack.cc -> subdomain = "music"
+    """
+    async def dispatch(self, request: Request, call_next):
+        host = request.headers.get("host", "").split(":")[0].lower()
+        
+        # Check for X-Subdomain header (for Nginx proxy)
+        subdomain = request.headers.get("x-subdomain", "").lower().strip()
+        
+        # If no X-Subdomain header, extract from Host
+        if not subdomain and host:
+            # Check if host ends with main domain
+            if host.endswith(f".{MAIN_DOMAIN}"):
+                # Extract subdomain part
+                subdomain = host.replace(f".{MAIN_DOMAIN}", "")
+            elif host == MAIN_DOMAIN or host == f"www.{MAIN_DOMAIN}":
+                subdomain = ""
+        
+        # Store subdomain in request state for use in routes
+        request.state.subdomain = subdomain if subdomain and subdomain != "www" else ""
+        
+        response = await call_next(request)
+        return response
+
+app.add_middleware(SubdomainMiddleware)
+
 # ===================== MODELS =====================
 
 class UserCreate(BaseModel):
