@@ -460,7 +460,7 @@ export default function RandomCover() {
                   >
                     <Layer>
                       {/* Background color */}
-                      <KonvaImage
+                      <Rect
                         x={0}
                         y={0}
                         width={CANVAS_SIZE}
@@ -471,7 +471,7 @@ export default function RandomCover() {
                       {/* Background image with filter */}
                       <BackgroundImage 
                         image={bgImage} 
-                        filter={currentFilter}
+                        filterType={currentFilter}
                         filterValue={filterValue}
                       />
                     </Layer>
