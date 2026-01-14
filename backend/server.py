@@ -1080,11 +1080,15 @@ async def get_public_page(slug: str):
     page["links"] = links
     page["views"] = page.get("views", 0) + 1
     
-    # Get user info (verification, site navigation, and plan features)
-    user = await db.users.find_one({"id": page["user_id"]}, {"_id": 0, "verified": 1, "show_verification_badge": 1, "site_navigation_enabled": 1, "plan": 1})
+    # Get user info (verification, site navigation, plan features, and contact info)
+    user = await db.users.find_one({"id": page["user_id"]}, {"_id": 0, "verified": 1, "show_verification_badge": 1, "site_navigation_enabled": 1, "plan": 1, "contact_email": 1, "social_links": 1})
     if user:
         page["user_verified"] = user.get("verified", False) and user.get("show_verification_badge", True)
         page["site_navigation_enabled"] = user.get("site_navigation_enabled", False)
+        
+        # Add contact info for public page
+        page["contact_email"] = user.get("contact_email", "")
+        page["social_links"] = user.get("social_links", {})
         
         # Get plan config for branding removal
         plan_config = await get_plan_config(user.get("plan", "free"))
@@ -1093,6 +1097,8 @@ async def get_public_page(slug: str):
         page["user_verified"] = False
         page["site_navigation_enabled"] = False
         page["can_remove_branding"] = False
+        page["contact_email"] = ""
+        page["social_links"] = {}
     
     return page
 
