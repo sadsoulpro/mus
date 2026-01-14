@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Music, Share2, Copy, Check, BadgeCheck, ChevronLeft, ChevronRight, Mail } from "lucide-react";
-import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes, FaTelegram, FaInstagram, FaTiktok, FaTwitter, FaGlobe } from "react-icons/fa";
+import { Music, Share2, Copy, Check, BadgeCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
 import { SiTidal } from "react-icons/si";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
