@@ -1084,6 +1084,179 @@ export default function AdminPanel() {
               </div>
             </TabsContent>
 
+            {/* Tickets Tab */}
+            <TabsContent value="tickets" className="mt-0">
+              <div className="space-y-4">
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <select
+                    value={ticketStatusFilter}
+                    onChange={(e) => {
+                      setTicketStatusFilter(e.target.value);
+                      fetchTickets();
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-zinc-900/50 border border-white/10 focus:border-primary focus:outline-none text-sm"
+                  >
+                    <option value="">Все статусы</option>
+                    <option value="open">Открытые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="resolved">Решённые</option>
+                    <option value="closed">Закрытые</option>
+                  </select>
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/50 border border-white/5">
+                    <MessageCircle className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm">Всего: <span className="font-semibold">{ticketsTotal}</span></span>
+                    {unreadTickets > 0 && (
+                      <span className="ml-2 px-2 py-1 rounded-full bg-red-500 text-white text-xs">
+                        {unreadTickets} непрочитанных
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tickets List */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Tickets List */}
+                  <div className="space-y-3">
+                    {tickets.map((ticket, i) => {
+                      const statusConfig = TICKET_STATUS_CONFIG[ticket.status] || TICKET_STATUS_CONFIG.open;
+                      const StatusIcon = statusConfig.icon;
+                      
+                      return (
+                        <motion.div
+                          key={ticket.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                          className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                            selectedTicket?.id === ticket.id
+                              ? 'bg-primary/10 border-primary/30'
+                              : !ticket.is_read_by_staff
+                                ? 'bg-blue-950/20 border-blue-500/20 hover:border-blue-500/40'
+                                : 'bg-zinc-900/50 border-white/5 hover:border-white/10'
+                          }`}
+                          onClick={() => openTicket(ticket.id)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0`}
+                                 style={{ backgroundColor: statusConfig.color + '20' }}>
+                              <StatusIcon className="w-5 h-5" style={{ color: statusConfig.color }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold truncate">{ticket.subject}</h3>
+                                {!ticket.is_read_by_staff && (
+                                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                От: {ticket.user?.username || ticket.user?.email}
+                              </p>
+                              <div className="flex items-center justify-between">
+                                <span className="px-2 py-1 rounded-lg text-xs border"
+                                      style={{ 
+                                        backgroundColor: statusConfig.color + '20',
+                                        borderColor: statusConfig.color + '30',
+                                        color: statusConfig.color
+                                      }}>
+                                  {statusConfig.label}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(ticket.created_at).toLocaleDateString('ru-RU')}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                    
+                    {tickets.length === 0 && (
+                      <div className="text-center py-20 text-muted-foreground">
+                        <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                        <p>Тикеты не найдены</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ticket Details */}
+                  <div className="lg:sticky lg:top-4">
+                    {selectedTicket ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h2 className="text-xl font-semibold mb-2">{selectedTicket.subject}</h2>
+                            <p className="text-sm text-muted-foreground">
+                              От: {selectedTicket.user?.username || selectedTicket.user?.email}
+                            </p>
+                          </div>
+                          <select
+                            value={selectedTicket.status}
+                            onChange={(e) => updateTicketStatus(selectedTicket.id, e.target.value)}
+                            className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-sm"
+                          >
+                            <option value="open">Открыт</option>
+                            <option value="in_progress">В работе</option>
+                            <option value="resolved">Решён</option>
+                            <option value="closed">Закрыт</option>
+                          </select>
+                        </div>
+
+                        {/* Messages */}
+                        <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                          {selectedTicket.messages?.map((message, idx) => (
+                            <div key={idx} className={`p-4 rounded-xl ${
+                              message.is_staff_reply 
+                                ? 'bg-primary/10 border border-primary/20 ml-4' 
+                                : 'bg-zinc-800/50 mr-4'
+                            }`}>
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  {message.is_staff_reply ? 'Поддержка' : (selectedTicket.user?.username || 'Пользователь')}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(message.created_at).toLocaleString('ru-RU')}
+                                </span>
+                              </div>
+                              <p className="text-sm whitespace-pre-wrap">{message.message}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Reply Form */}
+                        <div className="space-y-3">
+                          <Textarea
+                            placeholder="Ваш ответ..."
+                            value={ticketReply}
+                            onChange={(e) => setTicketReply(e.target.value)}
+                            className="min-h-[100px] bg-zinc-800/50 border-white/10 focus:border-primary"
+                          />
+                          <Button 
+                            onClick={sendTicketReply}
+                            disabled={!ticketReply.trim()}
+                            className="w-full bg-gradient-to-r from-primary to-purple-600"
+                          >
+                            <Send className="w-4 h-4 mr-2" />
+                            Отправить ответ
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5 text-center text-muted-foreground">
+                        <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                        <p>Выберите тикет для просмотра</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
             {/* Verification Tab */}
             <TabsContent value="verification" className="mt-0">
               <div className="space-y-4">
