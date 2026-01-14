@@ -49,6 +49,10 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 UPLOAD_DIR = ROOT_DIR / 'uploads'
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# Covers directory
+COVERS_DIR = UPLOAD_DIR / 'covers'
+COVERS_DIR.mkdir(exist_ok=True)
+
 # ===================== RBAC CONFIGURATION =====================
 
 # Owner email - gets automatic owner role
