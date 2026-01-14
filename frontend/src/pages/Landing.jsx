@@ -58,7 +58,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center lg:text-left order-2 lg:order-1"
+            className="text-center lg:text-left"
           >
             {/* Mobile-optimized heading */}
             <h1 className="font-gilroy-800 leading-[1.05] mb-4 sm:mb-5 lg:mb-6
