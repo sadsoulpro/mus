@@ -1206,7 +1206,7 @@ export default function RandomCover() {
                     <div className="mt-4 pt-4 border-t border-white/10">
                       <Label className="text-xs text-primary flex items-center gap-1 mb-2">
                         <Shuffle className="w-3 h-3" />
-                        AI Генерация (бесплатно)
+                        AI Генерация (Stable Diffusion XL)
                       </Label>
                       <Input
                         value={aiPrompt}
@@ -1230,7 +1230,7 @@ export default function RandomCover() {
                         {generatingAI ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Генерация...
+                            Генерация (~30 сек)...
                           </>
                         ) : (
                           <>
