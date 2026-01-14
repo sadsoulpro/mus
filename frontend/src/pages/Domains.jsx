@@ -93,6 +93,7 @@ export default function Domains() {
       const response = await api.get("/profile/contacts");
       setContactEmail(response.data.contact_email || "");
       setProfileDescription(response.data.profile_description || "");
+      setArtistName(response.data.artist_name || "");
       setSocialLinks(response.data.social_links || {
         telegram: "",
         instagram: "",
