@@ -52,6 +52,7 @@ export default function Domains() {
     website: ""
   });
   const [profileDescription, setProfileDescription] = useState("");
+  const [artistName, setArtistName] = useState("");
   const [savingContacts, setSavingContacts] = useState(false);
   const [contactsLoading, setContactsLoading] = useState(true);
 
