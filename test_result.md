@@ -177,6 +177,22 @@ backend:
           CRITICAL FIX APPLIED: Fixed UserResponse model in server.py to include verification fields (is_verified, verified, verification_status, etc.) that were being filtered out of API responses.
           
           All RBAC features are working correctly. System ready for production use.
+  - task: "Contact Info API for User Profiles"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Added contact info functionality:
+          1. GET /api/profile/contacts - returns user's contact_email and social_links
+          2. PUT /api/profile/contacts - updates contact_email and social_links
+          3. Updated /api/artist/{slug} to include contact_email and social_links from user
+          4. Social links include: telegram, instagram, vk, tiktok, twitter, website
 
 frontend:
   - task: "Odesli Auto-fill Feature in PageBuilder"
@@ -212,16 +228,48 @@ frontend:
       - working: true
         agent: "main"
         comment: "Updated all pages for full responsive design: Landing, Login, Register, Dashboard, Analytics, GlobalAnalytics, Settings, Verification, PageBuilder, PublicPage, AdminPanel. Mobile-first approach with breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px). Adaptive typography, spacing, grids, and touch-friendly elements."
+  - task: "Contact Info Section in Domains Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Domains.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: |
+          Added Contact Info section to Domains page:
+          1. Email for contact (public)
+          2. Social links: Telegram, Instagram, VK, TikTok, Twitter/X, Website
+          3. Save button with loading state
+          4. API integration with /api/profile/contacts
+  - task: "Contact Info Display in PublicPage"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/PublicPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: |
+          Added contact info display to PublicPage:
+          1. Shows "Связаться" section below share buttons
+          2. Displays contact email with mail icon
+          3. Shows social media icons with links (Telegram, Instagram, VK, TikTok, Twitter, Website)
+          4. Auto-formats social links to proper URLs
 
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Odesli Auto-fill Feature in PageBuilder"
+    - "Contact Info API for User Profiles"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -229,34 +277,12 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      Implemented RBAC + Dynamic Plan Limits system. Please test:
+      Implemented Contact Info feature. Please test:
       
-      1. Auto-owner assignment: Register user with thedrumepic@gmail.com - should get role=owner, plan=ultimate
-      2. Ban functionality: PUT /api/admin/users/{id}/ban with {"is_banned": true} - user should get 403 on all requests
-      3. Role management (owner only): PUT /api/admin/users/{id}/role with {"role": "moderator"}
-      4. Plan management: PUT /api/admin/users/{id}/plan with {"plan": "pro"}
-      5. Verify user: PUT /api/admin/users/{id}/verify with {"is_verified": true}
-      6. Plan config update: PUT /api/admin/plan-configs/free with {"max_pages_limit": 10}
-      7. Access check: GET /api/check-access/max_pages?value=5
-      8. My limits: GET /api/my-limits
-      9. Admin users list: GET /api/admin/users/list
+      1. GET /api/profile/contacts - should return contact_email and social_links
+      2. PUT /api/profile/contacts - update with:
+         {"contact_email": "test@example.com", "social_links": {"telegram": "@test", "instagram": "@test"}}
+      3. GET /api/artist/{slug} - should include contact_email and social_links from user
       
-      Admin credentials: admin@example.com / admin123 (role=admin)
-      Test that moderator/user cannot change roles (403)
-      Test that banned user gets 403 on all endpoints
-  - agent: "testing"
-    message: |
-      ✅ RBAC + Dynamic Plan Limits System Testing COMPLETED - ALL TESTS PASSED
-      
-      Comprehensive testing performed on all RBAC features:
-      
-      ✅ Auto-owner Assignment: thedrumepic@gmail.com gets owner role, ultimate plan, auto-verification
-      ✅ Plan Config APIs: All 3 plans available, admin can update configurations  
-      ✅ User Management: Admin can update plans and verify users, proper page_count tracking
-      ✅ Ban Functionality: Users can be banned, banned users get 403 on login
-      ✅ Role Permissions: Admin blocked from role changes (403), owner can change roles
-      ✅ Access Check APIs: my-limits and check-access working, launch mode active
-      
-      CRITICAL FIX: Updated UserResponse model to include verification fields that were missing from API responses.
-      
-      All RBAC endpoints working correctly. System ready for production.
+      Admin credentials: admin@example.com / admin123
+      Test page slug: thley
