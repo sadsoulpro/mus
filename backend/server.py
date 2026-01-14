@@ -933,6 +933,17 @@ async def get_user_pages(user: dict = Depends(get_current_user)):
 @api_router.post("/pages")
 async def create_page(data: PageCreate, user: dict = Depends(get_current_user)):
     
+    # Check page limit
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    max_pages = plan_config.get("max_pages_limit", 3)
+    current_count = await db.pages.count_documents({"user_id": user["id"]})
+    
+    if max_pages != -1 and current_count >= max_pages:
+        raise HTTPException(
+            status_code=403, 
+            detail="Лимит достигнут, перейдите на PRO-подписку."
+        )
+    
     # Check slug uniqueness
     existing = await db.pages.find_one({"slug": data.slug})
     if existing:
