@@ -281,7 +281,7 @@ export default function GlobalAnalytics() {
           </motion.div>
           
           {/* Cities */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className={`p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <h3 className="text-base sm:text-lg font-semibold">По городам</h3>
