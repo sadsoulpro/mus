@@ -36,7 +36,7 @@ import {
   Loader2, Image as ImageIcon, RotateCcw,
   Undo2, Redo2, Save, FolderOpen, Plus, 
   FileImage, Clock, MoreVertical, PanelRightOpen,
-  PanelRightClose, ChevronDown, ChevronUp, Settings2
+  PanelRightClose, ChevronDown, ChevronUp, Settings2, Crown, Lock
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
