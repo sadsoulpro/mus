@@ -51,10 +51,13 @@ export default function Login() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-2 mb-6 sm:mb-8">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center">
-                <Music className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
-              <Link to="/"><span className="font-display text-xl sm:text-2xl">MYTRACK</span></Link>
+              <Link to="/">
+                <img 
+                  src="/MyTrack-logo-main.svg" 
+                  alt="MyTrack" 
+                  className="h-8 sm:h-10 w-auto"
+                />
+              </Link>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Здравствуйте!</h1>
