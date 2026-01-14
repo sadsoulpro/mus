@@ -385,6 +385,7 @@ export default function GlobalAnalytics() {
               <Link to="/page/new"><Button className="mt-4 bg-primary hover:bg-primary/90" size="sm">Создать страницу</Button></Link>
             </div>
           )}
+          </div>
         </motion.div>
       </div>
     </Sidebar>
