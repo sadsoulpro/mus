@@ -341,9 +341,13 @@ function BackgroundImage({ image, filterType, filterValue }) {
 
 // ==================== MAIN COMPONENT ====================
 export default function RandomCover() {
+  const { user } = useAuth();
   const stageRef = useRef();
   const containerRef = useRef();
   const fileInputRef = useRef();
+  
+  // Check if user can use AI generation
+  const canUseAI = user?.plan_config?.can_use_ai_generation || user?.plan === 'pro';
   
   // Canvas state
   const [bgImage, setBgImage] = useState(null);
