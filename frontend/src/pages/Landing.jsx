@@ -97,7 +97,7 @@ export default function Landing() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative flex justify-center order-1 lg:order-2"
+            className="relative flex justify-center"
           >
             <div className="relative w-[200px] sm:w-[240px] lg:w-[280px] xl:w-[300px]">
               {/* Phone Frame */}
