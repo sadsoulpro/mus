@@ -1211,6 +1211,45 @@ export default function RandomCover() {
                       {bgImage ? "Заменить фото" : "Загрузить фото"}
                     </Button>
 
+                    {/* AI Image Generation */}
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <Label className="text-xs text-primary flex items-center gap-1 mb-2">
+                        <Shuffle className="w-3 h-3" />
+                        AI Генерация (бесплатно)
+                      </Label>
+                      <Input
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        placeholder="Опишите изображение на английском..."
+                        className="bg-zinc-800 text-sm"
+                        data-testid="ai-prompt-input"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !generatingAI) {
+                            generateAIImage();
+                          }
+                        }}
+                      />
+                      <Button
+                        variant="secondary"
+                        className="w-full mt-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                        onClick={generateAIImage}
+                        disabled={generatingAI || !aiPrompt.trim()}
+                        data-testid="generate-ai-btn"
+                      >
+                        {generatingAI ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Генерация...
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon className="w-4 h-4 mr-2" />
+                            Сгенерировать
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
                     {bgImage && (
                       <div className="mt-3">
                         <Label className="text-xs">Фильтр</Label>
