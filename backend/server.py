@@ -2626,6 +2626,162 @@ async def get_cover(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(filepath)
 
+# ===================== COVER PROJECTS ROUTES =====================
+
+class CoverProjectSave(BaseModel):
+    project_id: Optional[str] = None  # None for new project, ID for update
+    project_name: str
+    canvas_json: str  # JSON string of canvas state
+    preview_image: Optional[str] = None  # Base64 encoded preview image
+
+class CoverProjectResponse(BaseModel):
+    id: str
+    project_name: str
+    canvas_json: str
+    preview_url: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+@api_router.post("/projects/save")
+async def save_cover_project(data: CoverProjectSave, user: dict = Depends(get_current_user)):
+    """Save or update a cover project"""
+    try:
+        now = datetime.now(timezone.utc).isoformat()
+        preview_url = None
+        
+        # Handle preview image if provided
+        if data.preview_image:
+            try:
+                if "," in data.preview_image:
+                    image_data = data.preview_image.split(",")[1]
+                else:
+                    image_data = data.preview_image
+                
+                image_bytes = base64.b64decode(image_data)
+                preview_filename = f"preview_{uuid.uuid4().hex}.png"
+                preview_path = COVERS_DIR / preview_filename
+                
+                async with aiofiles.open(preview_path, 'wb') as f:
+                    await f.write(image_bytes)
+                
+                preview_url = f"/api/uploads/covers/{preview_filename}"
+            except Exception as e:
+                logging.warning(f"Failed to save preview image: {e}")
+        
+        # Update existing project
+        if data.project_id:
+            existing = await db.cover_projects.find_one({
+                "id": data.project_id,
+                "user_id": user["id"]
+            })
+            
+            if not existing:
+                raise HTTPException(status_code=404, detail="Проект не найден")
+            
+            # Delete old preview if exists and we have new one
+            if preview_url and existing.get("preview_url"):
+                old_filename = existing["preview_url"].split("/")[-1]
+                old_path = COVERS_DIR / old_filename
+                if old_path.exists():
+                    try:
+                        old_path.unlink()
+                    except:
+                        pass
+            
+            update_data = {
+                "project_name": data.project_name,
+                "canvas_json": data.canvas_json,
+                "updated_at": now
+            }
+            if preview_url:
+                update_data["preview_url"] = preview_url
+            
+            await db.cover_projects.update_one(
+                {"id": data.project_id},
+                {"$set": update_data}
+            )
+            
+            project = await db.cover_projects.find_one({"id": data.project_id}, {"_id": 0})
+            return {
+                "success": True,
+                "message": "Проект обновлён",
+                "project": project
+            }
+        
+        # Create new project
+        project_id = str(uuid.uuid4())
+        project = {
+            "id": project_id,
+            "user_id": user["id"],
+            "project_name": data.project_name,
+            "canvas_json": data.canvas_json,
+            "preview_url": preview_url,
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        await db.cover_projects.insert_one(project)
+        
+        return {
+            "success": True,
+            "message": "Проект сохранён",
+            "project": {k: v for k, v in project.items() if k != "_id"}
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Project save error: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка сохранения: {str(e)}")
+
+@api_router.get("/projects")
+async def get_user_projects(user: dict = Depends(get_current_user)):
+    """Get all cover projects for current user"""
+    projects = await db.cover_projects.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)
+    
+    return {"projects": projects}
+
+@api_router.get("/projects/{project_id}")
+async def get_project(project_id: str, user: dict = Depends(get_current_user)):
+    """Get a specific cover project"""
+    project = await db.cover_projects.find_one(
+        {"id": project_id, "user_id": user["id"]},
+        {"_id": 0}
+    )
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+    
+    return {"project": project}
+
+@api_router.delete("/projects/{project_id}")
+async def delete_project(project_id: str, user: dict = Depends(get_current_user)):
+    """Delete a cover project"""
+    project = await db.cover_projects.find_one({
+        "id": project_id,
+        "user_id": user["id"]
+    })
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+    
+    # Delete preview file if exists
+    if project.get("preview_url"):
+        preview_filename = project["preview_url"].split("/")[-1]
+        preview_path = COVERS_DIR / preview_filename
+        if preview_path.exists():
+            try:
+                preview_path.unlink()
+            except:
+                pass
+    
+    await db.cover_projects.delete_one({"id": project_id})
+    
+    return {"success": True, "message": "Проект удалён"}
+
 # ===================== STARTUP =====================
 
 @app.on_event("startup")
