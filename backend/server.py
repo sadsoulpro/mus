@@ -2912,6 +2912,193 @@ async def generate_ai_background(request: AIGenerateRequest, user: dict = Depend
         logging.error(f"AI generation error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка генерации: {str(e)}")
 
+# ===================== SUPPORT TICKETS =====================
+
+@api_router.post("/tickets")
+async def create_ticket(data: TicketCreate, user: dict = Depends(get_current_user)):
+    """Create a new support ticket"""
+    ticket = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_email": user["email"],
+        "username": user.get("username", ""),
+        "subject": data.subject,
+        "category": data.category,
+        "status": "open",
+        "messages": [{
+            "id": str(uuid.uuid4()),
+            "sender_id": user["id"],
+            "sender_role": "user",
+            "message": data.message,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }],
+        "is_read_by_staff": False,
+        "is_read_by_user": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.tickets.insert_one(ticket)
+    logging.info(f"New ticket created: {ticket['id']} by {user['email']}")
+    
+    return {k: v for k, v in ticket.items() if k != "_id"}
+
+@api_router.get("/tickets")
+async def get_user_tickets(user: dict = Depends(get_current_user)):
+    """Get all tickets for current user"""
+    tickets = await db.tickets.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)
+    
+    return tickets
+
+@api_router.get("/tickets/{ticket_id}")
+async def get_ticket(ticket_id: str, user: dict = Depends(get_current_user)):
+    """Get specific ticket - user can only view their own tickets"""
+    ticket = await db.tickets.find_one({"id": ticket_id}, {"_id": 0})
+    
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Тикет не найден")
+    
+    # Users can only view their own tickets
+    if ticket["user_id"] != user["id"] and not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Нет доступа к этому тикету")
+    
+    # If user is viewing their own ticket, mark as read by user
+    if ticket["user_id"] == user["id"] and not ticket.get("is_read_by_user", True):
+        await db.tickets.update_one(
+            {"id": ticket_id},
+            {"$set": {"is_read_by_user": True}}
+        )
+        ticket["is_read_by_user"] = True
+    
+    return ticket
+
+@api_router.post("/tickets/{ticket_id}/reply")
+async def reply_to_ticket(ticket_id: str, data: TicketReply, user: dict = Depends(get_current_user)):
+    """Add a reply to ticket"""
+    ticket = await db.tickets.find_one({"id": ticket_id})
+    
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Тикет не найден")
+    
+    is_staff = has_role_permission(user.get("role", "user"), "moderator")
+    
+    # Users can only reply to their own tickets
+    if ticket["user_id"] != user["id"] and not is_staff:
+        raise HTTPException(status_code=403, detail="Нет доступа к этому тикету")
+    
+    new_message = {
+        "id": str(uuid.uuid4()),
+        "sender_id": user["id"],
+        "sender_role": "staff" if is_staff else "user",
+        "sender_name": user.get("username", user["email"]),
+        "message": data.message,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Update read status based on who is replying
+    update_data = {
+        "$push": {"messages": new_message},
+        "$set": {
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "is_read_by_staff": is_staff,  # If staff replies, they've read it
+            "is_read_by_user": not is_staff  # If user replies, staff needs to read; if staff replies, user needs to read
+        }
+    }
+    
+    # If staff replies and ticket is open, change to in_progress
+    if is_staff and ticket["status"] == "open":
+        update_data["$set"]["status"] = "in_progress"
+    
+    await db.tickets.update_one({"id": ticket_id}, update_data)
+    
+    updated_ticket = await db.tickets.find_one({"id": ticket_id}, {"_id": 0})
+    return updated_ticket
+
+@api_router.get("/tickets/user/unread-count")
+async def get_user_unread_tickets(user: dict = Depends(get_current_user)):
+    """Get count of unread tickets for current user (staff replied)"""
+    count = await db.tickets.count_documents({
+        "user_id": user["id"],
+        "is_read_by_user": False
+    })
+    return {"unread_count": count}
+
+# Admin ticket endpoints
+@api_router.get("/admin/tickets")
+async def admin_get_tickets(
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50,
+    user: dict = Depends(get_admin_user)
+):
+    """Get all tickets for admin panel"""
+    if not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Требуется роль модератора или выше")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    tickets = await db.tickets.find(query, {"_id": 0}).sort("updated_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.tickets.count_documents(query)
+    
+    return {"tickets": tickets, "total": total}
+
+@api_router.get("/admin/tickets/unread-count")
+async def admin_get_unread_tickets_count(user: dict = Depends(get_admin_user)):
+    """Get count of unread tickets for staff"""
+    if not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Требуется роль модератора или выше")
+    
+    count = await db.tickets.count_documents({
+        "status": {"$in": ["open", "in_progress"]},
+        "is_read_by_staff": False
+    })
+    return {"unread_count": count}
+
+@api_router.get("/admin/tickets/{ticket_id}")
+async def admin_get_ticket(ticket_id: str, user: dict = Depends(get_admin_user)):
+    """Get specific ticket and mark as read by staff"""
+    if not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Требуется роль модератора или выше")
+    
+    ticket = await db.tickets.find_one({"id": ticket_id}, {"_id": 0})
+    
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Тикет не найден")
+    
+    # Mark as read by staff
+    if not ticket.get("is_read_by_staff", False):
+        await db.tickets.update_one(
+            {"id": ticket_id},
+            {"$set": {"is_read_by_staff": True}}
+        )
+        ticket["is_read_by_staff"] = True
+    
+    return ticket
+
+@api_router.put("/admin/tickets/{ticket_id}/status")
+async def admin_update_ticket_status(ticket_id: str, data: TicketStatusUpdate, user: dict = Depends(get_admin_user)):
+    """Update ticket status"""
+    if not has_role_permission(user.get("role", "user"), "moderator"):
+        raise HTTPException(status_code=403, detail="Требуется роль модератора или выше")
+    
+    if data.status not in ["open", "in_progress", "resolved", "closed"]:
+        raise HTTPException(status_code=400, detail="Неверный статус")
+    
+    result = await db.tickets.update_one(
+        {"id": ticket_id},
+        {"$set": {"status": data.status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Тикет не найден")
+    
+    return {"success": True, "status": data.status}
+
 # ===================== STARTUP =====================
 
 @app.on_event("startup")
