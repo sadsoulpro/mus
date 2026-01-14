@@ -267,6 +267,9 @@ function App() {
           <Route path="/multilinks" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
+          <Route path="/random-cover" element={
+            <ProtectedRoute><RandomCover /></ProtectedRoute>
+          } />
           <Route path="/analytics" element={
             <ProtectedRoute><GlobalAnalytics /></ProtectedRoute>
           } />
