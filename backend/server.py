@@ -266,11 +266,13 @@ class TokenResponse(BaseModel):
 class PlanConfigCreate(BaseModel):
     plan_name: str
     max_pages_limit: int = 3
-    max_subdomains_limit: int = 1
+    max_subdomains_limit: int = 0
     can_use_custom_design: bool = False
     has_analytics: bool = True
     has_advanced_analytics: bool = False
     can_remove_branding: bool = False
+    can_use_ai_generation: bool = False
+    can_verify_profile: bool = False
     priority_support: bool = False
 
 class PlanConfigUpdate(BaseModel):
@@ -280,13 +282,15 @@ class PlanConfigUpdate(BaseModel):
     has_analytics: Optional[bool] = None
     has_advanced_analytics: Optional[bool] = None
     can_remove_branding: Optional[bool] = None
+    can_use_ai_generation: Optional[bool] = None
+    can_verify_profile: Optional[bool] = None
     priority_support: Optional[bool] = None
 
 class UserRoleUpdate(BaseModel):
     role: str  # owner, admin, moderator, user
 
 class UserPlanUpdate(BaseModel):
-    plan: str  # free, pro, ultimate
+    plan: str  # free, pro
 
 class UserBanUpdate(BaseModel):
     is_banned: bool
