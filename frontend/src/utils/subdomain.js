@@ -9,8 +9,8 @@ const MAIN_DOMAIN = 'mytrack.cc';
 export function getSubdomain() {
   const host = window.location.hostname.toLowerCase();
   
-  // Check for localhost or IP (development)
-  if (host === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+  // Check for localhost, IP, or preview domain (development)
+  if (host === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(host) || host.includes('preview.emergentagent.com')) {
     // Check for subdomain in URL params for testing
     const params = new URLSearchParams(window.location.search);
     return params.get('subdomain') || null;
