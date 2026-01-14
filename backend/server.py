@@ -306,6 +306,19 @@ class SubdomainCreate(BaseModel):
 class SubdomainUpdate(BaseModel):
     is_active: bool
 
+# ===================== TICKET/SUPPORT MODELS =====================
+
+class TicketCreate(BaseModel):
+    subject: str = Field(..., min_length=3, max_length=200)
+    message: str = Field(..., min_length=10, max_length=5000)
+    category: str = "general"  # general, technical, billing, other
+
+class TicketReply(BaseModel):
+    message: str = Field(..., min_length=1, max_length=5000)
+
+class TicketStatusUpdate(BaseModel):
+    status: str  # open, in_progress, resolved, closed
+
 # ===================== HELPERS =====================
 
 def hash_password(password: str) -> str:
