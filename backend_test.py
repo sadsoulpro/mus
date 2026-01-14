@@ -1156,6 +1156,11 @@ def main():
         ("Role Permission Check", tester.test_role_permission_check),
         ("Access Check API", tester.test_access_check_api),
         
+        # Contact Info API tests (HIGH PRIORITY - as requested in review)
+        ("Get Contact Info", tester.test_get_contact_info),
+        ("Update Contact Info", tester.test_update_contact_info),
+        ("Artist Page Contact Info", tester.test_artist_page_contact_info),
+        
         # API Integration tests (high priority)
         ("Odesli API Integration", tester.test_odesli_integration),
         
