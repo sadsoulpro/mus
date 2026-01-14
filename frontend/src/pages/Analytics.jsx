@@ -74,9 +74,10 @@ export default function Analytics() {
   const [userLimits, setUserLimits] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user has advanced analytics
-  const hasAdvancedAnalytics = userLimits?.limits?.has_advanced_analytics || 
-    user?.plan === 'pro' || user?.plan === 'ultimate';
+  // Check if user has advanced analytics from API response or user plan
+  const hasAdvancedAnalytics = analytics?.has_advanced_analytics || 
+    user?.plan_config?.has_advanced_analytics ||
+    user?.plan === 'pro';
 
   useEffect(() => {
     fetchAnalytics();
