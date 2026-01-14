@@ -2534,6 +2534,97 @@ async def get_upload(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(filepath)
 
+# ===================== COVERS ROUTES =====================
+
+class CoverUploadRequest(BaseModel):
+    image: str  # Base64 encoded image
+    filename: Optional[str] = None
+
+@api_router.post("/covers/upload")
+async def upload_cover(data: CoverUploadRequest, user: dict = Depends(get_current_user)):
+    """Upload a cover image (Base64) and save to server"""
+    try:
+        # Decode base64 image
+        if "," in data.image:
+            # Remove data URL prefix (e.g., "data:image/png;base64,")
+            image_data = data.image.split(",")[1]
+        else:
+            image_data = data.image
+        
+        import base64
+        image_bytes = base64.b64decode(image_data)
+        
+        # Generate filename
+        filename = data.filename or f"cover_{uuid.uuid4().hex}.png"
+        if not filename.endswith(('.png', '.jpg', '.jpeg', '.webp')):
+            filename += '.png'
+        
+        # Save to covers directory
+        filepath = COVERS_DIR / filename
+        async with aiofiles.open(filepath, 'wb') as f:
+            await f.write(image_bytes)
+        
+        # Get file size
+        file_size = len(image_bytes)
+        
+        # Save to database
+        cover_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "filename": filename,
+            "path": f"/uploads/covers/{filename}",
+            "size": file_size,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.covers.insert_one(cover_doc)
+        
+        return {
+            "success": True,
+            "cover": {
+                "id": cover_doc["id"],
+                "filename": filename,
+                "path": cover_doc["path"],
+                "size": file_size
+            }
+        }
+    except Exception as e:
+        logging.error(f"Cover upload error: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки: {str(e)}")
+
+@api_router.get("/covers")
+async def get_user_covers(user: dict = Depends(get_current_user)):
+    """Get all covers for current user"""
+    covers = await db.covers.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return {"covers": covers}
+
+@api_router.delete("/covers/{cover_id}")
+async def delete_cover(cover_id: str, user: dict = Depends(get_current_user)):
+    """Delete a cover"""
+    cover = await db.covers.find_one({"id": cover_id, "user_id": user["id"]})
+    if not cover:
+        raise HTTPException(status_code=404, detail="Обложка не найдена")
+    
+    # Delete file
+    filepath = COVERS_DIR / cover["filename"]
+    if filepath.exists():
+        filepath.unlink()
+    
+    # Delete from database
+    await db.covers.delete_one({"id": cover_id})
+    
+    return {"success": True, "message": "Обложка удалена"}
+
+@api_router.get("/uploads/covers/{filename}")
+async def get_cover(filename: str):
+    """Serve cover image"""
+    filepath = COVERS_DIR / filename
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(filepath)
+
 # ===================== STARTUP =====================
 
 @app.on_event("startup")
