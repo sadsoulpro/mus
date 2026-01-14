@@ -374,6 +374,10 @@ export default function RandomCover() {
   const [aiPrompt, setAiPrompt] = useState("");
   const [generatingAI, setGeneratingAI] = useState(false);
   
+  // Mobile UI state
+  const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
+  const [activeControlTab, setActiveControlTab] = useState("image"); // image, text, actions
+  
   // Selected text settings (live preview)
   const selectedText = useMemo(() => {
     return textElements.find((el) => el.id === selectedId);
