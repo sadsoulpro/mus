@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       setSubmitted(true);
       toast.success("Инструкции отправлены на вашу почту");
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Произошла ошибка");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Произошла ошибка");
     } finally {
       setLoading(false);
     }

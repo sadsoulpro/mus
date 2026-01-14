@@ -48,7 +48,7 @@ export default function Verification() {
       fetchStatus();
       setForm({ artist_name: "", social_links: "", description: "" });
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось отправить заявку");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось отправить заявку");
     } finally {
       setSubmitting(false);
     }

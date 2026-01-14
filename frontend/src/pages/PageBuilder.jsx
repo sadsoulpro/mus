@@ -224,7 +224,7 @@ export default function PageBuilder() {
         return;
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось сохранить страницу");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось сохранить страницу");
     } finally {
       setSaving(false);
     }

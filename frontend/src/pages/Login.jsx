@@ -29,7 +29,7 @@ export default function Login() {
         navigate("/multilinks");
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Неверные учётные данные");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Неверные учётные данные");
     } finally {
       setLoading(false);
     }

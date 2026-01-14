@@ -41,7 +41,7 @@ export default function Settings() {
       toast.success(response.data.message);
       if (refreshUser) await refreshUser();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось обновить профиль");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось обновить профиль");
     } finally {
       setProfileLoading(false);
     }
@@ -59,7 +59,7 @@ export default function Settings() {
       toast.success(response.data.message);
       setPasswordForm({ current_password: "", new_password: "", confirm_password: "" });
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось изменить пароль");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось изменить пароль");
     } finally {
       setPasswordLoading(false);
     }
@@ -74,7 +74,7 @@ export default function Settings() {
       logout();
       navigate("/");
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось удалить аккаунт");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось удалить аккаунт");
     } finally {
       setDeleteLoading(false);
     }

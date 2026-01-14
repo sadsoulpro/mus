@@ -739,7 +739,7 @@ export default function RandomCover() {
       }
     } catch (error) {
       console.error("AI generation error:", error);
-      const errorMessage = error.response?.data?.detail || "Ошибка генерации изображения";
+      const errorMessage = typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Ошибка генерации изображения";
       toast.error(errorMessage);
       setGeneratingAI(false);
     }

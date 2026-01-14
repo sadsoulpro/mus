@@ -31,7 +31,7 @@ export default function Register() {
       toast.success("Аккаунт создан! Добро пожаловать в MyTrack!");
       navigate("/multilinks");
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Ошибка регистрации");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Ошибка регистрации");
     } finally {
       setLoading(false);
     }

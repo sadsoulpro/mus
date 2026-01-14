@@ -156,7 +156,7 @@ export default function Domains() {
       setAvailability(null);
       fetchSubdomains();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Не удалось создать поддомен");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось создать поддомен");
     } finally {
       setCreating(false);
     }
