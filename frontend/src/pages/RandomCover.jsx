@@ -1451,7 +1451,7 @@ export default function RandomCover() {
                           </Button>
                         </>
                       ) : (
-                        <p className="text-xs text-muted-foreground text-center py-4">
+                        <p className="text-xs text-muted-foreground text-center py-3 lg:py-4">
                           Выберите текст на холсте или добавьте новый
                         </p>
                       )}
@@ -1468,11 +1468,13 @@ export default function RandomCover() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4 space-y-3">
+                  <div className={`bg-zinc-900/50 rounded-2xl border border-white/5 p-3 lg:p-4 space-y-2 lg:space-y-3 ${
+                    activeControlTab !== "actions" ? "hidden lg:block" : ""
+                  }`}>
                     <Button
                       onClick={randomizeDesign}
                       variant="outline"
-                      className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                      className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10 h-10 lg:h-auto"
                       disabled={textElements.length === 0 && !bgImage}
                       data-testid="random-design-btn"
                     >
@@ -1483,7 +1485,7 @@ export default function RandomCover() {
                     <Button
                       onClick={resetDesign}
                       variant="outline"
-                      className="w-full"
+                      className="w-full h-10 lg:h-auto"
                       data-testid="reset-design-btn"
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
@@ -1492,7 +1494,7 @@ export default function RandomCover() {
 
                     <Button
                       onClick={saveCover}
-                      className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                      className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 h-11 lg:h-auto"
                       disabled={saving || (!bgImage && textElements.length === 0)}
                       data-testid="save-cover-btn"
                     >
@@ -1501,12 +1503,13 @@ export default function RandomCover() {
                       ) : (
                         <Download className="w-4 h-4 mr-2" />
                       )}
-                      Сохранить (3000x3000)
+                      <span className="hidden sm:inline">Сохранить (3000x3000)</span>
+                      <span className="sm:hidden">Скачать</span>
                     </Button>
                   </div>
 
-                  {/* Tips */}
-                  <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
+                  {/* Tips - Desktop only */}
+                  <div className="hidden lg:block bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
                     <h4 className="text-sm font-semibold text-blue-400 mb-2">Советы</h4>
                     <ul className="text-xs text-zinc-400 space-y-1">
                       <li>• Изменения применяются мгновенно</li>
