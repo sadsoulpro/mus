@@ -128,7 +128,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
 }
 
 // Mobile menu component
-function MobileMenu({ user, onLogout }) {
+function MobileMenu({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   
@@ -142,10 +142,13 @@ function MobileMenu({ user, onLogout }) {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="lg:hidden"
+          className="lg:hidden relative"
           data-testid="mobile-menu-btn"
         >
           <Menu className="w-5 h-5" />
+          {(unreadUserTickets > 0 || unreadStaffTickets > 0) && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          )}
         </Button>
       </SheetTrigger>
       <SheetContent 
@@ -171,6 +174,8 @@ function MobileMenu({ user, onLogout }) {
               onLogout();
             }}
             onNavigate={handleNavigate}
+            unreadUserTickets={unreadUserTickets}
+            unreadStaffTickets={unreadStaffTickets}
           />
         </div>
       </SheetContent>
@@ -179,7 +184,7 @@ function MobileMenu({ user, onLogout }) {
 }
 
 // Desktop Sidebar component
-function DesktopSidebar({ user, onLogout }) {
+function DesktopSidebar({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
   const location = useLocation();
   
   return (
@@ -201,17 +206,24 @@ function DesktopSidebar({ user, onLogout }) {
         user={user}
         onLogout={onLogout}
         onNavigate={() => {}}
+        unreadUserTickets={unreadUserTickets}
+        unreadStaffTickets={unreadStaffTickets}
       />
     </aside>
   );
 }
 
 // Mobile Header component
-function MobileHeader({ user, onLogout }) {
+function MobileHeader({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
   return (
     <div className="flex items-center justify-between p-4 lg:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
       <div className="flex items-center gap-3">
-        <MobileMenu user={user} onLogout={onLogout} />
+        <MobileMenu 
+          user={user} 
+          onLogout={onLogout} 
+          unreadUserTickets={unreadUserTickets}
+          unreadStaffTickets={unreadStaffTickets}
+        />
         <Link to="/multilinks">
           <img 
             src="/MyTrack-logo-main.svg" 
@@ -228,6 +240,48 @@ function MobileHeader({ user, onLogout }) {
 export default function Sidebar({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [unreadUserTickets, setUnreadUserTickets] = useState(0);
+  const [unreadStaffTickets, setUnreadStaffTickets] = useState(0);
+  const prevStaffCountRef = useRef(0);
+  
+  const isStaff = user?.role === "admin" || user?.role === "owner" || user?.role === "moderator";
+
+  // Fetch unread counts
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      try {
+        // Always fetch user unread tickets
+        const userRes = await api.get("/tickets/user/unread-count");
+        setUnreadUserTickets(userRes.data.unread_count);
+        
+        // Fetch staff unread if user is staff
+        if (isStaff) {
+          const staffRes = await api.get("/admin/tickets/unread-count");
+          const newCount = staffRes.data.unread_count;
+          
+          // Show toast if new tickets arrived
+          if (newCount > prevStaffCountRef.current && prevStaffCountRef.current > 0) {
+            toast.info("Новое обращение в поддержку!", {
+              description: "Проверьте раздел тикетов в админ-панели",
+              duration: 5000
+            });
+          }
+          
+          prevStaffCountRef.current = newCount;
+          setUnreadStaffTickets(newCount);
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    };
+
+    fetchUnreadCounts();
+    
+    // Poll every 30 seconds
+    const interval = setInterval(fetchUnreadCounts, 30000);
+    
+    return () => clearInterval(interval);
+  }, [isStaff]);
 
   const handleLogout = () => {
     logout();
@@ -237,10 +291,20 @@ export default function Sidebar({ children }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
-      <DesktopSidebar user={user} onLogout={handleLogout} />
+      <DesktopSidebar 
+        user={user} 
+        onLogout={handleLogout}
+        unreadUserTickets={unreadUserTickets}
+        unreadStaffTickets={unreadStaffTickets}
+      />
       
       {/* Mobile Header */}
-      <MobileHeader user={user} onLogout={handleLogout} />
+      <MobileHeader 
+        user={user} 
+        onLogout={handleLogout}
+        unreadUserTickets={unreadUserTickets}
+        unreadStaffTickets={unreadStaffTickets}
+      />
       
       {/* Main Content */}
       <main className="lg:ml-64">
