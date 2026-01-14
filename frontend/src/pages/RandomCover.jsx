@@ -20,15 +20,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/App";
 import { toast } from "sonner";
 import Sidebar from "@/components/Sidebar";
 import { 
   Upload, Type, Shuffle, Download, Trash2, 
   Loader2, Image as ImageIcon, RotateCcw,
-  Undo2, Redo2
+  Undo2, Redo2, Save, FolderOpen, Plus, 
+  FileImage, Clock, MoreVertical
 } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Google Fonts to load
 const FONTS = [
@@ -351,6 +360,15 @@ export default function RandomCover() {
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
   const [savedProject, setSavedProject] = useState(null);
   
+  // Projects state
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [currentProjectName, setCurrentProjectName] = useState("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [savingProject, setSavingProject] = useState(false);
+  const [activeTab, setActiveTab] = useState("editor");
+  
   // Selected text settings (live preview)
   const selectedText = useMemo(() => {
     return textElements.find((el) => el.id === selectedId);
@@ -359,6 +377,7 @@ export default function RandomCover() {
   // ==================== INITIALIZATION ====================
   useEffect(() => {
     loadFonts();
+    fetchProjects();
     
     // Check for saved project
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -389,6 +408,155 @@ export default function RandomCover() {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
+  // ==================== PROJECTS API ====================
+  const fetchProjects = async () => {
+    setLoadingProjects(true);
+    try {
+      const response = await api.get("/projects");
+      setProjects(response.data.projects || []);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
+
+  const saveProject = async (name) => {
+    if (!name?.trim()) {
+      toast.error("Введите название проекта");
+      return;
+    }
+
+    setSavingProject(true);
+    try {
+      // Generate preview image
+      let previewImage = null;
+      if (stageRef.current) {
+        setSelectedId(null);
+        setGuides([]);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        previewImage = stageRef.current.toDataURL({
+          pixelRatio: 0.5,
+          mimeType: "image/png",
+        });
+      }
+
+      // Build canvas JSON with all state needed for restoration
+      const canvasState = {
+        textElements,
+        currentFilter,
+        filterValue,
+        bgImageData, // Base64 image data for background
+      };
+
+      const response = await api.post("/projects/save", {
+        project_id: currentProjectId,
+        project_name: name.trim(),
+        canvas_json: JSON.stringify(canvasState),
+        preview_image: previewImage,
+      });
+
+      if (response.data.success) {
+        const savedProject = response.data.project;
+        setCurrentProjectId(savedProject.id);
+        setCurrentProjectName(savedProject.project_name);
+        toast.success(currentProjectId ? "Проект обновлён" : "Проект сохранён");
+        fetchProjects();
+        setShowSaveDialog(false);
+      }
+    } catch (error) {
+      console.error("Save project error:", error);
+      toast.error("Ошибка сохранения проекта");
+    } finally {
+      setSavingProject(false);
+    }
+  };
+
+  const loadProject = async (projectId) => {
+    try {
+      const response = await api.get(`/projects/${projectId}`);
+      const project = response.data.project;
+      
+      if (!project) {
+        toast.error("Проект не найден");
+        return;
+      }
+
+      // Parse canvas state
+      const canvasState = JSON.parse(project.canvas_json);
+      
+      // Restore state
+      setTextElements(canvasState.textElements || []);
+      setCurrentFilter(canvasState.currentFilter || FILTER_TYPES.NONE);
+      setFilterValue(canvasState.filterValue || 0.5);
+      
+      // Restore background image
+      if (canvasState.bgImageData) {
+        loadImageFromData(canvasState.bgImageData);
+      } else {
+        setBgImage(null);
+        setBgImageData(null);
+      }
+      
+      // Set project info
+      setCurrentProjectId(project.id);
+      setCurrentProjectName(project.project_name);
+      setSelectedId(null);
+      setGuides([]);
+      
+      // Clear history for new project
+      setHistory([]);
+      setHistoryIndex(-1);
+      
+      // Switch to editor tab
+      setActiveTab("editor");
+      
+      toast.success(`Загружен проект: ${project.project_name}`);
+    } catch (error) {
+      console.error("Load project error:", error);
+      toast.error("Ошибка загрузки проекта");
+    }
+  };
+
+  const deleteProject = async (projectId, e) => {
+    e?.stopPropagation();
+    
+    if (!confirm("Удалить этот проект?")) return;
+    
+    try {
+      await api.delete(`/projects/${projectId}`);
+      toast.success("Проект удалён");
+      
+      // Clear current project if deleted
+      if (currentProjectId === projectId) {
+        setCurrentProjectId(null);
+        setCurrentProjectName("");
+      }
+      
+      fetchProjects();
+    } catch (error) {
+      console.error("Delete project error:", error);
+      toast.error("Ошибка удаления проекта");
+    }
+  };
+
+  const startNewProject = () => {
+    setCurrentProjectId(null);
+    setCurrentProjectName("");
+    setTextElements([]);
+    setBgImage(null);
+    setBgImageData(null);
+    setCurrentFilter(FILTER_TYPES.NONE);
+    setFilterValue(0.5);
+    setSelectedId(null);
+    setGuides([]);
+    setHistory([]);
+    setHistoryIndex(-1);
+    localStorage.removeItem(STORAGE_KEY);
+    setActiveTab("editor");
+    toast.success("Новый проект создан");
+  };
+
   // ==================== KEYBOARD SHORTCUTS ====================
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -404,14 +572,25 @@ export default function RandomCover() {
       }
       // Delete selected
       if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+        // Don't trigger if typing in input
+        if (document.activeElement?.tagName === "INPUT") return;
         e.preventDefault();
         deleteSelectedText();
+      }
+      // Save: Ctrl+S
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        if (currentProjectId) {
+          saveProject(currentProjectName);
+        } else {
+          setShowSaveDialog(true);
+        }
       }
     };
     
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [historyIndex, history, selectedId]);
+  }, [historyIndex, history, selectedId, currentProjectId, currentProjectName]);
 
   // ==================== AUTO-SAVE ====================
   const saveToLocalStorage = useCallback(() => {
@@ -529,123 +708,120 @@ export default function RandomCover() {
     setShowRecoveryDialog(false);
   };
 
-  // ==================== TEXT MANAGEMENT ====================
+  // ==================== TEXT OPERATIONS ====================
   const addTextElement = () => {
     const newText = {
-      id: `text-${Date.now()}`,
-      text: "Новый текст",
-      x: CANVAS_SIZE / 2 - 100,
-      y: CANVAS_SIZE / 2,
+      id: `text_${Date.now()}`,
+      text: "Ваш текст",
+      x: CANVAS_SIZE / 2 - 75,
+      y: CANVAS_SIZE / 2 - 24,
       fontSize: 48,
-      fontFamily: "Anton",
-      fill: "#ffffff",
-      width: 200,
+      fontFamily: "Roboto",
+      fill: "#FFFFFF",
+      width: 150,
       align: "center",
-      rotation: 0,
     };
-    setTextElements((prev) => [...prev, newText]);
+    setTextElements([...textElements, newText]);
     setSelectedId(newText.id);
     saveToHistory();
-    toast.success("Текст добавлен");
   };
 
-  const updateTextElement = useCallback((id, newAttrs) => {
-    setTextElements((prev) =>
-      prev.map((el) => (el.id === id ? { ...el, ...newAttrs } : el))
+  const updateTextElement = (id, newAttrs) => {
+    setTextElements(
+      textElements.map((el) => (el.id === id ? { ...el, ...newAttrs } : el))
     );
-  }, []);
+  };
 
-  // Live update selected text (no "Apply" button needed)
-  const updateSelectedText = useCallback((key, value) => {
-    if (selectedId) {
-      setTextElements((prev) =>
-        prev.map((el) => (el.id === selectedId ? { ...el, [key]: value } : el))
-      );
-    }
-  }, [selectedId]);
+  const updateSelectedText = (key, value) => {
+    if (!selectedId) return;
+    updateTextElement(selectedId, { [key]: value });
+  };
 
   const deleteSelectedText = () => {
-    if (selectedId) {
-      setTextElements((prev) => prev.filter((el) => el.id !== selectedId));
-      setSelectedId(null);
-      saveToHistory();
-      toast.success("Текст удален");
-    }
+    if (!selectedId) return;
+    setTextElements(textElements.filter((el) => el.id !== selectedId));
+    setSelectedId(null);
+    saveToHistory();
   };
 
-  // ==================== SNAPPING ====================
-  const handleDragMove = useCallback((e, node) => {
+  // ==================== SNAPPING HANDLERS ====================
+  const handleDragMove = (e, node) => {
     if (!node) return;
-    
-    const lineGuideStops = getLineGuideStops(node.id(), textElements);
+
+    const lineGuideStops = getLineGuideStops(selectedId, textElements);
     const objectSnappingEdges = getObjectSnappingEdges(node);
-    const currentGuides = getGuides(lineGuideStops, objectSnappingEdges);
+    const newGuides = getGuides(lineGuideStops, objectSnappingEdges);
 
-    if (currentGuides.length === 0) {
-      setGuides([]);
-      return;
-    }
+    setGuides(newGuides);
 
-    setGuides(currentGuides);
-
-    // Apply snapping
     const absPos = node.absolutePosition();
-    currentGuides.forEach((lg) => {
-      if (lg.orientation === "V") {
-        absPos.x = lg.lineGuide + lg.offset;
-      } else if (lg.orientation === "H") {
-        absPos.y = lg.lineGuide + lg.offset;
+    newGuides.forEach((guide) => {
+      if (guide.orientation === "V") {
+        absPos.x = guide.lineGuide + guide.offset;
+      } else if (guide.orientation === "H") {
+        absPos.y = guide.lineGuide + guide.offset;
       }
     });
     node.absolutePosition(absPos);
-  }, [textElements]);
+  };
 
-  const handleDragEnd = useCallback(() => {
+  const handleDragEnd = () => {
     setGuides([]);
     saveToHistory();
-  }, [saveToHistory]);
+  };
 
-  const handleTransformEnd = useCallback(() => {
+  const handleTransformEnd = () => {
     saveToHistory();
-  }, [saveToHistory]);
+  };
 
-  // ==================== RANDOM DESIGN ====================
+  // ==================== DESIGN OPERATIONS ====================
   const randomizeDesign = () => {
-    const randomFilterIndex = Math.floor(Math.random() * (FILTERS.length - 1)) + 1;
-    setCurrentFilter(FILTERS[randomFilterIndex].type);
-    setFilterValue(Math.random() * 0.5 + 0.3);
+    if (textElements.length === 0 && !bgImage) return;
 
-    setTextElements((prev) =>
-      prev.map((el) => ({
-        ...el,
-        x: Math.random() * (CANVAS_SIZE - 200) + 50,
-        y: Math.random() * (CANVAS_SIZE - 100) + 50,
-        fontFamily: FONTS[Math.floor(Math.random() * FONTS.length)].family,
-        rotation: Math.random() * 30 - 15,
-        fontSize: Math.floor(Math.random() * 40) + 32,
-      }))
-    );
+    // Random colors palette
+    const colors = ["#FFFFFF", "#FF6B6B", "#4ECDC4", "#FFE66D", "#95E1D3", "#F38181", "#AA96DA"];
+    
+    const randomized = textElements.map((el) => ({
+      ...el,
+      x: Math.random() * (CANVAS_SIZE - 150) + 25,
+      y: Math.random() * (CANVAS_SIZE - 100) + 25,
+      fill: colors[Math.floor(Math.random() * colors.length)],
+      fontSize: Math.floor(Math.random() * 60) + 24,
+      fontFamily: FONTS[Math.floor(Math.random() * FONTS.length)].family,
+      rotation: Math.random() * 30 - 15,
+    }));
+    
+    setTextElements(randomized);
+    
+    // Random filter
+    const filterKeys = Object.keys(FILTER_TYPES);
+    const randomFilter = FILTER_TYPES[filterKeys[Math.floor(Math.random() * filterKeys.length)]];
+    setCurrentFilter(randomFilter);
+    
     saveToHistory();
-    toast.success("Случайный дизайн применен!");
+    toast.success("Случайный дизайн применён!");
   };
 
   const resetDesign = () => {
-    setCurrentFilter(FILTER_TYPES.NONE);
-    setFilterValue(0.5);
     setTextElements([]);
     setBgImage(null);
     setBgImageData(null);
+    setCurrentFilter(FILTER_TYPES.NONE);
+    setFilterValue(0.5);
     setSelectedId(null);
+    setGuides([]);
     setHistory([]);
     setHistoryIndex(-1);
+    setCurrentProjectId(null);
+    setCurrentProjectName("");
     localStorage.removeItem(STORAGE_KEY);
     toast.success("Дизайн сброшен");
   };
 
-  // ==================== SAVE/EXPORT ====================
+  // ==================== SAVE COVER ====================
   const saveCover = async () => {
     if (!stageRef.current) return;
-
+    
     setSaving(true);
     try {
       setSelectedId(null);
@@ -680,6 +856,17 @@ export default function RandomCover() {
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
+  // Format date
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <Sidebar>
       {/* Recovery Dialog */}
@@ -702,6 +889,49 @@ export default function RandomCover() {
         </DialogContent>
       </Dialog>
 
+      {/* Save Project Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800">
+          <DialogHeader>
+            <DialogTitle>Сохранить проект</DialogTitle>
+            <DialogDescription>
+              Введите название для вашего проекта
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={currentProjectName}
+              onChange={(e) => setCurrentProjectName(e.target.value)}
+              placeholder="Название проекта"
+              className="bg-zinc-800"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  saveProject(currentProjectName);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              Отмена
+            </Button>
+            <Button 
+              onClick={() => saveProject(currentProjectName)} 
+              className="bg-primary"
+              disabled={savingProject || !currentProjectName.trim()}
+            >
+              {savingProject ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              Сохранить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
@@ -710,7 +940,7 @@ export default function RandomCover() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                   <ImageIcon className="w-5 h-5 text-white" />
@@ -718,336 +948,511 @@ export default function RandomCover() {
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold">RandomCover</h1>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Создайте уникальную обложку для вашей музыки
+                    {currentProjectName || "Новый проект"}
                   </p>
                 </div>
               </div>
               
-              {/* Undo/Redo buttons */}
-              <div className="flex items-center gap-1">
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                {/* Undo/Redo buttons */}
+                <div className="flex items-center gap-1 mr-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleUndo}
+                    disabled={!canUndo}
+                    title="Отменить (Ctrl+Z)"
+                    className="h-9 w-9"
+                    data-testid="undo-btn"
+                  >
+                    <Undo2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRedo}
+                    disabled={!canRedo}
+                    title="Повторить (Ctrl+Y)"
+                    className="h-9 w-9"
+                    data-testid="redo-btn"
+                  >
+                    <Redo2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {/* Save button */}
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleUndo}
-                  disabled={!canUndo}
-                  title="Отменить (Ctrl+Z)"
-                  className="h-9 w-9"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (currentProjectId) {
+                      saveProject(currentProjectName);
+                    } else {
+                      setShowSaveDialog(true);
+                    }
+                  }}
+                  disabled={textElements.length === 0 && !bgImage}
+                  className="gap-2"
+                  data-testid="save-project-btn"
                 >
-                  <Undo2 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRedo}
-                  disabled={!canRedo}
-                  title="Повторить (Ctrl+Y)"
-                  className="h-9 w-9"
-                >
-                  <Redo2 className="w-4 h-4" />
+                  <Save className="w-4 h-4" />
+                  <span className="hidden sm:inline">
+                    {currentProjectId ? "Сохранить" : "Сохранить проект"}
+                  </span>
                 </Button>
               </div>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-[1fr,320px] gap-6">
-            {/* Canvas Area */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="order-2 lg:order-1"
-            >
-              <div 
-                ref={containerRef}
-                className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4 sm:p-6"
-              >
-                <div 
-                  className="mx-auto bg-zinc-800 rounded-xl overflow-hidden relative"
-                  style={{ 
-                    width: containerSize, 
-                    height: containerSize,
-                    boxShadow: "0 0 60px rgba(139, 92, 246, 0.1)"
-                  }}
-                >
-                  <Stage
-                    ref={stageRef}
-                    width={containerSize}
-                    height={containerSize}
-                    scaleX={scale}
-                    scaleY={scale}
-                    onMouseDown={(e) => {
-                      if (e.target === e.target.getStage()) {
-                        setSelectedId(null);
-                      }
-                    }}
-                    onTouchStart={(e) => {
-                      if (e.target === e.target.getStage()) {
-                        setSelectedId(null);
-                      }
-                    }}
-                  >
-                    {/* Background Layer */}
-                    <Layer>
-                      <Rect
-                        x={0}
-                        y={0}
-                        width={CANVAS_SIZE}
-                        height={CANVAS_SIZE}
-                        fill="#1a1a1a"
-                      />
-                      <BackgroundImage 
-                        image={bgImage} 
-                        filterType={currentFilter}
-                        filterValue={filterValue}
-                      />
-                    </Layer>
-                    
-                    {/* Text Layer */}
-                    <Layer>
-                      {textElements.map((el) => (
-                        <TextElement
-                          key={el.id}
-                          shapeProps={el}
-                          isSelected={el.id === selectedId}
-                          onSelect={() => setSelectedId(el.id)}
-                          onChange={(newAttrs) => updateTextElement(el.id, newAttrs)}
-                          onDragMove={handleDragMove}
-                          onDragEnd={handleDragEnd}
-                          onTransformEnd={handleTransformEnd}
-                        />
-                      ))}
-                    </Layer>
-                    
-                    {/* Guides Layer */}
-                    <Layer>
-                      {guides.map((guide, i) => {
-                        if (guide.orientation === "H") {
-                          return (
-                            <Line
-                              key={`guide-${i}`}
-                              points={[0, guide.lineGuide, CANVAS_SIZE, guide.lineGuide]}
-                              stroke={GUIDE_COLOR}
-                              strokeWidth={GUIDE_STROKE_WIDTH}
-                              dash={[4, 4]}
-                            />
-                          );
-                        } else if (guide.orientation === "V") {
-                          return (
-                            <Line
-                              key={`guide-${i}`}
-                              points={[guide.lineGuide, 0, guide.lineGuide, CANVAS_SIZE]}
-                              stroke={GUIDE_COLOR}
-                              strokeWidth={GUIDE_STROKE_WIDTH}
-                              dash={[4, 4]}
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-                    </Layer>
-                  </Stage>
-                </div>
-
-                <p className="text-center text-xs text-muted-foreground mt-4">
-                  Финальное разрешение: {OUTPUT_SIZE}x{OUTPUT_SIZE}px • 
-                  История: {historyIndex + 1}/{history.length}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Controls Panel */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="order-1 lg:order-2 space-y-4"
-            >
-              {/* Image Upload */}
-              <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4">
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-primary" />
-                  Фоновое изображение
-                </h3>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {bgImage ? "Заменить фото" : "Загрузить фото"}
-                </Button>
-
-                {bgImage && (
-                  <div className="mt-3">
-                    <Label className="text-xs">Фильтр</Label>
-                    <Select
-                      value={currentFilter}
-                      onValueChange={(val) => {
-                        setCurrentFilter(val);
-                        saveToHistory();
-                      }}
-                    >
-                      <SelectTrigger className="mt-1 bg-zinc-800">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FILTERS.map((f) => (
-                          <SelectItem key={f.type} value={f.type}>
-                            {f.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {/* Tabs: Editor / My Projects */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="bg-zinc-900/50 border border-white/5">
+              <TabsTrigger value="editor" className="gap-2" data-testid="editor-tab">
+                <ImageIcon className="w-4 h-4" />
+                Редактор
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="gap-2" data-testid="projects-tab">
+                <FolderOpen className="w-4 h-4" />
+                Мои проекты
+                {projects.length > 0 && (
+                  <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
+                    {projects.length}
+                  </span>
                 )}
-              </div>
+              </TabsTrigger>
+            </TabsList>
 
-              {/* Text Controls - Live Preview */}
-              <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4">
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Type className="w-4 h-4 text-primary" />
-                  Текст {selectedText && <span className="text-xs text-muted-foreground">(выбран)</span>}
-                </h3>
-                
-                <div className="space-y-3">
-                  {selectedText ? (
-                    <>
-                      <div>
-                        <Label className="text-xs">Содержание</Label>
-                        <Input
-                          value={selectedText.text}
-                          onChange={(e) => updateSelectedText("text", e.target.value)}
-                          className="mt-1 bg-zinc-800"
-                          placeholder="Введите текст"
-                        />
-                      </div>
+            {/* Editor Tab */}
+            <TabsContent value="editor" className="mt-0">
+              <div className="grid lg:grid-cols-[1fr,320px] gap-6">
+                {/* Canvas Area */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="order-2 lg:order-1"
+                >
+                  <div 
+                    ref={containerRef}
+                    className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4 sm:p-6"
+                  >
+                    <div 
+                      className="mx-auto bg-zinc-800 rounded-xl overflow-hidden relative"
+                      style={{ 
+                        width: containerSize, 
+                        height: containerSize,
+                        boxShadow: "0 0 60px rgba(139, 92, 246, 0.1)"
+                      }}
+                      data-testid="canvas-container"
+                    >
+                      <Stage
+                        ref={stageRef}
+                        width={containerSize}
+                        height={containerSize}
+                        scaleX={scale}
+                        scaleY={scale}
+                        onMouseDown={(e) => {
+                          if (e.target === e.target.getStage()) {
+                            setSelectedId(null);
+                          }
+                        }}
+                        onTouchStart={(e) => {
+                          if (e.target === e.target.getStage()) {
+                            setSelectedId(null);
+                          }
+                        }}
+                      >
+                        {/* Background Layer */}
+                        <Layer>
+                          <Rect
+                            x={0}
+                            y={0}
+                            width={CANVAS_SIZE}
+                            height={CANVAS_SIZE}
+                            fill="#1a1a1a"
+                          />
+                          <BackgroundImage 
+                            image={bgImage} 
+                            filterType={currentFilter}
+                            filterValue={filterValue}
+                          />
+                        </Layer>
+                        
+                        {/* Text Layer */}
+                        <Layer>
+                          {textElements.map((el) => (
+                            <TextElement
+                              key={el.id}
+                              shapeProps={el}
+                              isSelected={el.id === selectedId}
+                              onSelect={() => setSelectedId(el.id)}
+                              onChange={(newAttrs) => updateTextElement(el.id, newAttrs)}
+                              onDragMove={handleDragMove}
+                              onDragEnd={handleDragEnd}
+                              onTransformEnd={handleTransformEnd}
+                            />
+                          ))}
+                        </Layer>
+                        
+                        {/* Guides Layer */}
+                        <Layer>
+                          {guides.map((guide, i) => {
+                            if (guide.orientation === "H") {
+                              return (
+                                <Line
+                                  key={`guide-${i}`}
+                                  points={[0, guide.lineGuide, CANVAS_SIZE, guide.lineGuide]}
+                                  stroke={GUIDE_COLOR}
+                                  strokeWidth={GUIDE_STROKE_WIDTH}
+                                  dash={[4, 4]}
+                                />
+                              );
+                            } else if (guide.orientation === "V") {
+                              return (
+                                <Line
+                                  key={`guide-${i}`}
+                                  points={[guide.lineGuide, 0, guide.lineGuide, CANVAS_SIZE]}
+                                  stroke={GUIDE_COLOR}
+                                  strokeWidth={GUIDE_STROKE_WIDTH}
+                                  dash={[4, 4]}
+                                />
+                              );
+                            }
+                            return null;
+                          })}
+                        </Layer>
+                      </Stage>
+                    </div>
 
-                      <div>
-                        <Label className="text-xs">Шрифт</Label>
-                        <Select 
-                          value={selectedText.fontFamily} 
-                          onValueChange={(val) => updateSelectedText("fontFamily", val)}
+                    <p className="text-center text-xs text-muted-foreground mt-4">
+                      Финальное разрешение: {OUTPUT_SIZE}x{OUTPUT_SIZE}px • 
+                      История: {historyIndex + 1}/{history.length}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Controls Panel */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="order-1 lg:order-2 space-y-4"
+                >
+                  {/* Image Upload */}
+                  <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <Upload className="w-4 h-4 text-primary" />
+                      Фоновое изображение
+                    </h3>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      data-testid="image-upload-input"
+                    />
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => fileInputRef.current?.click()}
+                      data-testid="upload-image-btn"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {bgImage ? "Заменить фото" : "Загрузить фото"}
+                    </Button>
+
+                    {bgImage && (
+                      <div className="mt-3">
+                        <Label className="text-xs">Фильтр</Label>
+                        <Select
+                          value={currentFilter}
+                          onValueChange={(val) => {
+                            setCurrentFilter(val);
+                            saveToHistory();
+                          }}
                         >
-                          <SelectTrigger className="mt-1 bg-zinc-800">
+                          <SelectTrigger className="mt-1 bg-zinc-800" data-testid="filter-select">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {FONTS.map((f) => (
-                              <SelectItem key={f.family} value={f.family}>
-                                <span style={{ fontFamily: f.family }}>{f.name}</span>
+                            {FILTERS.map((f) => (
+                              <SelectItem key={f.type} value={f.type}>
+                                {f.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
+                    )}
+                  </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label className="text-xs">Цвет</Label>
-                          <div className="flex gap-2 mt-1">
+                  {/* Text Controls - Live Preview */}
+                  <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <Type className="w-4 h-4 text-primary" />
+                      Текст {selectedText && <span className="text-xs text-muted-foreground">(выбран)</span>}
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      {selectedText ? (
+                        <>
+                          <div>
+                            <Label className="text-xs">Содержание</Label>
                             <Input
-                              type="color"
-                              value={selectedText.fill}
-                              onChange={(e) => updateSelectedText("fill", e.target.value)}
-                              className="w-10 h-9 p-1 bg-zinc-800"
-                            />
-                            <Input
-                              value={selectedText.fill}
-                              onChange={(e) => updateSelectedText("fill", e.target.value)}
-                              className="flex-1 bg-zinc-800 font-mono text-xs"
+                              value={selectedText.text}
+                              onChange={(e) => updateSelectedText("text", e.target.value)}
+                              className="mt-1 bg-zinc-800"
+                              placeholder="Введите текст"
+                              data-testid="text-content-input"
                             />
                           </div>
-                        </div>
-                        <div>
-                          <Label className="text-xs">Размер: {Math.round(selectedText.fontSize)}px</Label>
-                          <Slider
-                            value={[selectedText.fontSize]}
-                            onValueChange={([val]) => updateSelectedText("fontSize", val)}
-                            min={12}
-                            max={120}
-                            step={1}
-                            className="mt-3"
-                          />
-                        </div>
-                      </div>
 
-                      <Button
-                        onClick={deleteSelectedText}
-                        variant="outline"
-                        className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                          <div>
+                            <Label className="text-xs">Шрифт</Label>
+                            <Select 
+                              value={selectedText.fontFamily} 
+                              onValueChange={(val) => updateSelectedText("fontFamily", val)}
+                            >
+                              <SelectTrigger className="mt-1 bg-zinc-800" data-testid="font-select">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {FONTS.map((f) => (
+                                  <SelectItem key={f.family} value={f.family}>
+                                    <span style={{ fontFamily: f.family }}>{f.name}</span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs">Цвет</Label>
+                              <div className="flex gap-2 mt-1">
+                                <Input
+                                  type="color"
+                                  value={selectedText.fill}
+                                  onChange={(e) => updateSelectedText("fill", e.target.value)}
+                                  className="w-10 h-9 p-1 bg-zinc-800"
+                                  data-testid="color-input"
+                                />
+                                <Input
+                                  value={selectedText.fill}
+                                  onChange={(e) => updateSelectedText("fill", e.target.value)}
+                                  className="flex-1 bg-zinc-800 font-mono text-xs"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-xs">Размер: {Math.round(selectedText.fontSize)}px</Label>
+                              <Slider
+                                value={[selectedText.fontSize]}
+                                onValueChange={([val]) => updateSelectedText("fontSize", val)}
+                                min={12}
+                                max={120}
+                                step={1}
+                                className="mt-3"
+                                data-testid="font-size-slider"
+                              />
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={deleteSelectedText}
+                            variant="outline"
+                            className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            data-testid="delete-text-btn"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Удалить текст
+                          </Button>
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted-foreground text-center py-4">
+                          Выберите текст на холсте или добавьте новый
+                        </p>
+                      )}
+
+                      <Button 
+                        onClick={addTextElement} 
+                        className="w-full bg-primary hover:bg-primary/90"
+                        data-testid="add-text-btn"
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Удалить текст
+                        <Type className="w-4 h-4 mr-1" />
+                        Добавить текст
                       </Button>
-                    </>
-                  ) : (
-                    <p className="text-xs text-muted-foreground text-center py-4">
-                      Выберите текст на холсте или добавьте новый
-                    </p>
-                  )}
+                    </div>
+                  </div>
 
+                  {/* Action Buttons */}
+                  <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4 space-y-3">
+                    <Button
+                      onClick={randomizeDesign}
+                      variant="outline"
+                      className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                      disabled={textElements.length === 0 && !bgImage}
+                      data-testid="random-design-btn"
+                    >
+                      <Shuffle className="w-4 h-4 mr-2" />
+                      Случайный дизайн
+                    </Button>
+
+                    <Button
+                      onClick={resetDesign}
+                      variant="outline"
+                      className="w-full"
+                      data-testid="reset-design-btn"
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Сбросить
+                    </Button>
+
+                    <Button
+                      onClick={saveCover}
+                      className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                      disabled={saving || (!bgImage && textElements.length === 0)}
+                      data-testid="save-cover-btn"
+                    >
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4 mr-2" />
+                      )}
+                      Сохранить (3000x3000)
+                    </Button>
+                  </div>
+
+                  {/* Tips */}
+                  <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
+                    <h4 className="text-sm font-semibold text-blue-400 mb-2">Советы</h4>
+                    <ul className="text-xs text-zinc-400 space-y-1">
+                      <li>• Изменения применяются мгновенно</li>
+                      <li>• Элементы примагничиваются к центру и друг к другу</li>
+                      <li>• <kbd className="px-1 bg-zinc-800 rounded">Ctrl+Z</kbd> — отмена, <kbd className="px-1 bg-zinc-800 rounded">Ctrl+Y</kbd> — повтор</li>
+                      <li>• <kbd className="px-1 bg-zinc-800 rounded">Ctrl+S</kbd> — сохранить проект</li>
+                      <li>• Проект автоматически сохраняется</li>
+                    </ul>
+                  </div>
+                </motion.div>
+              </div>
+            </TabsContent>
+
+            {/* Projects Tab */}
+            <TabsContent value="projects" className="mt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-zinc-900/50 rounded-2xl border border-white/5 p-6"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold">Мои проекты</h2>
                   <Button 
-                    onClick={addTextElement} 
-                    className="w-full bg-primary hover:bg-primary/90"
+                    onClick={startNewProject}
+                    className="gap-2"
+                    data-testid="new-project-btn"
                   >
-                    <Type className="w-4 h-4 mr-1" />
-                    Добавить текст
+                    <Plus className="w-4 h-4" />
+                    Новый проект
                   </Button>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="bg-zinc-900/50 rounded-2xl border border-white/5 p-4 space-y-3">
-                <Button
-                  onClick={randomizeDesign}
-                  variant="outline"
-                  className="w-full border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-                  disabled={textElements.length === 0 && !bgImage}
-                >
-                  <Shuffle className="w-4 h-4 mr-2" />
-                  Случайный дизайн
-                </Button>
+                {loadingProjects ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  </div>
+                ) : projects.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FileImage className="w-16 h-16 mx-auto text-zinc-700 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Нет сохранённых проектов</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Создайте свою первую обложку в редакторе и сохраните проект
+                    </p>
+                    <Button onClick={() => setActiveTab("editor")} variant="outline">
+                      Перейти в редактор
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {projects.map((project) => (
+                      <div
+                        key={project.id}
+                        onClick={() => loadProject(project.id)}
+                        className={`group relative bg-zinc-800/50 rounded-xl overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 ${
+                          currentProjectId === project.id ? "ring-2 ring-primary" : ""
+                        }`}
+                        data-testid={`project-card-${project.id}`}
+                      >
+                        {/* Preview */}
+                        <div className="aspect-square bg-zinc-900">
+                          {project.preview_url ? (
+                            <img
+                              src={project.preview_url}
+                              alt={project.project_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <FileImage className="w-12 h-12 text-zinc-700" />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Info */}
+                        <div className="p-3">
+                          <h4 className="font-medium text-sm truncate">
+                            {project.project_name}
+                          </h4>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                            <Clock className="w-3 h-3" />
+                            {formatDate(project.updated_at)}
+                          </p>
+                        </div>
 
-                <Button
-                  onClick={resetDesign}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Сбросить
-                </Button>
+                        {/* Actions */}
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 bg-black/50 hover:bg-black/70"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => loadProject(project.id)}>
+                                <FolderOpen className="w-4 h-4 mr-2" />
+                                Открыть
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={(e) => deleteProject(project.id, e)}
+                                className="text-red-400"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Удалить
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
 
-                <Button
-                  onClick={saveCover}
-                  className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                  disabled={saving || (!bgImage && textElements.length === 0)}
-                >
-                  {saving ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4 mr-2" />
-                  )}
-                  Сохранить (3000x3000)
-                </Button>
-              </div>
-
-              {/* Tips */}
-              <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
-                <h4 className="text-sm font-semibold text-blue-400 mb-2">Советы</h4>
-                <ul className="text-xs text-zinc-400 space-y-1">
-                  <li>• Изменения применяются мгновенно</li>
-                  <li>• Элементы примагничиваются к центру и друг к другу</li>
-                  <li>• <kbd className="px-1 bg-zinc-800 rounded">Ctrl+Z</kbd> — отмена, <kbd className="px-1 bg-zinc-800 rounded">Ctrl+Y</kbd> — повтор</li>
-                  <li>• Проект автоматически сохраняется</li>
-                </ul>
-              </div>
-            </motion.div>
-          </div>
+                        {/* Current indicator */}
+                        {currentProjectId === project.id && (
+                          <div className="absolute top-2 left-2">
+                            <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">
+                              Текущий
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </Sidebar>
