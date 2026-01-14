@@ -2326,6 +2326,7 @@ async def get_subdomain_page(request: Request, slug: Optional[str] = None):
         return {
             "subdomain": subdomain,
             "username": user.get("username"),
+            "artist_name": user.get("artist_name", ""),
             "profile_description": user.get("profile_description", ""),
             "pages": pages,
             "verified": user.get("verified", False) and user.get("show_verification_badge", True),
