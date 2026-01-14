@@ -477,6 +477,58 @@ export default function PublicPage() {
             )}
           </motion.div>
           
+          {/* Contact Info Section */}
+          {(page.contact_email || (page.social_links && Object.values(page.social_links).some(v => v))) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-white/10"
+            >
+              <p className="text-xs text-zinc-500 mb-3 text-center">Связаться</p>
+              
+              {/* Contact Email */}
+              {page.contact_email && (
+                <a 
+                  href={`mailto:${page.contact_email}`}
+                  className="flex items-center justify-center gap-2 mb-3 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 border border-white/10 rounded-xl transition-all group"
+                >
+                  <Mail className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-zinc-300 group-hover:text-white">{page.contact_email}</span>
+                </a>
+              )}
+              
+              {/* Social Links */}
+              {page.social_links && Object.values(page.social_links).some(v => v) && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {Object.entries(page.social_links).map(([platform, value]) => {
+                    if (!value) return null;
+                    
+                    const platformInfo = SOCIAL_PLATFORMS[platform];
+                    if (!platformInfo) return null;
+                    
+                    const Icon = platformInfo.icon;
+                    const url = formatSocialUrl(platform, value);
+                    
+                    return (
+                      <a
+                        key={platform}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                        style={{ backgroundColor: `${platformInfo.color}20` }}
+                        title={platformInfo.name}
+                      >
+                        <Icon className="w-5 h-5" style={{ color: platformInfo.color }} />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
+          )}
+          
           {/* QR Code - only show if enabled */}
           {page.qr_enabled !== false && (
             <motion.div
