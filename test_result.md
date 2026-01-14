@@ -183,7 +183,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -193,6 +193,28 @@ backend:
           2. PUT /api/profile/contacts - updates contact_email and social_links
           3. Updated /api/artist/{slug} to include contact_email and social_links from user
           4. Social links include: telegram, instagram, vk, tiktok, twitter, website
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CONTACT INFO API TESTING COMPLETED - ALL TESTS PASSED (7/7 - 100% success rate)
+          
+          1. GET /api/profile/contacts: ✅ PASSED
+             - Returns correct structure with contact_email and social_links fields
+             - All 6 social platforms present: telegram, instagram, vk, tiktok, twitter, website
+             - Proper authentication required and working
+          
+          2. PUT /api/profile/contacts: ✅ PASSED  
+             - Successfully updates contact_email and social_links as specified in review request
+             - Test data: {"contact_email": "new@example.com", "social_links": {"telegram": "@newtest", "instagram": "@newtest"}}
+             - Returns success message: "Контактная информация обновлена"
+             - Data persistence verified by subsequent GET request
+          
+          3. GET /api/artist/thley: ✅ PASSED
+             - Artist page correctly includes contact_email and social_links from user
+             - Found existing contact info: email="music@example.com", telegram="@mymusic_channel", instagram="@mymusic_official"
+             - All required fields present in response structure
+          
+          All Contact Info API endpoints are working correctly with proper authentication, data validation, and persistence. Ready for production use.
 
 frontend:
   - task: "Odesli Auto-fill Feature in PageBuilder"
