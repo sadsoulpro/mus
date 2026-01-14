@@ -77,7 +77,7 @@
 }
 
 body {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Gilroy', sans-serif;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
@@ -86,7 +86,22 @@ body {
 }
 
 .font-display {
-    font-family: 'Anton', sans-serif;
+    font-family: 'Gilroy', sans-serif;
+}
+
+.font-gilroy-300 {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 300;
+}
+
+.font-gilroy-600 {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 600;
+}
+
+.font-gilroy-800 {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 800;
 }
 
 @layer base {
