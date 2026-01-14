@@ -2960,13 +2960,28 @@ async def startup_event():
     await db.subdomains.create_index("user_id")
     await db.cover_projects.create_index("user_id")
     
-    # Update existing plan configs with subdomain limits
-    for plan_name in ["free", "pro", "ultimate"]:
-        default_limit = DEFAULT_PLAN_CONFIGS[plan_name]["max_subdomains_limit"]
-        await db.plan_configs.update_one(
-            {"plan_name": plan_name, "max_subdomains_limit": {"$exists": False}},
-            {"$set": {"max_subdomains_limit": default_limit}}
-        )
+    # Update existing plan configs with new fields
+    for plan_name in ["free", "pro"]:
+        if plan_name in DEFAULT_PLAN_CONFIGS:
+            default_config = DEFAULT_PLAN_CONFIGS[plan_name]
+            await db.plan_configs.update_one(
+                {"plan_name": plan_name},
+                {"$set": {
+                    "max_subdomains_limit": default_config.get("max_subdomains_limit", 0),
+                    "can_use_ai_generation": default_config.get("can_use_ai_generation", False),
+                    "can_verify_profile": default_config.get("can_verify_profile", False)
+                }},
+                upsert=True
+            )
+    
+    # Migrate users from 'ultimate' plan to 'pro'
+    await db.users.update_many(
+        {"plan": "ultimate"},
+        {"$set": {"plan": "pro"}}
+    )
+    
+    # Remove old 'ultimate' plan config
+    await db.plan_configs.delete_one({"plan_name": "ultimate"})
     
     # Migrate old "Unknown" entries to "Неизвестно" for consistency
     migration_result = await db.clicks.update_many(
