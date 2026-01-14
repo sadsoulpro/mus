@@ -711,10 +711,29 @@ export default function AdminPanel() {
                         <p className="text-[10px] text-muted-foreground mt-1">-1 = безлимит</p>
                       </div>
 
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1.5 block">Лимит поддоменов</label>
+                        <input
+                          type="number"
+                          value={config.max_subdomains_limit ?? 0}
+                          onChange={(e) => {
+                            setPlanConfigs(prev => prev.map(p => 
+                              p.plan_name === config.plan_name ? {...p, max_subdomains_limit: parseInt(e.target.value)} : p
+                            ));
+                            setEditingPlan(config.plan_name);
+                          }}
+                          className="w-full h-10 px-3 rounded-xl bg-zinc-800/50 border border-white/10 text-sm focus:border-primary focus:outline-none transition-colors"
+                          min="-1"
+                        />
+                        <p className="text-[10px] text-muted-foreground mt-1">-1 = безлимит, 0 = запрещено</p>
+                      </div>
+
                       <div className="space-y-2.5">
                         {[
                           { key: 'has_analytics', label: 'Базовая аналитика' },
                           { key: 'has_advanced_analytics', label: 'Расширенная аналитика' },
+                          { key: 'can_use_ai_generation', label: 'AI генерация обложек' },
+                          { key: 'can_verify_profile', label: 'Верификация профиля' },
                           { key: 'can_remove_branding', label: 'Убрать брендинг' },
                           { key: 'priority_support', label: 'Приоритетная поддержка' }
                         ].map(({ key, label }) => (
