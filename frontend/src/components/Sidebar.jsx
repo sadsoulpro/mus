@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/App";
+import { useAuth, api } from "@/App";
+import { toast } from "sonner";
 import { 
   BarChart3, Eye, Shield, Settings, LogOut, 
-  BadgeCheck, Menu, X, HelpCircle, Globe, Palette
+  BadgeCheck, Menu, X, HelpCircle, Globe, Palette, MessageCircle
 } from "lucide-react";
 import {
   Sheet,
@@ -20,11 +21,12 @@ const navItems = [
   { path: "/domains", label: "Домены", icon: Globe },
   { path: "/settings", label: "Настройки", icon: Settings },
   { path: "/verification", label: "Верификация", icon: BadgeCheck },
+  { path: "/support", label: "Поддержка", icon: MessageCircle },
   { path: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
 // Reusable navigation content
-function NavContent({ currentPath, user, onLogout, onNavigate }) {
+function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets, unreadStaffTickets }) {
   const isAdminRole = user?.role === "admin" || user?.role === "owner" || user?.role === "moderator";
 
   return (
@@ -35,6 +37,9 @@ function NavContent({ currentPath, user, onLogout, onNavigate }) {
           const isActive = currentPath === item.path || 
             (item.path === "/multilinks" && currentPath === "/multilinks") ||
             (item.path === "/analytics" && currentPath.startsWith("/analytics"));
+          
+          // Show badge for support item
+          const showUserBadge = item.path === "/support" && unreadUserTickets > 0;
           
           return (
             <Link
@@ -49,7 +54,12 @@ function NavContent({ currentPath, user, onLogout, onNavigate }) {
               data-testid={`nav-${item.path.replace("/", "")}`}
             >
               <Icon className="w-5 h-5" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {showUserBadge && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white animate-pulse">
+                  {unreadUserTickets}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -61,7 +71,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate }) {
           <Link
             to="/admin"
             onClick={onNavigate}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors mb-4 ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors mb-2 ${
               currentPath === "/admin"
                 ? "bg-white/5 text-foreground"
                 : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
@@ -69,7 +79,12 @@ function NavContent({ currentPath, user, onLogout, onNavigate }) {
             data-testid="nav-admin"
           >
             <Shield className="w-5 h-5" />
-            Админ-панель
+            <span className="flex-1">Админ-панель</span>
+            {unreadStaffTickets > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white animate-pulse">
+                {unreadStaffTickets}
+              </span>
+            )}
           </Link>
         )}
         <div className="flex items-center gap-3 mb-4">
