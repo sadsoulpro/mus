@@ -15,6 +15,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import jwt
 import bcrypt
+import base64
 from PIL import Image, ImageFilter
 import aiofiles
 import io
