@@ -286,6 +286,9 @@ function App() {
           <Route path="/faq" element={
             <ProtectedRoute><FAQ /></ProtectedRoute>
           } />
+          <Route path="/pricing" element={
+            <ProtectedRoute><Pricing /></ProtectedRoute>
+          } />
           <Route path="/page/new" element={
             <ProtectedRoute><PageBuilder /></ProtectedRoute>
           } />
