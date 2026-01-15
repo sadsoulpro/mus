@@ -1850,6 +1850,11 @@ export const translations = {
       changeStatus: "Cambiar estado",
       replyPlaceholder: "Escribe tu respuesta...",
       sendReply: "Enviar",
+      // Plan changes
+      planChanged: "Plan cambiado",
+      planChangedForTesting: "Tu plan ha sido cambiado para pruebas",
+      verificationRevoked: "Verificación revocada",
+      verified: "Verificado",
       // Roles
       roleOwner: "Propietario",
       roleAdmin: "Admin",
