@@ -410,6 +410,34 @@ export default function AdminPanel() {
                 {ROLE_CONFIG[currentUser?.role]?.label}
               </div>
             </div>
+            
+            {/* Owner Test Plan Switcher */}
+            {isOwner && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 rounded-xl bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-yellow-400" />
+                    <span className="text-sm font-medium text-yellow-300">Тестирование подписок</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Ваш текущий план:</span>
+                    <select
+                      value={currentUser?.plan || 'free'}
+                      onChange={(e) => updateOwnerPlan(e.target.value)}
+                      className="h-8 px-3 rounded-lg bg-zinc-800 border border-yellow-500/30 text-sm cursor-pointer hover:border-yellow-500/50 transition-colors text-white"
+                    >
+                      <option value="free">Free</option>
+                      <option value="pro">Pro</option>
+                    </select>
+                    <span className="text-xs text-muted-foreground">(для тестирования)</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Tabs */}
