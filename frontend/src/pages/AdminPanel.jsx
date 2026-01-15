@@ -623,7 +623,7 @@ export default function AdminPanel() {
                                 <span className="text-lg w-7">{getCountryFlag(item.country)}</span>
                                 <div className="flex-1">
                                   <div className="flex justify-between text-sm mb-1.5">
-                                    <span className="font-medium">{item.country || t('admin', 'unknown')}</span>
+                                    <span className="font-medium">{translateCountry(item.country)}</span>
                                     <span className="text-muted-foreground">{item.clicks}</span>
                                   </div>
                                   <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
