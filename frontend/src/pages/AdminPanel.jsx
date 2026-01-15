@@ -781,9 +781,9 @@ export default function AdminPanel() {
                       'bg-zinc-900/50 border-white/5'
                     }`}
                   >
-                    {config.plan_name === 'ultimate' && (
+                    {config.plan_name === 'pro' && (
                       <div className="absolute top-4 right-4">
-                        <Crown className="w-6 h-6 text-yellow-400" />
+                        <Crown className="w-6 h-6 text-blue-400" />
                       </div>
                     )}
 
