@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Link2, BarChart3, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/App";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Landing() {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -25,25 +28,26 @@ export default function Landing() {
         </div>
         
         <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher variant="compact" />
           {isAuthenticated ? (
             <>
               <Link to={user?.role === 'admin' ? '/admin' : '/multilinks'}>
-                <Button variant="ghost" data-testid="nav-panel-btn" className="px-3 sm:px-4 text-sm font-gilroy-600">Панель</Button>
+                <Button variant="ghost" data-testid="nav-panel-btn" className="px-3 sm:px-4 text-sm font-gilroy-600">{t('nav', 'panel')}</Button>
               </Link>
               <Link to="/page/new">
                 <Button data-testid="nav-create-btn" className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-5 py-2 text-sm font-gilroy-600">
-                  Создать
+                  {t('nav', 'create')}
                 </Button>
               </Link>
             </>
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" data-testid="nav-login-btn" className="px-3 sm:px-4 text-sm font-gilroy-600">Войти</Button>
+                <Button variant="ghost" data-testid="nav-login-btn" className="px-3 sm:px-4 text-sm font-gilroy-600">{t('nav', 'login')}</Button>
               </Link>
               <Link to="/register">
                 <Button data-testid="nav-signup-btn" className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-5 py-2 text-sm font-gilroy-600">
-                  Начать
+                  {t('nav', 'register')}
                 </Button>
               </Link>
             </>
@@ -64,13 +68,13 @@ export default function Landing() {
             {/* Mobile-optimized heading */}
             <h1 className="font-gilroy-800 leading-[1.05] mb-4 sm:mb-5 lg:mb-6
               text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-              СОЗДАЙ<br />
-              <span className="text-primary">МУЛЬТИССЫЛКУ</span><br />
-              ДЛЯ СВОЕЙ <span className="text-primary">МУЗЫКИ</span>
+              {t('landing', 'heroTitle1')}<br />
+              <span className="text-primary">{t('landing', 'heroTitle2')}</span><br />
+              {t('landing', 'heroTitle3')} <span className="text-primary">{t('landing', 'heroTitle4')}</span>
             </h1>
             <p className="font-gilroy-300 text-muted-foreground max-w-md mx-auto lg:mx-0
               text-sm sm:text-base lg:text-lg lg:mb-8">
-              Стильные страницы для ваших релизов. Одна ссылка — все платформы.
+              {t('landing', 'heroSubtitle')}
             </p>
             {/* Desktop buttons - hidden on mobile/tablet */}
             <div className="hidden lg:flex flex-row gap-3 justify-start">
@@ -79,7 +83,7 @@ export default function Landing() {
                   data-testid="hero-get-started-btn"
                   className="bg-primary hover:bg-primary/90 rounded-full px-8 py-5 text-base font-gilroy-600 shadow-lg shadow-primary/20 transition-all hover:scale-105"
                 >
-                  Создать страницу
+                  {t('landing', 'createPage')}
                 </Button>
               </Link>
               <Link to="/demo">
@@ -88,7 +92,7 @@ export default function Landing() {
                   data-testid="hero-demo-btn"
                   className="rounded-full px-8 py-5 text-base font-gilroy-600 border-white/10 hover:bg-white/5"
                 >
-                  Демо
+                  {t('landing', 'demo')}
                 </Button>
               </Link>
             </div>
