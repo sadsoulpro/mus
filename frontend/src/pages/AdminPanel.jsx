@@ -338,14 +338,40 @@ export default function AdminPanel() {
     }
   };
 
-  // Country flags
+  // Country flags - map country names to emoji flags
   const COUNTRY_FLAGS = {
-    "Россия": "🇷🇺", "США": "🇺🇸", "Украина": "🇺🇦", "Беларусь": "🇧🇾",
-    "Казахстан": "🇰🇿", "Германия": "🇩🇪", "ФРГ": "🇩🇪", "Великобритания": "🇬🇧",
-    "Франция": "🇫🇷", "Гонконг": "🇭🇰", "Сингапур": "🇸🇬",
-    "Неизвестно": "🌍", "Unknown": "🌍",
+    "Россия": "🇷🇺", "Russia": "🇷🇺", "Rusia": "🇷🇺",
+    "США": "🇺🇸", "USA": "🇺🇸", "EE.UU.": "🇺🇸",
+    "Украина": "🇺🇦", "Ukraine": "🇺🇦", "Ucrania": "🇺🇦",
+    "Беларусь": "🇧🇾", "Belarus": "🇧🇾", "Bielorrusia": "🇧🇾",
+    "Казахстан": "🇰🇿", "Kazakhstan": "🇰🇿", "Kazajistán": "🇰🇿",
+    "Германия": "🇩🇪", "Germany": "🇩🇪", "Alemania": "🇩🇪", "ФРГ": "🇩🇪",
+    "Великобритания": "🇬🇧", "United Kingdom": "🇬🇧", "Reino Unido": "🇬🇧", "UK": "🇬🇧",
+    "Франция": "🇫🇷", "France": "🇫🇷", "Francia": "🇫🇷",
+    "Гонконг": "🇭🇰", "Hong Kong": "🇭🇰",
+    "Сингапур": "🇸🇬", "Singapore": "🇸🇬", "Singapur": "🇸🇬",
+    "Неизвестно": "🌍", "Unknown": "🌍", "Desconocido": "🌍",
   };
   const getCountryFlag = (country) => COUNTRY_FLAGS[country] || "🌍";
+  
+  // Translate country name
+  const translateCountry = (country) => {
+    const countryMap = {
+      "Россия": "countryRussia", "Russia": "countryRussia", "Rusia": "countryRussia",
+      "США": "countryUSA", "USA": "countryUSA", "EE.UU.": "countryUSA",
+      "Украина": "countryUkraine", "Ukraine": "countryUkraine", "Ucrania": "countryUkraine",
+      "Беларусь": "countryBelarus", "Belarus": "countryBelarus", "Bielorrusia": "countryBelarus",
+      "Казахстан": "countryKazakhstan", "Kazakhstan": "countryKazakhstan", "Kazajistán": "countryKazakhstan",
+      "Германия": "countryGermany", "Germany": "countryGermany", "Alemania": "countryGermany", "ФРГ": "countryGermany",
+      "Великобритания": "countryUK", "United Kingdom": "countryUK", "Reino Unido": "countryUK", "UK": "countryUK",
+      "Франция": "countryFrance", "France": "countryFrance", "Francia": "countryFrance",
+      "Гонконг": "countryHongKong", "Hong Kong": "countryHongKong",
+      "Сингапур": "countrySingapore", "Singapore": "countrySingapore", "Singapur": "countrySingapore",
+      "Неизвестно": "countryUnknown", "Unknown": "countryUnknown", "Desconocido": "countryUnknown",
+    };
+    const key = countryMap[country];
+    return key ? t('admin', key) : country || t('admin', 'countryUnknown');
+  };
 
   const getProgressColor = (percent) => {
     if (percent >= 90) return "bg-red-500";
