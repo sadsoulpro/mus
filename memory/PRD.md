@@ -1,223 +1,124 @@
-# MyTrack MVP - Product Requirements Document
+# MyTrack - Link-in-Bio for Musicians
 
 ## Original Problem Statement
-Build a minimal band.link-like smart link web service for musicians. Focus on MVP only. No overengineering.
-
-## User Choices
-- **Image Storage**: Local file storage (server-side)
-- **Authentication**: JWT-based custom auth
-- **Theme**: Dark theme (modern, music-industry feel)
-- **Admin Account**: admin@example.com / admin123
-- **Language**: Russian (full UI localization)
-
-## User Personas
-
-### Guest (Fan)
-- Views public smart link pages
-- Clicks platform links to access music
-- No authentication required
-
-### User (Artist)
-- Registers and logs in
-- Creates and manages smart link pages
-- Views basic analytics (views, clicks)
-- Uploads cover images
-
-### Admin
-- Manages all users and pages
-- Can block/unblock users
-- Can disable/enable pages
-
-## Core Requirements (Static)
-
-### 1. Authentication
-- [x] User registration (email + password + username)
-- [x] Login / logout with JWT
-- [x] Password reset endpoint (MVP: returns success message)
-- [x] User model: id, email, username, plan (free), created_at, status
-
-### 2. User Dashboard
-- [x] List of user's smart pages
-- [x] Create new page button
-- [x] Basic stats per page: views, total clicks
-
-### 3. Smart Link Page (Public)
-- [x] Public URL: /artist/{slug}
-- [x] Artist name, release title, description
-- [x] Cover image with blurred background
-- [x] Platform links (Spotify, Apple Music, YouTube, SoundCloud, Tidal, Deezer, Custom)
-- [x] Click tracking via backend redirect
-
-### 4. Page Builder
-- [x] Create / edit page
-- [x] Fields: title, slug, artist name, release title, description
-- [x] Cover image upload with auto blur for background
-- [x] Links management (add, toggle, delete)
-- [x] Live mobile preview
-
-### 5. Analytics (Basic)
-- [x] Track page views
-- [x] Track clicks per platform
-- [x] Display simple numbers (no charts)
-
-### 6. Admin Panel
-- [x] Admin login
-- [x] List users with page counts
-- [x] View all pages
-- [x] Block / unblock user
-- [x] Disable / enable page
+Application cloned from GitHub repository `https://github.com/sadsoulpro/prefinal-final.git`. A link-in-bio service for musicians with smart link pages.
 
 ## What's Been Implemented
 
-### Backend (FastAPI + MongoDB)
-- Complete REST API with all endpoints
-- JWT authentication with proper header handling
-- File upload with automatic blurred background generation (Pillow)
-- Click tracking and redirect system
-- Admin routes with role-based access
-- Database indexes for performance
-- Default admin user creation on startup
-- Backend proxy for iTunes/Spotify API (CORS bypass)
+### Core Features (Existing)
+- JWT-based authentication (login, register, password reset)
+- Role-based access control (Owner, Admin, Moderator, User)
+- Smart link pages with music platform links
+- Odesli/Songlink API integration for auto-filling music links (URL + UPC code support)
+- Cover image upload and management
+- QR code generation for pages
+- Analytics (views, clicks, geography)
+- Subdomain management
+- Admin panel with global analytics
+- Support ticket system
+- Verification badge system
+- RandomCover - AI-powered cover art editor
 
-### Frontend (React + Tailwind CSS)
-- Dark theme with neon purple accents
-- Glassmorphism design for public pages
-- Responsive sidebar layout for dashboard
-- Live preview in page builder
-- Platform icons with brand colors (including Yandex Music, VK Music)
-- Framer Motion animations
-- Toast notifications via Sonner
-- QR code generation with download
-- Scan Source feature (auto-populate from Spotify/Apple Music)
-- Dynamic OG meta tags for public pages
-- Link reordering with up/down buttons
-- **Full Russian localization** (January 9, 2026)
+### Session Updates (2025-01-15)
+1. **Subscription Plan Cleanup** - Removed "Ultimate" plan, keeping only FREE and PRO
+2. **Owner Test Feature** - API endpoint for owner to switch plans for testing
+3. **Odesli UPC Search** - Added UPC code search via iTunes API + Odesli
+4. **Platform Expansion** - Added 15+ music platforms with icons
+5. **API Keys** - Added RESEND_API_KEY and HUGGINGFACE_TOKEN to backend
+6. **Full Internationalization (i18n)** - Complete translation system for RU, EN, ES
 
-### Database Collections
-- users: authentication and profile
-- pages: smart link pages
-- links: platform links per page
-- clicks: click tracking data
-
-## API Endpoints
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/forgot-password
-- POST /api/auth/reset-password
-- GET /api/auth/me
-- GET/POST /api/pages
-- GET/PUT/DELETE /api/pages/{id}
-- GET/POST /api/pages/{id}/links
-- PUT/DELETE /api/pages/{id}/links/{link_id}
-- GET /api/artist/{slug} (public)
-- GET /api/click/{link_id} (redirect + track)
-- GET /api/analytics/{page_id}
-- GET /api/admin/users
-- GET /api/admin/pages
-- PUT /api/admin/users/{id}/block
-- PUT /api/admin/pages/{id}/disable
-- POST /api/upload
-
-## Prioritized Backlog
-
-### P0 (Completed)
-- ✅ Core authentication
-- ✅ Page CRUD operations
-- ✅ Public smart link pages
-- ✅ Click tracking
-- ✅ Admin panel
-- ✅ Password reset with email (Resend)
-
-### P1 (Next Phase)
-- Custom themes/colors for pages
-- Image optimization
-- Email verification
-
-### P2 (Future)
-- Pre-save campaigns
-- Email capture forms
-- Multiple page themes
-- Analytics charts
-
-## Out of Scope
-- Payments/subscriptions
-- Teams/collaboration
-- Advanced analytics/charts
-- Design themes marketplace
+### i18n Implementation
+- Custom React Context-based i18n system
+- Central translations file: `/app/frontend/src/i18n/translations.js`
+- Language switcher in sidebar
+- Browser language auto-detection with localStorage persistence
+- Translated pages:
+  - Landing page
+  - Login / Register
+  - Dashboard / Sidebar
+  - Settings
+  - PageBuilder
+  - RandomCover
+  - Analytics
+  - Domains
+  - Verification
+  - Support
+  - FAQ
+  - Admin Panel
 
 ## Tech Stack
-- **Backend**: FastAPI, MongoDB, Pillow
-- **Frontend**: React, Tailwind CSS, Framer Motion
-- **Auth**: JWT (PyJWT, bcrypt)
-- **File Storage**: Local (server-side)
+- **Backend**: FastAPI, MongoDB (motor), Pydantic, JWT, bcrypt
+- **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, Framer Motion
+- **Database**: MongoDB
+- **Services**: Managed by Supervisor
 
-## Testing Summary
-- Backend: 90.5% pass rate
-- Frontend: 100% functional (all bugs fixed)
-- All core flows working
+## Key API Endpoints
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/users/me` - Current user profile
+- `GET /api/lookup/odesli?url=<url_or_upc>` - Music link lookup
+- `PUT /api/owner/my-plan` - Owner plan change (testing)
+- CRUD endpoints for pages, links, subdomains, tickets
 
-## Recent Updates (January 10, 2026)
+## Database Schema
+- **users**: id, email, username, password_hash, role, plan, status, verified
+- **pages**: id, user_id, slug, title, cover_image, links, qr_enabled
+- **subdomains**: id, user_id, subdomain, is_active
+- **tickets**: id, user_id, subject, messages, status
 
-### Bug Fixes
-- ✅ Fixed extra "back" arrow on public page - removed unused goBack function and duplicate JSX
-- ✅ Fixed infinite scroll navigation - added missing 'slug' dependency to useEffect
-- ✅ Confirmed delete page button works correctly in Dashboard
+## Test Credentials
+- **Owner**: `thedrumepic@gmail.com` / `test123`
 
-### Site Mode Feature
-- ✅ Toggle switch in Dashboard to enable/disable site navigation
-- ✅ Navigation arrows on public pages when site mode is enabled
-- ✅ Infinite loop navigation between user's pages
-- ✅ Tooltip previews showing previous/next release titles
-- ✅ Backend endpoint: PUT /api/settings/site-navigation
+## Pending/Future Tasks
 
-### Other Completed Features
-- ✅ Responsive sidebar component (Sidebar.jsx)
-- ✅ Full responsive design across all pages
-- ✅ FAQ page with accordion
-- ✅ Persistent authentication using localStorage
-- ✅ Dynamic Landing page (Login → Panel button when logged in)
-- ✅ Auto-generated page titles and slugs
+### P2 - Security Improvements
+- Remove hardcoded JWT_SECRET fallback
+- Make OWNER_EMAIL configurable via .env
 
-## Localization Status (January 9, 2026)
-**Russian Translation Complete:**
-- ✅ Login page
-- ✅ Register page
-- ✅ Dashboard
-- ✅ Admin Panel
-- ✅ PageBuilder (all sections)
-- ✅ Toast messages
-- ✅ Form labels and placeholders
-- ✅ Buttons and navigation
-- ✅ Forgot Password page
-- ✅ Reset Password page
-- ✅ Password reset email template (Russian)
+### P3 - Performance
+- Optimize N+1 database queries in admin panel
 
-## Recent Updates (January 12, 2026)
+## File Structure
+```
+/app
+├── backend/
+│   ├── .env
+│   ├── requirements.txt
+│   └── server.py
+├── frontend/
+│   ├── .env
+│   ├── package.json
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── i18n/
+│   │   │   ├── index.js
+│   │   │   └── translations.js
+│   │   ├── contexts/
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── LanguageContext.jsx
+│   │   ├── components/
+│   │   │   ├── Sidebar.jsx
+│   │   │   └── LanguageSwitcher.jsx
+│   │   └── pages/
+│   │       ├── Landing.jsx
+│   │       ├── Login.jsx
+│   │       ├── Register.jsx
+│   │       ├── Dashboard.jsx
+│   │       ├── PageBuilder.jsx
+│   │       ├── RandomCover.jsx
+│   │       ├── Analytics.jsx
+│   │       ├── Domains.jsx
+│   │       ├── Settings.jsx
+│   │       ├── Support.jsx
+│   │       ├── FAQ.jsx
+│   │       ├── Verification.jsx
+│   │       └── AdminPanel.jsx
+└── memory/
+    └── PRD.md
+```
 
-### Subdomain Management System ✅
-- ✅ User Domains page (`/domains`) - create, toggle, delete personal subdomains
-- ✅ Plan-based limits: FREE=1, PRO=3, ULTIMATE=unlimited
-- ✅ Availability checker with real-time validation
-- ✅ Reserved subdomains protection (admin, www, api, etc.)
-- ✅ Admin Panel Domains tab - manage all system subdomains
-- ✅ Admin can block/unblock user subdomains
-- ✅ Subdomain format: `{subdomain}.mytrack.app`
-
-### New API Endpoints (Subdomains)
-- GET /api/subdomains - get user's subdomains
-- GET /api/subdomains/check/{subdomain} - check availability
-- POST /api/subdomains - create subdomain
-- PUT /api/subdomains/{id} - toggle active status
-- DELETE /api/subdomains/{id} - delete subdomain
-- GET /api/admin/subdomains - admin: list all subdomains
-- PUT /api/admin/subdomains/{id}/toggle - admin: block/unblock
-- DELETE /api/admin/subdomains/{id} - admin: force delete
-- GET /api/resolve/{subdomain} - resolve subdomain to user
-
-### Database Collections (Updated)
-- subdomains: `{id, user_id, subdomain, is_active, disabled_by_admin, created_at}`
-
-### Testing Status
-- Backend: 17/17 tests passed (100%)
-- Frontend: All UI tests passed
-- Test files: `/app/tests/test_subdomains.py`
+## 3rd Party Integrations
+- **Odesli/Songlink API** - No key required
+- **iTunes Search API** - No key required  
+- **Resend** - Key in .env (not implemented yet)
+- **Hugging Face** - Key in .env (not implemented yet)
