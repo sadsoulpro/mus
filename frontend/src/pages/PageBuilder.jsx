@@ -881,7 +881,7 @@ export default function PageBuilder() {
               
               {links.length === 0 && (
                 <p className="text-center text-muted-foreground py-8 border border-dashed border-zinc-800 rounded-xl">
-                  Ссылок пока нет. Добавьте первую ссылку выше.
+                  {t('pageBuilder', 'noLinks')}
                 </p>
               )}
             </div>
@@ -892,11 +892,11 @@ export default function PageBuilder() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-semibold">QR-код</h2>
+                <h2 className="text-lg font-semibold">{t('pageBuilder', 'qrCode')}</h2>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {qrEnabled ? "Включен" : "Отключен"}
+                  {qrEnabled ? t('common', 'enabled') : t('common', 'disabled')}
                 </span>
                 <Switch
                   checked={qrEnabled}
@@ -929,7 +929,7 @@ export default function PageBuilder() {
                   </div>
                   <div className="flex-1 text-center sm:text-left">
                     <p className="text-sm text-muted-foreground mb-2">
-                      Сканируйте для открытия страницы
+                      {t('pageBuilder', 'qrDesc')}
                     </p>
                     <p className="text-xs text-zinc-500 mb-4 font-mono break-all">
                       {getPublicUrl()}
@@ -941,7 +941,7 @@ export default function PageBuilder() {
                       data-testid="download-qr-btn"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Скачать PNG
+                      {t('pageBuilder', 'downloadPng')}
                     </Button>
                   </div>
                 </div>
@@ -950,13 +950,13 @@ export default function PageBuilder() {
             
             {qrEnabled && !formData.slug && (
               <p className="text-center text-muted-foreground py-6 border border-dashed border-zinc-800 rounded-xl">
-                Введите URL-адрес выше для генерации QR-кода
+                {t('pageBuilder', 'enterUrlForQr')}
               </p>
             )}
             
             {!qrEnabled && (
               <p className="text-center text-muted-foreground py-6 border border-dashed border-zinc-800 rounded-xl">
-                QR-код отключен
+                {t('pageBuilder', 'qrDisabled')}
               </p>
             )}
           </section>
