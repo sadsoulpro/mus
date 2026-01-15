@@ -227,6 +227,30 @@ function App() {
   // If on subdomain, show SubdomainPage only
   if (subdomain) {
     return (
+      <LanguageProvider>
+        <AuthContext.Provider value={{ 
+          user, 
+          login, 
+          register, 
+          logout, 
+          loading, 
+          refreshUser,
+          isAuthenticated 
+        }}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<SubdomainPage />} />
+              <Route path="/:slug" element={<SubdomainPage />} />
+            </Routes>
+          </BrowserRouter>
+          <Toaster position="top-right" richColors />
+        </AuthContext.Provider>
+      </LanguageProvider>
+    );
+  }
+
+  return (
+    <LanguageProvider>
       <AuthContext.Provider value={{ 
         user, 
         login, 
@@ -237,27 +261,6 @@ function App() {
         isAuthenticated 
       }}>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<SubdomainPage />} />
-            <Route path="/:slug" element={<SubdomainPage />} />
-          </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" richColors />
-      </AuthContext.Provider>
-    );
-  }
-
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      register, 
-      logout, 
-      loading, 
-      refreshUser,
-      isAuthenticated 
-    }}>
-      <BrowserRouter>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
