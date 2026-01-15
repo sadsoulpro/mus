@@ -7,8 +7,8 @@ import {
   ArrowLeft, Eye, MousePointer, TrendingUp, Globe, MapPin, 
   Lock, Crown, Calendar, Clock, BarChart3, Users, Zap
 } from "lucide-react";
-import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes } from "react-icons/fa";
-import { SiTidal } from "react-icons/si";
+import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes, FaGoogle, FaNapster, FaBandcamp } from "react-icons/fa";
+import { SiTidal, SiPandora, SiAudiomack } from "react-icons/si";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell
@@ -35,19 +35,81 @@ const DeezerIcon = (props) => (
   </svg>
 );
 
+const YouTubeMusicIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <polygon points="10,8 16,12 10,16" fill="white"/>
+  </svg>
+);
+
+const GooglePlayIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+  </svg>
+);
+
+const PandoraIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15v-4H8v-2h2V9c0-1.71 1.39-3 3.1-3H16v2h-2.9c-.59 0-1.1.51-1.1 1v2h4v2h-4v4h-2z"/>
+  </svg>
+);
+
+const AudiusIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <path d="M8 16V8l8 4-8 4z" fill="white"/>
+  </svg>
+);
+
+const AnghamiIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="white"/>
+  </svg>
+);
+
+const BoomplayIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <path d="M10 8v8l6-4-6-4z" fill="white"/>
+  </svg>
+);
+
+const SpinrillaIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <circle cx="12" cy="12" r="10" fill="currentColor"/>
+    <circle cx="12" cy="12" r="4" fill="white"/>
+  </svg>
+);
+
 const PLATFORMS = {
-  yandex: { name: "Яндекс Музыка", icon: FaYandex, color: "#FFCC00" },
-  youtube: { name: "YouTube", icon: FaYoutube, color: "#FF0000" },
-  apple: { name: "Apple Music", icon: FaApple, color: "#FA233B" },
-  itunes: { name: "iTunes", icon: FaItunes, color: "#EA4CC0" },
   spotify: { name: "Spotify", icon: FaSpotify, color: "#1DB954" },
+  appleMusic: { name: "Apple Music", icon: FaApple, color: "#FA233B" },
+  itunes: { name: "iTunes", icon: FaItunes, color: "#EA4CC0" },
+  youtube: { name: "YouTube", icon: FaYoutube, color: "#FF0000" },
+  youtubeMusic: { name: "YouTube Music", icon: YouTubeMusicIcon, color: "#FF0000" },
+  yandex: { name: "Яндекс Музыка", icon: FaYandex, color: "#FFCC00" },
   vk: { name: "VK Музыка", icon: FaVk, color: "#4C75A3" },
   deezer: { name: "Deezer", icon: DeezerIcon, color: "#A238FF" },
+  tidal: { name: "Tidal", icon: SiTidal, color: "#000000" },
+  amazonMusic: { name: "Amazon Music", icon: FaAmazon, color: "#FF9900" },
+  amazonStore: { name: "Amazon Store", icon: FaAmazon, color: "#FF9900" },
+  soundcloud: { name: "SoundCloud", icon: FaSoundcloud, color: "#FF5500" },
+  pandora: { name: "Pandora", icon: PandoraIcon, color: "#005483" },
+  napster: { name: "Napster", icon: FaNapster, color: "#000000" },
+  audiomack: { name: "Audiomack", icon: SiAudiomack, color: "#FFA200" },
+  audius: { name: "Audius", icon: AudiusIcon, color: "#CC0FE0" },
+  anghami: { name: "Anghami", icon: AnghamiIcon, color: "#6C3694" },
+  boomplay: { name: "Boomplay", icon: BoomplayIcon, color: "#E11B22" },
+  spinrilla: { name: "Spinrilla", icon: SpinrillaIcon, color: "#121212" },
+  bandcamp: { name: "Bandcamp", icon: FaBandcamp, color: "#629AA9" },
+  google: { name: "Google", icon: FaGoogle, color: "#4285F4" },
+  googleStore: { name: "Google Store", icon: GooglePlayIcon, color: "#34A853" },
   zvuk: { name: "Звук", icon: ZvukIcon, color: "#6B4EFF" },
   mts: { name: "МТС Музыка", icon: MtsIcon, color: "#E30611" },
+  // Legacy mappings
+  apple: { name: "Apple Music", icon: FaApple, color: "#FA233B" },
   amazon: { name: "Amazon Music", icon: FaAmazon, color: "#FF9900" },
-  tidal: { name: "Tidal", icon: SiTidal, color: "#000000" },
-  soundcloud: { name: "SoundCloud", icon: FaSoundcloud, color: "#FF5500" },
   custom: { name: "Другая ссылка", icon: FaLink, color: "#888888" },
 };
 
