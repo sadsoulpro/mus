@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { User, Mail, Lock, Trash2, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   
   const [profileForm, setProfileForm] = useState({
     username: user?.username || "",
@@ -30,18 +32,25 @@ export default function Settings() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Get delete confirmation word based on language
+  const getDeleteWord = () => {
+    if (language === 'ru') return 'УДАЛИТЬ';
+    if (language === 'es') return 'ELIMINAR';
+    return 'DELETE';
+  };
+
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    if (!profileForm.username.trim()) { toast.error("Введите имя пользователя"); return; }
-    if (!profileForm.email.trim()) { toast.error("Введите email"); return; }
+    if (!profileForm.username.trim()) { toast.error(t('auth', 'usernameRequired')); return; }
+    if (!profileForm.email.trim()) { toast.error(t('auth', 'emailRequired')); return; }
     
     setProfileLoading(true);
     try {
       const response = await api.put("/settings/profile", { username: profileForm.username, email: profileForm.email });
-      toast.success(response.data.message);
+      toast.success(t('settings', 'settingsSaved'));
       if (refreshUser) await refreshUser();
     } catch (error) {
-      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось обновить профиль");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : t('errors', 'saveFailed'));
     } finally {
       setProfileLoading(false);
     }
@@ -49,32 +58,32 @@ export default function Settings() {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    if (!passwordForm.current_password) { toast.error("Введите текущий пароль"); return; }
-    if (passwordForm.new_password.length < 6) { toast.error("Минимум 6 символов"); return; }
-    if (passwordForm.new_password !== passwordForm.confirm_password) { toast.error("Пароли не совпадают"); return; }
+    if (!passwordForm.current_password) { toast.error(t('auth', 'passwordRequired')); return; }
+    if (passwordForm.new_password.length < 6) { toast.error(t('auth', 'passwordMinLength')); return; }
+    if (passwordForm.new_password !== passwordForm.confirm_password) { toast.error(t('errors', 'validationError')); return; }
     
     setPasswordLoading(true);
     try {
       const response = await api.put("/settings/password", { current_password: passwordForm.current_password, new_password: passwordForm.new_password });
-      toast.success(response.data.message);
+      toast.success(t('settings', 'settingsSaved'));
       setPasswordForm({ current_password: "", new_password: "", confirm_password: "" });
     } catch (error) {
-      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось изменить пароль");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : t('errors', 'saveFailed'));
     } finally {
       setPasswordLoading(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== "УДАЛИТЬ") { toast.error("Введите УДАЛИТЬ"); return; }
+    if (deleteConfirmText !== getDeleteWord()) { toast.error(t('errors', 'validationError')); return; }
     setDeleteLoading(true);
     try {
       await api.delete("/settings/account");
-      toast.success("Аккаунт удалён");
+      toast.success(t('common', 'success'));
       logout();
       navigate("/");
     } catch (error) {
-      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось удалить аккаунт");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : t('errors', 'deleteFailed'));
     } finally {
       setDeleteLoading(false);
     }
@@ -85,8 +94,8 @@ export default function Settings() {
       <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-10">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-display mb-2">Настройки</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Управление профилем и безопасностью</p>
+          <h1 className="text-xl sm:text-2xl font-display mb-2">{t('settings', 'title')}</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">{t('settings', 'profile')} & {t('settings', 'security')}</p>
         </div>
         
         {/* Profile Section */}
@@ -96,8 +105,8 @@ export default function Settings() {
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
             <div>
-              <h2 className="font-semibold text-sm sm:text-base">Профиль</h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">Изменить имя и email</p>
+              <h2 className="font-semibold text-sm sm:text-base">{t('settings', 'profile')}</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">{t('settings', 'changeEmail')}</p>
             </div>
           </div>
           
