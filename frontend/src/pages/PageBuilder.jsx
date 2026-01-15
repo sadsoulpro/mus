@@ -607,14 +607,14 @@ export default function PageBuilder() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="font-semibold text-sm sm:text-base truncate">{isEditing ? "Редактирование" : "Новая страница"}</h1>
+            <h1 className="font-semibold text-sm sm:text-base truncate">{isEditing ? t('pageBuilder', 'editing') : t('pageBuilder', 'newPage')}</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             {isEditing && formData.slug && (
               <a href={`/${formData.slug}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="rounded-full" data-testid="view-public-page-btn">
                   <ExternalLink className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Открыть страницу</span>
+                  <span className="hidden sm:inline">{t('pageBuilder', 'viewPage')}</span>
                 </Button>
               </a>
             )}
