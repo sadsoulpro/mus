@@ -719,17 +719,17 @@ export default function PageBuilder() {
                   />
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">
-                  Генерируется автоматически, если не указан
+                  {t('pageBuilder', 'slugHint')}
                 </p>
               </div>
               
               {/* Описание */}
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm">Описание (необязательно)</Label>
+                <Label htmlFor="description" className="text-sm">{t('pageBuilder', 'description')}</Label>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Расскажите о релизе..."
+                  placeholder={t('pageBuilder', 'descPlaceholder')}
                   value={formData.description}
                   onChange={handleChange}
                   data-testid="description-input"
@@ -741,7 +741,7 @@ export default function PageBuilder() {
           
           {/* 3. Обложка */}
           <section>
-            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Обложка</h2>
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{t('pageBuilder', 'coverImage')}</h2>
             <div className="space-y-3 sm:space-y-4">
               <div 
                 className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-zinc-800 overflow-hidden border-2 border-dashed border-zinc-700 hover:border-primary/50 transition-colors cursor-pointer group"
@@ -756,7 +756,7 @@ export default function PageBuilder() {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">Загрузить</span>
+                    <span className="text-sm text-muted-foreground">{t('common', 'upload')}</span>
                   </div>
                 )}
                 {uploading && (
@@ -774,14 +774,14 @@ export default function PageBuilder() {
                 data-testid="cover-upload-input"
               />
               <p className="text-xs text-muted-foreground">
-                Рекомендуется: 1000x1000px, JPG или PNG
+                {t('pageBuilder', 'coverHint')}
               </p>
             </div>
           </section>
           
           {/* 4. Ссылки на платформы */}
           <section className="overflow-hidden">
-            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Ссылки на платформы</h2>
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{t('pageBuilder', 'platformLinks')}</h2>
             
             {/* Add New Link */}
             <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4">
