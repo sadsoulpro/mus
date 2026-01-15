@@ -1408,25 +1408,25 @@ export default function RandomCover() {
                   }`}>
                     <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm lg:text-base">
                       <Type className="w-4 h-4 text-primary" />
-                      Текст {selectedText && <span className="text-xs text-muted-foreground">(выбран)</span>}
+                      {t('randomCover', 'text')} {selectedText && <span className="text-xs text-muted-foreground">({t('common', 'selected')})</span>}
                     </h3>
                     
                     <div className="space-y-3">
                       {selectedText ? (
                         <>
                           <div>
-                            <Label className="text-xs">Содержание</Label>
+                            <Label className="text-xs">{t('randomCover', 'content')}</Label>
                             <Input
                               value={selectedText.text}
                               onChange={(e) => updateSelectedText("text", e.target.value)}
                               className="mt-1 bg-zinc-800"
-                              placeholder="Введите текст"
+                              placeholder={t('randomCover', 'enterText')}
                               data-testid="text-content-input"
                             />
                           </div>
 
                           <div>
-                            <Label className="text-xs">Шрифт</Label>
+                            <Label className="text-xs">{t('randomCover', 'font')}</Label>
                             <Select 
                               value={selectedText.fontFamily} 
                               onValueChange={(val) => updateSelectedText("fontFamily", val)}
@@ -1446,7 +1446,7 @@ export default function RandomCover() {
 
                           <div className="grid grid-cols-2 gap-2 lg:gap-3">
                             <div>
-                              <Label className="text-xs">Цвет</Label>
+                              <Label className="text-xs">{t('randomCover', 'color')}</Label>
                               <div className="flex gap-2 mt-1">
                                 <Input
                                   type="color"
@@ -1463,7 +1463,7 @@ export default function RandomCover() {
                               </div>
                             </div>
                             <div>
-                              <Label className="text-xs">Размер: {Math.round(selectedText.fontSize)}px</Label>
+                              <Label className="text-xs">{t('randomCover', 'size')}: {Math.round(selectedText.fontSize)}px</Label>
                               <Slider
                                 value={[selectedText.fontSize]}
                                 onValueChange={([val]) => updateSelectedText("fontSize", val)}
@@ -1483,14 +1483,14 @@ export default function RandomCover() {
                             data-testid="delete-text-btn"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Удалить текст
+                            {t('randomCover', 'deleteText')}
                           </Button>
                         </>
                       ) : (
                         <p className="text-xs text-muted-foreground text-center py-3 lg:py-4">
-                          Выберите текст на холсте или добавьте новый
+                          {t('randomCover', 'selectOrAddText')}
                         </p>
-                      )}
+                      )}}
 
                       <Button 
                         onClick={addTextElement} 
