@@ -1665,6 +1665,11 @@ export const translations = {
       changeStatus: "Сменить статус",
       replyPlaceholder: "Напишите ваш ответ...",
       sendReply: "Отправить",
+      // Plan changes
+      planChanged: "План изменён",
+      planChangedForTesting: "Ваш план изменён для тестирования",
+      verificationRevoked: "Верификация снята",
+      verified: "Верифицирован",
       // Roles
       roleOwner: "Владелец",
       roleAdmin: "Админ",
