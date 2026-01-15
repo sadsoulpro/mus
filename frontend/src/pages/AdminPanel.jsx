@@ -268,7 +268,7 @@ export default function AdminPanel() {
   const updateUserPlan = async (userId, newPlan) => {
     try {
       await api.put(`/admin/users/${userId}/plan`, { plan: newPlan });
-      toast.success(`План изменён`);
+      toast.success(t('admin', 'planChanged'));
       fetchData();
     } catch (error) {
       toast.error(getErrorMessage(error));
