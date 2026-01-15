@@ -1,163 +1,198 @@
 <analysis>**original_problem_statement:**
-Initial request was to open the application and load it. The session evolved to include a series of feature requests and UI improvements for a band.link-style application for musicians.
+Initial Request: загрузи данное приложение из гитхаба (Load this application from GitHub).
+The user then provided a GitHub URL: 
 
-**PRODUCT REQUIREMENTS:**
+After successfully loading and setting up the application, the user provided a series of feature requests:
 
-1.  **Icon Fix:** Fix missing platform icons on the public page. (Resolved, was a data issue).
-2.  **Contact Info:** Allow users to add email and social media links via the Domains page, and display them.
-3.  **Contact Info Placement:** Move the contact info from individual release pages to the main page of the user's subdomain.
-4.  **Profile Customization:**
-    *   Add a Profile Description field, display it on the subdomain page instead of the URL.
-    *   Add an Artist Pseudonym field, display it on the subdomain page instead of the username.
-5.  **UI/UX Improvements:**
-    *   On the Multilinks page, change the Open Page action from a dropdown item to a dedicated icon.
-    *   Reorder sections on the Domains page.
-    *   Update help text on the Domains page.
-6.  **Landing Page Overhaul:**
-    *   Implement a full-screen HERO section.
-    *   Update the site logo and favicon.
-    *   Change the site-wide font to Gilroy with specific weights for different elements.
-    *   Make the landing page fully responsive, adjusting element order for mobile/tablet views.
-7.  **Logo Consistency:** Ensure the new logo is used across all pages (login, register, sidebar, etc.).
-8.  **RandomCover Feature (V1):**
-    *   Create a new page/feature called RandomCover for generating cover art.
-    *   Use  for a canvas-based editor.
-    *   Implement functionality to add a background image, add/edit text, and use a transformer.
-    *   Include a Random Design button and an export-to-image function.
-    *   Create a backend endpoint to save the generated cover.
-9.  **RandomCover Feature (V2 - Current Task):**
-    *   Implement live preview (instant updates without Apply buttons).
-    *   Add smart guides and snapping for element alignment.
-    *   Implement Undo/Redo functionality with keyboard shortcuts.
-    *   Implement autosaving to  with a restore prompt.
+1.  **Admin Panel Subscription Management**:
+    *   Remove Ultimate plan from the app.
+    *   Add a function for the Owner to change their own subscription for testing.
 
-**User's preferred language**:
-Russian. The next agent MUST respond in Russian.
+2.  **Odesli/Autofill Enhancement**:
+    *   Add search by UPC code to the Autofill field.
+    *   Update placeholders and user notifications to reflect the UPC/link search capability.
+    *   Add a list of new music platforms.
+
+3.  **API Key Integration**:
+    *   Add provided API keys for Resend and Hugging Face.
+
+4.  **Multi-language Support (Internationalization)**:
+    *   Add a language selector (RU, EN, ES) in the header.
+    *   Auto-detect browser language, with EN as the fallback.
+    *   Translate the entire site (landing, auth, dashboard, page builder, public pages, system messages).
+
+5.  **Follow-up on Translation**:
+    *   The user specified several pages inside the authenticated dashboard that were missed during the initial translation: , , , , , , , and .
+    *   The user then provided further feedback with screenshots, noting that the  page was still untranslated, the sidebar link  needed a proper translation, and the  link was pushing the  button off-screen.
+    *   After these were fixed, the user's final request was to finish translating the  to English and Spanish.
+
+**User's preferred language**: русский (Russian)
 
 **what currently exists?**
-A full-stack application for musicians to create multilink pages for their releases. The app features user authentication, page creation, subdomain management, and a new cover art generator tool (RandomCover). The landing page has been completely redesigned with a new font (Gilroy) and a full-screen hero section. The application logo has been updated sitewide. The RandomCover feature has just undergone a major rewrite to add advanced UX features like live preview, snapping guides, undo/redo, and autosave.
+The project is a full-stack MyTrack application (FastAPI backend, React frontend, MongoDB) for musicians. It has user authentication (JWT), role-based access (Owner, Admin, User), and Odesli/Songlink integration for autofilling music links via URL or UPC code.
+
+A custom internationalization (i18n) system has been implemented, supporting Russian (RU), English (EN), and Spanish (ES). The vast majority of the application, including the landing page, auth pages, and most of the authenticated user dashboard, has been successfully translated. API keys for Resend and Hugging Face are stored in the backend environment.
 
 **Last working item**:
-- **Last item agent was working:** The agent was working on a major UX overhaul for the  feature. It completely rewrote the  component to implement live previews, snapping smart guides, undo/redo history, and autosaving to localStorage, as requested by the user. The new file has been written, but its functionality has not yet been tested.
+- **Last item agent was working:** Translating the  component. The user pointed out that while it worked in Russian, it was not translated for English and Spanish. The agent was in the middle of a large-scale refactor of the file, adding translation keys to  and systematically replacing hardcoded Russian text with the  function.
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** Frontend testing agent. The agent should test the new  page functionality thoroughly:
-    1.  Verify that the page loads without errors.
-    2.  Test the live preview: change text content, font size, and color, and confirm the canvas updates instantly.
-    3.  Test snapping: drag an element and verify that guide lines appear and the element snaps to the center of the canvas and to the edges/center of other elements.
-    4.  Test Undo/Redo: perform several actions (add text, move, resize) and then use the Undo/Redo buttons (and ideally Ctrl+Z/Ctrl+Y) to verify the state changes correctly.
-    5.  Test Autosave: make changes, refresh the page, and verify if a prompt to restore the previous session appears and works.
+- **Which testing method agent to use?** screenshot tool
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0):** The new  implementation is untested and may contain bugs.
+-   **Issue 1: Complete translation of the Admin Panel (P0)**
+    -   **Description**: The  component contains a large amount of hardcoded Russian text, which prevents it from being displayed correctly in English or Spanish.
+    -   **Attempted fixes**: The agent has already added a significant number of translation keys to the  section of  and has performed multiple  operations to update . However, the process was not complete.
+    -   **Next debug checklist**:
+        1.  Review  to find any remaining hardcoded Russian text.
+        2.  For any remaining text, add corresponding keys to the  section in  for EN, RU, and ES.
+        3.  Replace the hardcoded text in  with the  function call.
+        4.  Restart the frontend service: frontend: ERROR (not running)
+frontend: started.
+        5.  Log in as the owner ( / ).
+        6.  Navigate to the Admin Panel.
+        7.  Use the  tool to verify the panel displays correctly in English (default), then switch the language to Spanish and take another screenshot to confirm the translation.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills the user's explicit request to make the entire application, including administrative sections, fully multilingual.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?** Y (The overall i18n task required multiple follow-ups)
+    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Blocked on other issue**: None
 
-  - **Issues Detail:**
-    - **Issue 1: Potential bugs in the new RandomCover component**
-      - **Attempted fixes:** A complete rewrite of the component has just been performed. No fixes have been attempted on the new code yet.
-      - **Next debug checklist:**
-        1.  Start the application and navigate to the  page.
-        2.  Open the browser's developer console and check for any runtime errors.
-        3.  Systematically test each new feature as described in the Which testing method to use? section above (live preview, snapping, undo/redo, autosave).
-        4.  Inspect the component's state and props using React DevTools to debug any unexpected behavior.
-        5.  Review the code in  for logical errors, especially in the history management, snapping calculations, and  interaction.
-      - **Why fix this issue and what will be achieved with the fix?** This is the user's latest and most complex request. Fixing any issues will complete the implementation of a professional-grade cover art editor, delivering significant value.
-      - **Status:** NOT STARTED
-      - **Is recurring issue?** N
-      - **Should Test frontend/backend/both after fix?** Frontend
-      - **Blocked on other issue:** None
+-   **Issue 2: Mixed language in PageBuilder preview (P2)**
+    -   **Description**: The agent noted that while testing PageBuilder, the preview area showed some text in Russian (Здесь появятся ссылки) even when the main UI was in English.
+    -   **Next debug checklist**:
+        1.  Inspect .
+        2.  Locate the code responsible for rendering the preview section.
+        3.  Identify why that specific text is not being translated with the rest of the page. It might be a static component or have its text derived from a different, non-reactive source.
+        4.  Refactor the code to use the  function from the  hook.
+    -   **Why fix this issue and what will be achieved with the fix?**: Ensures a consistent and professional user experience by eliminating language mixing.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Blocked on other issue**: None
 
 **In progress Task List**:
-- **Task 1 (P0):** Test and validate the new  editor functionality.
-    - **Where to resume:** Navigate to the  page and begin testing the features implemented in the latest version of .
-    - **What will be achieved with this?** Confirmation that the live preview, smart guides, undo/redo, and autosave features work as requested.
-    - **Status:** TESTING PENDING
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on something:** None
+- **Task 1: Complete the internationalization (i18n) of the Admin Panel (P0)**
+    - **Where to resume**: The agent was performing a series of  operations on . The next step is to continue this process until all visible text is sourced from the  file.
+    - **What will be achieved with this?**: The Admin Panel will be fully functional and usable for English, Russian, and Spanish-speaking administrators.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: frontend
+    - **Blocked on something**: None
 
 **Upcoming and Future Tasks**
-- None were explicitly mentioned by the user after the  request. The agent should confirm completion of the current task and then ask the user for the next steps.
+*   **Future Task (P2)**: Refactor the backend to load  strictly from environment variables, removing the hardcoded fallback.
+*   **Future Task (P2)**: Refactor the backend to make the  configurable via an environment variable instead of being hardcoded.
+*   **Future Task (P3)**: Investigate and optimize potential N+1 database queries in the admin panel for better performance at scale.
 
 **Completed work in this session**
-- **Feature:** Added Contact Information section (Artist Name, Description, Email, Socials) to user profiles, editable on the  page.
-- **Feature:** Implemented the initial version of the RandomCover feature with a  canvas, text/image addition, and save functionality (, ).
-- **UI Overhaul:** Redesigned the landing page () with a full-screen hero, new Gilroy font, new logo, and responsive layouts.
-- **UI/UX:**
-  - Replaced the old logo sitewide (Sidebar, Login, Register, Forgot Password pages).
-  - Updated the site's favicon.
-  - Moved contact info from individual release pages to the main subdomain page footer.
-  - Replaced the username/subdomain URL on the subdomain page with the new artist name and description ().
-  - Improved the Multilinks page UI by making the Open page action a dedicated icon ().
-  - Reorganized the layout of the  page for better UX.
-- **Bug Fix:** Resolved an error with the Random Design button in the RandomCover editor caused by a missing filter in the Konva library.
-- **Backend:**
-  - Added new endpoints for managing profile contact info () and saving covers ().
-  - Updated user data models to store the new profile information in MongoDB.
-- **Testing:** Successfully performed backend testing after adding new contact info endpoints.
+- **Completed Dashboard Translations**: Fully translated the following pages that were previously missed: , , and .
+- **Fixed User-Reported Issues**:
+    - **Analytics Page Translated**: Correctly identified that  used a separate  component, which was then fully translated.
+    - **Sidebar UI Fixed**:
+        - Merged the content of  into  as a new tabbed section.
+        - Removed the  link from .
+        - Correctly translated the  link to Верификация (and its EN/ES equivalents).
+        - These changes resolved a layout bug, making the Выйти (Logout) button visible again.
+- **Fixed Code Error**: Corrected a JSX parsing error in  that was preventing the frontend from compiling.
+- **Testing and Verification**: Successfully reset the owner's password and used the  tool to log in and visually confirm all fixes and new translations across multiple pages and languages (RU, EN, ES).
+- **PRD Update**: Updated  with the latest progress.
+
+**Earlier issues found/mentioned but not fixed**
+- **Issue 1: Hardcoded JWT Secret Fallback**
+    - **Debug checklist**: Locate the  usage in  and remove the fallback value, ensuring it relies solely on .
+    - **Why to solve this issue and what will be achieved with this?**: Improves security by preventing the application from running with a predictable secret.
+    - **Should Test frontend/backend/both after fix**: backend
+    - **Is recurring issue?**: N
+
+- **Issue 2: Hardcoded Owner Email**
+    - **Debug checklist**: Find the hardcoded email thedrumepic@gmail.com in  and replace it with a value from an environment variable like .
+    - **Why to solve this issue and what will be achieved with this?**: Increases flexibility and makes the application easier to configure.
+    - **Should Test frontend/backend/both after fix**: backend
+    - **Is recurring issue?**: N
+
+**Known issue recurrence from previous fork**
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, React Router, Tailwind CSS,  for 2D canvas graphics,  for icons.
-- **Backend:** FastAPI, MongoDB (via ).
-- **Architecture:** Full-stack monolith with a React SPA consuming a FastAPI backend. Services are managed by .
+-   **Backend**: FastAPI, MongoDB (motor), Pydantic, JWT, bcrypt.
+-   **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, Framer Motion, Custom React Context for i18n.
+-   **Architecture**: Monorepo with  and  directories, managed by .
 
 **key DB schema**
-- **users:** (Implicitly updated) Contains user details, roles, plans, and a nested  document.
-  - : 
-- **covers:** (New collection) Stores metadata for generated cover art.
-  - 
+-   **users**: 
+-   **pages**: 
 
 **changes in tech stack**
-- **Added Frontend Libraries:** ,  for the cover art editor.
+-   None.
 
 **All files of reference**
-- : **(Most important)** The file containing the latest, untested implementation of the cover art editor.
-- : The completely redesigned landing page.
-- : The page for managing subdomains and now also profile/contact information.
-- : The public-facing page for a user's subdomain, which now displays profile info.
-- : The main navigation component, updated with the new logo and RandomCover link.
-- : The main backend file, updated with endpoints for contact info and cover uploading.
-- : Updated to include the Gilroy font family.
-- : Updated with the  for the Gilroy font.
+*   **/app/frontend/src/pages/AdminPanel.jsx**: **(In Progress)** Being refactored for i18n.
+*   **/app/frontend/src/i18n/translations.js**: Modified multiple times to add keys for , , and .
+*   **/app/frontend/src/pages/GlobalAnalytics.jsx**: Modified to be fully translated.
+*   **/app/frontend/src/pages/Support.jsx**: Modified to include content from  in a new tabbed interface.
+*   **/app/frontend/src/components/Sidebar.jsx**: Modified to remove the FAQ link and fix the verified link text, which solved a layout issue.
+*   **/app/frontend/src/pages/RandomCover.jsx**: Modified for translation and to fix a JSX error.
+*   **/app/frontend/src/pages/Domains.jsx**: Modified for translation.
+*   **/app/frontend/src/pages/Analytics.jsx**: Modified for translation.
+*   **/app/memory/PRD.md**: Updated to reflect completed work.
+
+**Areas that need refactoring**:
+-   The hardcoded  and  in  should be moved to environment variables.
+-   The file  is now redundant as its content has been merged into . It can be deleted to clean up the codebase.
+
+**key api endpoints**
+-   
+-   
+-   
+-   
 
 **Critical Info for New Agent**
-- The most recent task was a complete rewrite of . This new code is powerful but completely untested. The top priority is to test it thoroughly and fix any ensuing bugs.
-- The user communicates in Russian. All responses must be in Russian.
-- The project uses MongoDB, not PostgreSQL as the user once mentioned. The agent correctly clarified this and proceeded with MongoDB.
-- Subdomain testing requires a workaround. The agent patched  to allow testing via query parameters on the preview URL (e.g., ). This is crucial for testing subdomain-related features.
+-   The highest priority (P0) is to finish translating  for English and Spanish. This is a large file and the previous agent was mid-task.
+-   The user communicates exclusively in Russian. All  and  messages must be in Russian.
+-   The custom i18n system uses the  hook and a  function.
+-   Login credentials for the owner account are  / . The password was reset during this session.
+-   After completing the Admin Panel translation, address the minor language-mixing bug in the PageBuilder preview.
 
 **documents and test reports created in this job**
-- : Updated to reflect successful backend tests after adding contact info endpoints.
+-    was updated.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Move the contact info block below the subdomains list on the  page. (Completed)
-2.  **User:** Update the help text in the How subdomains work section. (Completed)
-3.  **User:** Massive landing page overhaul: full-screen hero, new logo, new Gilroy font with specific weights. (Completed)
-4.  **User:** Optimize the landing page text and layout for all devices, especially mobile. (Completed)
-5.  **User:** On mobile/tablet, move the phone mockup below the hero text. (Completed)
-6.  **User:** On mobile/tablet, move the hero buttons below the phone mockup. (Completed)
-7.  **User:** Update the logo for authenticated users in their dashboard/sidebar. (Completed)
-8.  **User:** Change the favicon and update the logo on the Forgot Password page. (Completed)
-9.  **User:** Add the  editor V2: live preview, smart guides, undo/redo, and autosave. (In Progress - code written, not tested)
-10. **User:** Provided an image showing a runtime error in the first version of the RandomCover editor. (Resolved)
+1.  **User (Confirmation)**: Подтверждаю (I confirm).
+2.  **Agent**: Implemented initial batch of page translations.
+3.  **Agent**: Called , believing the task was complete.
+4.  **User (Feedback)**: Аналитика не переведена. verified-Верификация переведи нормально для всех языков в сайдбаре. Также перемести информацию FAQ в Поддержку, так как не видно кнопки Выход. Приложил скрины для твоего понимания. (Analytics is not translated. Translate verified normally for all languages in the sidebar. Also, move the FAQ info to Support, as the Logout button isn't visible. Attached screenshots for your understanding.)
+5.  **Agent**: Acknowledged and correctly identified the three issues from the user's feedback.
+6.  **Agent**: Implemented fixes for all three issues (translated , merged  into , and fixed the sidebar).
+7.  **Agent**: Verified all fixes with screenshots.
+8.  **Agent**: Called  again, summarizing the completed work.
+9.  **User (Feedback)**: осталось перевести админ панель на английский и испанский (the admin panel still needs to be translated into English and Spanish).
+10. **Agent**: Acknowledged the final remaining translation task and began working on .
 
 **Project Health Check:**
-- **Broken:** The  page is potentially broken or buggy after a major rewrite. Its state is unknown until tested.
-- **Mocked:** None.
+*   **Broken**: None. The application is running and functional.
+*   **Mocked**: None.
 
 **3rd Party Integrations**
-- Odesli: Used for automatically fetching music platform links. Integrated in the original app template.
+-   **Odesli/Songlink API**: For fetching music platform links (no key).
+-   **iTunes Search API**: For UPC code lookups (no key).
+-   **Resend**: API key is in , but not yet implemented in code.
+-   **Hugging Face**: API key is in , but not yet implemented in code.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES (backend testing agent was used after adding contact endpoints).
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** None.
-- **Known regressions:** None.
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: None.
+-   **Testing method**: The  tool was used extensively and successfully for visual UI verification after the agent logged into the application.
 
 **Credentials to test flow:**
-The agent has successfully used  credentials to log in. This should continue to work.
+-   **Owner**:  /  (Password was reset in this session).
+-   **Admin**:  / 
+-   **User**:  / 
 
 **What agent forgot to execute**
-- The agent has not yet tested the major refactor of the  component. This is the critical next step.</analysis>
+The agent initially declared the i18n task finished twice prematurely. The first time, it missed several pages which the user listed. The second time, it overlooked that the  page was a separate component and also missed the sidebar layout issues. Finally, the agent did not check the  in languages other than Russian, which the user had to point out as the final remaining piece of the translation task.</analysis>
