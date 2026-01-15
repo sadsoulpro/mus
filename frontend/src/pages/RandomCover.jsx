@@ -45,6 +45,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Google Fonts to load
 const FONTS = [
@@ -342,6 +343,7 @@ function BackgroundImage({ image, filterType, filterValue }) {
 // ==================== MAIN COMPONENT ====================
 export default function RandomCover() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const stageRef = useRef();
   const containerRef = useRef();
   const fileInputRef = useRef();
