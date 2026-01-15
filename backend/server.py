@@ -2009,6 +2009,21 @@ async def admin_update_user_plan(user_id: str, data: UserPlanUpdate, user: dict 
     
     return {"success": True, "user_id": user_id, "new_plan": data.plan}
 
+@api_router.put("/owner/my-plan")
+async def owner_update_own_plan(data: UserPlanUpdate, user: dict = Depends(get_owner_user)):
+    """Owner can change their own plan for testing purposes"""
+    if data.plan not in ["free", "pro"]:
+        raise HTTPException(status_code=400, detail="Invalid plan. Valid plans: free, pro")
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"plan": data.plan, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    logging.info(f"Owner changed own plan to {data.plan} for testing")
+    
+    return {"success": True, "new_plan": data.plan}
+
 @api_router.put("/admin/users/{user_id}/ban")
 async def admin_ban_user(user_id: str, data: UserBanUpdate, user: dict = Depends(get_admin_user)):
     """Ban/unban user - Admin/Moderator"""
