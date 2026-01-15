@@ -1490,7 +1490,7 @@ export default function RandomCover() {
                         <p className="text-xs text-muted-foreground text-center py-3 lg:py-4">
                           {t('randomCover', 'selectOrAddText')}
                         </p>
-                      )}}
+                      )}
 
                       <Button 
                         onClick={addTextElement} 
