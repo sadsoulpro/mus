@@ -7,6 +7,8 @@ import { useAuth } from "@/App";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,6 +16,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +24,7 @@ export default function Login() {
     
     try {
       const data = await login(email, password);
-      toast.success("С возвращением!");
+      toast.success(t('auth', 'loginTitle') + "!");
       
       if (data.user.role === "admin") {
         navigate("/admin");
@@ -29,7 +32,7 @@ export default function Login() {
         navigate("/multilinks");
       }
     } catch (error) {
-      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Неверные учётные данные");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : t('auth', 'invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -37,12 +40,17 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      {/* Language Switcher - Top Right */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSwitcher variant="compact" />
+      </div>
+      
       {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 py-8 sm:py-12 lg:px-16">
         <div className="w-full max-w-md mx-auto">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 sm:mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm sm:text-base">На главную</span>
+            <span className="text-sm sm:text-base">{t('common', 'back')}</span>
           </Link>
           
           <motion.div
@@ -60,18 +68,18 @@ export default function Login() {
               </Link>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Здравствуйте!</h1>
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">{t('auth', 'loginTitle')}</h1>
             <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
-              Войдите, чтобы создать мультиссылку.
+              {t('auth', 'loginSubtitle')}
             </p>
             
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm">E-Mail</Label>
+                <Label htmlFor="email" className="text-sm">{t('common', 'email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="mail@example.com"
+                  placeholder={t('auth', 'emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -81,7 +89,7 @@ export default function Login() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm">Пароль</Label>
+                <Label htmlFor="password" className="text-sm">{t('common', 'password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -94,7 +102,7 @@ export default function Login() {
                 />
                 <div className="text-right">
                   <Link to="/forgot-password" className="text-xs sm:text-sm text-primary hover:underline" data-testid="forgot-password-link">
-                    Забыли пароль?
+                    {t('auth', 'forgotPassword')}
                   </Link>
                 </div>
               </div>
@@ -105,14 +113,14 @@ export default function Login() {
                 data-testid="login-submit-btn"
                 className="w-full h-11 sm:h-12 bg-primary hover:bg-primary/90 rounded-xl font-semibold"
               >
-                {loading ? "Вход..." : "Войти"}
+                {loading ? t('common', 'loading') : t('auth', 'loginButton')}
               </Button>
             </form>
             
             <p className="mt-6 sm:mt-8 text-center text-sm sm:text-base text-muted-foreground">
-              Нет аккаунта?{" "}
+              {t('auth', 'noAccount')}{" "}
               <Link to="/register" className="text-primary hover:underline" data-testid="register-link">
-                Зарегистрироваться
+                {t('auth', 'signUp')}
               </Link>
             </p>
           </motion.div>
@@ -129,9 +137,9 @@ export default function Login() {
               className="h-20 xl:h-24 w-auto"
             />
           </div>
-          <h2 className="font-gilroy-600 text-2xl xl:text-3xl mb-4">ДЕЛИТЕСЬ МУЗЫКОЙ</h2>
+          <h2 className="font-gilroy-600 text-2xl xl:text-3xl mb-4">{t('landing', 'heroTitle2')}</h2>
           <p className="font-gilroy-300 text-muted-foreground max-w-sm">
-            Одна ссылка для всех платформ. Простая аналитика. Бесплатно навсегда.
+            {t('landing', 'heroSubtitle')}
           </p>
         </div>
       </div>
