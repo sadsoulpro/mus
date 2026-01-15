@@ -138,7 +138,7 @@ export default function AdminPanel() {
       ));
       fetchUnreadTicketsCount();
     } catch (error) {
-      toast.error("Не удалось загрузить тикет");
+      toast.error(t('admin', 'ticketLoadError'));
     }
   };
 
