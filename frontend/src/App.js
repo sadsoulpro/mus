@@ -318,6 +318,7 @@ function App() {
       </BrowserRouter>
       <Toaster position="top-right" richColors />
     </AuthContext.Provider>
+  </LanguageProvider>
   );
 }
 
