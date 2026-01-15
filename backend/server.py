@@ -2497,19 +2497,39 @@ async def lookup_spotify(url: str):
 @api_router.get("/lookup/odesli")
 async def lookup_odesli(url: str, country: Optional[str] = "RU"):
     """Proxy endpoint for Odesli (song.link) API to get links for all platforms.
-    Supports both URLs and UPC codes."""
+    Supports URLs and UPC codes (via iTunes lookup first)."""
     try:
         async with httpx.AsyncClient() as client:
             # Check if input is a UPC code (numeric, typically 12-14 digits)
             clean_input = url.strip()
             is_upc = clean_input.isdigit() and 10 <= len(clean_input) <= 14
             
-            if is_upc:
-                # For UPC codes, use different API format
-                odesli_url = f"https://api.song.link/v1-alpha.1/links?platform=itunes&type=album&id={clean_input}&userCountry={country}"
-            else:
-                odesli_url = f"https://api.song.link/v1-alpha.1/links?url={clean_input}&userCountry={country}"
+            lookup_url = clean_input
             
+            if is_upc:
+                # For UPC codes, first search in iTunes to get a proper URL
+                itunes_url = f"https://itunes.apple.com/lookup?upc={clean_input}&country={country}"
+                itunes_response = await client.get(itunes_url, timeout=10.0)
+                
+                if itunes_response.status_code == 200:
+                    itunes_data = itunes_response.json()
+                    results = itunes_data.get("results", [])
+                    
+                    if results:
+                        # Get the collection URL (album) or track URL
+                        collection_url = results[0].get("collectionViewUrl") or results[0].get("trackViewUrl")
+                        if collection_url:
+                            lookup_url = collection_url
+                            logging.info(f"UPC {clean_input} resolved to: {collection_url}")
+                        else:
+                            return {"error": "Релиз не найден по UPC коду", "links": {}}
+                    else:
+                        return {"error": "Релиз не найден по UPC коду", "links": {}}
+                else:
+                    return {"error": "Не удалось найти релиз по UPC", "links": {}}
+            
+            # Call Odesli API
+            odesli_url = f"https://api.song.link/v1-alpha.1/links?url={lookup_url}&userCountry={country}"
             response = await client.get(odesli_url, timeout=15.0)
             
             if response.status_code != 200:
@@ -2522,9 +2542,6 @@ async def lookup_odesli(url: str, country: Optional[str] = "RU"):
             links_by_platform = data.get("linksByPlatform", {})
             
             # Map ALL Odesli platform names to our platform IDs
-            # Odesli returns: spotify, itunes, appleMusic, youtube, youtubeMusic, google, googleStore,
-            # pandora, deezer, tidal, amazonStore, amazonMusic, soundcloud, napster, yandex,
-            # spinrilla, audius, anghami, boomplay, audiomack
             platform_mapping = {
                 "spotify": "spotify",
                 "itunes": "itunes",
