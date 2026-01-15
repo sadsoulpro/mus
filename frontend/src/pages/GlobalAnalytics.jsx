@@ -12,9 +12,11 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts";
 import Sidebar from "@/components/Sidebar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function GlobalAnalytics() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -32,7 +34,7 @@ export default function GlobalAnalytics() {
       const response = await api.get("/analytics/global/summary");
       setAnalytics(response.data);
     } catch (error) {
-      toast.error("Не удалось загрузить аналитику");
+      toast.error(t('errors', 'loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -60,8 +62,8 @@ export default function GlobalAnalytics() {
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-display mb-2">Аналитика</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Обзор статистики всех ваших страниц</p>
+          <h1 className="text-2xl sm:text-3xl font-display mb-2">{t('analytics', 'title')}</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">{t('analytics', 'subtitle')}</p>
         </div>
         
         {/* Stats Overview */}
@@ -80,7 +82,7 @@ export default function GlobalAnalytics() {
             <p className="text-xl sm:text-3xl font-bold mb-1">
               {(analytics?.total_views || 0).toLocaleString()}
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Просмотров</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'totalViews')}</p>
           </motion.div>
           
           <motion.div
@@ -98,7 +100,7 @@ export default function GlobalAnalytics() {
             <p className="text-xl sm:text-3xl font-bold mb-1">
               {(analytics?.total_clicks || 0).toLocaleString()}
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Кликов</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'totalClicks')}</p>
           </motion.div>
           
           <motion.div
@@ -116,7 +118,7 @@ export default function GlobalAnalytics() {
             <p className="text-xl sm:text-3xl font-bold mb-1">
               {(analytics?.total_shares || 0).toLocaleString()}
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Поделились</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'shares')}</p>
           </motion.div>
           
           <motion.div
@@ -134,7 +136,7 @@ export default function GlobalAnalytics() {
             <p className="text-xl sm:text-3xl font-bold mb-1">
               {(analytics?.total_qr_scans || 0).toLocaleString()}
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground">QR сканов</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'qrScans')}</p>
           </motion.div>
         </div>
         
@@ -149,8 +151,8 @@ export default function GlobalAnalytics() {
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold">Динамика</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Клики за 30 дней</p>
+                <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'dynamics')}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'clicksLast30')}</p>
               </div>
               <TrendingUp className="w-5 h-5 text-muted-foreground" />
             </div>
@@ -168,12 +170,12 @@ export default function GlobalAnalytics() {
                   <XAxis dataKey="date" stroke="#71717a" fontSize={10} tickFormatter={(v) => v.slice(5)} />
                   <YAxis stroke="#71717a" fontSize={10} />
                   <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }} />
-                  <Area type="monotone" dataKey="clicks" stroke="#d946ef" fillOpacity={1} fill="url(#colorClicks)" name="Клики" />
+                  <Area type="monotone" dataKey="clicks" stroke="#d946ef" fillOpacity={1} fill="url(#colorClicks)" name={t('common', 'clicks')} />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">
-                Нет данных за последние 30 дней
+                {t('analytics', 'noDataLast30')}
               </div>
             )}
           </motion.div>
@@ -187,17 +189,17 @@ export default function GlobalAnalytics() {
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold">Способы распространения</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Как делятся страницами</p>
+                <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'shareTypes')}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'howShared')}</p>
               </div>
               <Share2 className="w-5 h-5 text-muted-foreground" />
             </div>
             
             <div className="space-y-4">
               {[
-                { type: "link", label: "Прямая ссылка", icon: ArrowUpRight, color: "#d946ef", count: analytics?.shares_by_type?.link || 0 },
-                { type: "qr", label: "QR-код", icon: QrCode, color: "#8b5cf6", count: analytics?.shares_by_type?.qr || analytics?.total_qr_scans || 0 },
-                { type: "social", label: "Соц. сети", icon: Share2, color: "#22c55e", count: analytics?.shares_by_type?.social || 0 },
+                { type: "link", label: t('analytics', 'directLink'), icon: ArrowUpRight, color: "#d946ef", count: analytics?.shares_by_type?.link || 0 },
+                { type: "qr", label: t('analytics', 'qrCode'), icon: QrCode, color: "#8b5cf6", count: analytics?.shares_by_type?.qr || analytics?.total_qr_scans || 0 },
+                { type: "social", label: t('analytics', 'socialNetworks'), icon: Share2, color: "#22c55e", count: analytics?.shares_by_type?.social || 0 },
               ].map((item) => {
                 const Icon = item.icon;
                 const total = Object.values(analytics?.shares_by_type || {}).reduce((a, b) => a + b, 0) + (analytics?.total_qr_scans || 0);
@@ -231,11 +233,11 @@ export default function GlobalAnalytics() {
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-zinc-900/60 backdrop-blur-md">
               <div className="text-center p-6">
                 <Crown className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-white mb-2">Доступно в PRO подписке</h3>
-                <p className="text-sm text-muted-foreground mb-4">География кликов доступна в PRO версии</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('analytics', 'proRequired')}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{t('analytics', 'geographyPro')}</p>
                 <Link to="/pricing">
                   <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
-                    Перейти на PRO
+                    {t('common', 'upgrade')}
                   </Button>
                 </Link>
               </div>
@@ -246,8 +248,8 @@ export default function GlobalAnalytics() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className={`p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold">По странам</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Распределение кликов</p>
+                <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'byCountry')}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'clickDistribution')}</p>
               </div>
               <Globe className="w-5 h-5 text-muted-foreground" />
             </div>
@@ -275,7 +277,7 @@ export default function GlobalAnalytics() {
               </div>
             ) : (
               <div className="h-[150px] flex items-center justify-center text-muted-foreground text-sm">
-                <div className="text-center"><Globe className="w-8 h-8 mx-auto mb-2 opacity-50" /><p>Нет данных</p></div>
+                <div className="text-center"><Globe className="w-8 h-8 mx-auto mb-2 opacity-50" /><p>{t('analytics', 'noData')}</p></div>
               </div>
             )}
           </motion.div>
@@ -284,8 +286,8 @@ export default function GlobalAnalytics() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className={`p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold">По городам</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Топ городов</p>
+                <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'byCities')}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'topCities')}</p>
               </div>
               <MapPin className="w-5 h-5 text-muted-foreground" />
             </div>
@@ -313,7 +315,7 @@ export default function GlobalAnalytics() {
               </div>
             ) : (
               <div className="h-[150px] flex items-center justify-center text-muted-foreground text-sm">
-                <div className="text-center"><MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" /><p>Нет данных</p></div>
+                <div className="text-center"><MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" /><p>{t('analytics', 'noData')}</p></div>
               </div>
             )}
           </motion.div>
@@ -326,11 +328,11 @@ export default function GlobalAnalytics() {
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-zinc-900/60 backdrop-blur-md">
               <div className="text-center p-6">
                 <Crown className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-white mb-2">Доступно в PRO подписке</h3>
-                <p className="text-sm text-muted-foreground mb-4">Детальная статистика по страницам</p>
+                <h3 className="text-lg font-semibold text-white mb-2">{t('analytics', 'proRequired')}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{t('analytics', 'detailedStats')}</p>
                 <Link to="/pricing">
                   <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
-                    Перейти на PRO
+                    {t('common', 'upgrade')}
                   </Button>
                 </Link>
               </div>
@@ -339,8 +341,8 @@ export default function GlobalAnalytics() {
           
           <div className={`${!hasAdvancedAnalytics ? 'filter blur-sm pointer-events-none' : ''}`}>
             <div className="mb-4 sm:mb-6">
-              <h3 className="text-base sm:text-lg font-semibold">Статистика по страницам</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Детальная аналитика</p>
+              <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'pageStats')}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">{t('analytics', 'detailedAnalytics')}</p>
             </div>
           
           {analytics?.pages?.length > 0 ? (
@@ -348,9 +350,9 @@ export default function GlobalAnalytics() {
               <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="border-b border-white/5">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Страница</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Просм.</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Клики</th>
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">{t('common', 'page')}</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">{t('analytics', 'views')}</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">{t('common', 'clicks')}</th>
                     <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">CTR</th>
                   </tr>
                 </thead>
@@ -381,8 +383,8 @@ export default function GlobalAnalytics() {
           ) : (
             <div className="py-8 text-center text-muted-foreground">
               <BarChart3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">У вас пока нет страниц</p>
-              <Link to="/page/new"><Button className="mt-4 bg-primary hover:bg-primary/90" size="sm">Создать страницу</Button></Link>
+              <p className="text-sm">{t('analytics', 'noPages')}</p>
+              <Link to="/page/new"><Button className="mt-4 bg-primary hover:bg-primary/90" size="sm">{t('dashboard', 'createNew')}</Button></Link>
             </div>
           )}
           </div>
@@ -394,98 +396,27 @@ export default function GlobalAnalytics() {
 
 // Маппинг русских названий стран к флагам эмодзи
 const COUNTRY_FLAGS = {
-  // Русские названия (от ip-api.com с lang=ru)
-  "Россия": "🇷🇺",
-  "США": "🇺🇸",
-  "Украина": "🇺🇦",
-  "Беларусь": "🇧🇾",
-  "Казахстан": "🇰🇿",
-  "Германия": "🇩🇪",
-  "ФРГ": "🇩🇪",
-  "Великобритания": "🇬🇧",
-  "Франция": "🇫🇷",
-  "Италия": "🇮🇹",
-  "Испания": "🇪🇸",
-  "Нидерланды": "🇳🇱",
-  "Польша": "🇵🇱",
-  "Канада": "🇨🇦",
-  "Австралия": "🇦🇺",
-  "Китай": "🇨🇳",
-  "Япония": "🇯🇵",
-  "Южная Корея": "🇰🇷",
-  "Индия": "🇮🇳",
-  "Бразилия": "🇧🇷",
-  "Мексика": "🇲🇽",
-  "Турция": "🇹🇷",
-  "Швеция": "🇸🇪",
-  "Норвегия": "🇳🇴",
-  "Финляндия": "🇫🇮",
-  "Дания": "🇩🇰",
-  "Швейцария": "🇨🇭",
-  "Австрия": "🇦🇹",
-  "Бельгия": "🇧🇪",
-  "Чехия": "🇨🇿",
-  "Португалия": "🇵🇹",
-  "Греция": "🇬🇷",
-  "Израиль": "🇮🇱",
-  "ОАЭ": "🇦🇪",
-  "Сингапур": "🇸🇬",
-  "Гонконг": "🇭🇰",
-  "Тайвань": "🇹🇼",
-  "Таиланд": "🇹🇭",
-  "Вьетнам": "🇻🇳",
-  "Индонезия": "🇮🇩",
-  "Малайзия": "🇲🇾",
-  "Филиппины": "🇵🇭",
-  "Аргентина": "🇦🇷",
-  "Чили": "🇨🇱",
-  "Колумбия": "🇨🇴",
-  "Перу": "🇵🇪",
-  "Египет": "🇪🇬",
-  "ЮАР": "🇿🇦",
-  "Нигерия": "🇳🇬",
-  "Латвия": "🇱🇻",
-  "Литва": "🇱🇹",
-  "Эстония": "🇪🇪",
-  "Грузия": "🇬🇪",
-  "Армения": "🇦🇲",
-  "Азербайджан": "🇦🇿",
-  "Узбекистан": "🇺🇿",
-  "Кыргызстан": "🇰🇬",
-  "Таджикистан": "🇹🇯",
-  "Туркменистан": "🇹🇲",
-  "Молдова": "🇲🇩",
-  "Сербия": "🇷🇸",
-  "Хорватия": "🇭🇷",
-  "Словения": "🇸🇮",
-  "Словакия": "🇸🇰",
-  "Румыния": "🇷🇴",
-  "Болгария": "🇧🇬",
-  "Венгрия": "🇭🇺",
-  "Ирландия": "🇮🇪",
-  "Новая Зеландия": "🇳🇿",
-  // Английские названия (fallback)
-  "Russia": "🇷🇺",
-  "United States": "🇺🇸",
-  "Ukraine": "🇺🇦",
-  "Belarus": "🇧🇾",
-  "Kazakhstan": "🇰🇿",
-  "Germany": "🇩🇪",
-  "United Kingdom": "🇬🇧",
-  "France": "🇫🇷",
-  "Hong Kong": "🇭🇰",
-  // Коды стран (на всякий случай)
-  "RU": "🇷🇺",
-  "US": "🇺🇸",
-  "UA": "🇺🇦",
-  "BY": "🇧🇾",
-  "KZ": "🇰🇿",
-  "DE": "🇩🇪",
-  "GB": "🇬🇧",
-  "FR": "🇫🇷",
-  // Неизвестно
-  "Неизвестно": "🌍",
-  "Unknown": "🌍",
+  "Россия": "🇷🇺", "США": "🇺🇸", "Украина": "🇺🇦", "Беларусь": "🇧🇾",
+  "Казахстан": "🇰🇿", "Германия": "🇩🇪", "ФРГ": "🇩🇪", "Великобритания": "🇬🇧",
+  "Франция": "🇫🇷", "Италия": "🇮🇹", "Испания": "🇪🇸", "Нидерланды": "🇳🇱",
+  "Польша": "🇵🇱", "Канада": "🇨🇦", "Австралия": "🇦🇺", "Китай": "🇨🇳",
+  "Япония": "🇯🇵", "Южная Корея": "🇰🇷", "Индия": "🇮🇳", "Бразилия": "🇧🇷",
+  "Мексика": "🇲🇽", "Турция": "🇹🇷", "Швеция": "🇸🇪", "Норвегия": "🇳🇴",
+  "Финляндия": "🇫🇮", "Дания": "🇩🇰", "Швейцария": "🇨🇭", "Австрия": "🇦🇹",
+  "Бельгия": "🇧🇪", "Чехия": "🇨🇿", "Португалия": "🇵🇹", "Греция": "🇬🇷",
+  "Израиль": "🇮🇱", "ОАЭ": "🇦🇪", "Сингапур": "🇸🇬", "Гонконг": "🇭🇰",
+  "Тайвань": "🇹🇼", "Таиланд": "🇹🇭", "Вьетнам": "🇻🇳", "Индонезия": "🇮🇩",
+  "Малайзия": "🇲🇾", "Филиппины": "🇵🇭", "Аргентина": "🇦🇷", "Чили": "🇨🇱",
+  "Колумбия": "🇨🇴", "Перу": "🇵🇪", "Египет": "🇪🇬", "ЮАР": "🇿🇦",
+  "Нигерия": "🇳🇬", "Латвия": "🇱🇻", "Литва": "🇱🇹", "Эстония": "🇪🇪",
+  "Грузия": "🇬🇪", "Армения": "🇦🇲", "Азербайджан": "🇦🇿", "Узбекистан": "🇺🇿",
+  "Кыргызстан": "🇰🇬", "Таджикистан": "🇹🇯", "Туркменистан": "🇹🇲", "Молдова": "🇲🇩",
+  "Сербия": "🇷🇸", "Хорватия": "🇭🇷", "Словения": "🇸🇮", "Словакия": "🇸🇰",
+  "Румыния": "🇷🇴", "Болгария": "🇧🇬", "Венгрия": "🇭🇺", "Ирландия": "🇮🇪",
+  "Новая Зеландия": "🇳🇿", "Russia": "🇷🇺", "United States": "🇺🇸",
+  "Ukraine": "🇺🇦", "Belarus": "🇧🇾", "Kazakhstan": "🇰🇿", "Germany": "🇩🇪",
+  "United Kingdom": "🇬🇧", "France": "🇫🇷", "Hong Kong": "🇭🇰",
+  "Неизвестно": "🌍", "Unknown": "🌍",
 };
 
 function getCountryFlag(country) {
@@ -493,7 +424,6 @@ function getCountryFlag(country) {
 }
 
 function getCountryName(country) {
-  // Если это уже русское название - возвращаем как есть
   if (country && country !== "Unknown" && country !== "Неизвестно") {
     return country;
   }
