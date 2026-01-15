@@ -323,7 +323,7 @@ export const translations = {
       ctaTitle: "Готовы начать?",
       ctaSubtitle: "Создайте свою смарт-ссылку за несколько минут",
       ctaButton: "Начать бесплатно",
-      footer: "MyTrack — Смарт-ссылки для музыкантов",
+      footer: "Все права защищены.",
     },
     es: {
       heroTitle1: "CREA",
