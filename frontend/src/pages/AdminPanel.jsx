@@ -43,6 +43,7 @@ const COLORS = ['#d946ef', '#8b5cf6', '#3b82f6', '#22c55e', '#eab308', '#ef4444'
 
 export default function AdminPanel() {
   const { user: currentUser } = useAuth();
+  const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [pages, setPages] = useState([]);
   const [verificationRequests, setVerificationRequests] = useState([]);
@@ -67,12 +68,12 @@ export default function AdminPanel() {
   const canViewVPS = isOwner || isAdmin;
 
   // Helper to extract error message from API response
-  const getErrorMessage = (error, defaultMsg = "Ошибка") => {
+  const getErrorMessage = (error, defaultMsg) => {
     const detail = error.response?.data?.detail;
     if (typeof detail === 'string') return detail;
     if (Array.isArray(detail)) return detail.map(d => d.msg || String(d)).join(', ');
     if (detail && typeof detail === 'object' && detail.msg) return detail.msg;
-    return defaultMsg;
+    return defaultMsg || t('errors', 'generic');
   };
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export default function AdminPanel() {
       setUsers(usersRes.data);
       setPages(pagesRes.data);
     } catch (error) {
-      toast.error("Не удалось загрузить данные");
+      toast.error(t('errors', 'loadFailed'));
     } finally {
       setLoading(false);
     }
