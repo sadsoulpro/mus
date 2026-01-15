@@ -964,7 +964,7 @@ export default function PageBuilder() {
         
         {/* Live Preview */}
         <div className="hidden lg:block sticky top-24 h-fit">
-          <h2 className="text-lg font-semibold mb-4">Предпросмотр</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('common', 'preview')}</h2>
           <div className="relative mx-auto w-[300px]">
             {/* Phone Frame */}
             <div className="rounded-[40px] border-4 border-zinc-800 bg-zinc-900 p-2 shadow-2xl">
@@ -1000,10 +1000,10 @@ export default function PageBuilder() {
                   </div>
                   
                   <h3 className="font-display text-lg uppercase">
-                    {formData.artist_name || "Имя артиста"}
+                    {formData.artist_name || t('pageBuilder', 'artistName')}
                   </h3>
                   <p className="text-sm text-zinc-400 mb-6">
-                    {formData.release_title || "Название релиза"}
+                    {formData.release_title || t('pageBuilder', 'releaseTitle')}
                   </p>
                   
                   {/* Links Preview */}
