@@ -343,7 +343,7 @@ export const translations = {
       ctaTitle: "¿Listo para empezar?",
       ctaSubtitle: "Crea tu enlace inteligente en minutos",
       ctaButton: "Comenzar gratis",
-      footer: "MyTrack — Enlaces inteligentes para músicos",
+      footer: "Todos los derechos reservados.",
     },
   },
 
