@@ -1248,7 +1248,7 @@ export default function AdminPanel() {
                     {tickets.length === 0 && (
                       <div className="text-center py-20 text-muted-foreground">
                         <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                        <p>Тикеты не найдены</p>
+                        <p>{t('admin', 'noTicketsFound')}</p>
                       </div>
                     )}
                   </div>
@@ -1265,7 +1265,7 @@ export default function AdminPanel() {
                           <div>
                             <h2 className="text-xl font-semibold mb-2">{selectedTicket.subject}</h2>
                             <p className="text-sm text-muted-foreground">
-                              От: {selectedTicket.user?.username || selectedTicket.user?.email}
+                              {t('admin', 'ticketFrom')}: {selectedTicket.user?.username || selectedTicket.user?.email}
                             </p>
                           </div>
                           <select
@@ -1273,10 +1273,10 @@ export default function AdminPanel() {
                             onChange={(e) => updateTicketStatus(selectedTicket.id, e.target.value)}
                             className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-sm"
                           >
-                            <option value="open">Открыт</option>
-                            <option value="in_progress">В работе</option>
-                            <option value="resolved">Решён</option>
-                            <option value="closed">Закрыт</option>
+                            <option value="open">{t('admin', 'ticketOpen')}</option>
+                            <option value="in_progress">{t('admin', 'ticketInProgress')}</option>
+                            <option value="resolved">{t('admin', 'ticketResolved')}</option>
+                            <option value="closed">{t('admin', 'ticketClosed')}</option>
                           </select>
                         </div>
 
