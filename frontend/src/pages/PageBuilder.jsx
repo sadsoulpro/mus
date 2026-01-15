@@ -253,9 +253,9 @@ export default function PageBuilder() {
         headers: { "Content-Type": "multipart/form-data" }
       });
       setFormData(prev => ({ ...prev, cover_image: response.data.cover_url }));
-      toast.success("Изображение загружено");
+      toast.success(t('common', 'success'));
     } catch (error) {
-      toast.error("Не удалось загрузить изображение");
+      toast.error(t('errors', 'uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -276,7 +276,7 @@ export default function PageBuilder() {
       let finalTitle = formData.title?.trim();
       if (!finalTitle) {
         const parts = [formData.artist_name, formData.release_title].filter(Boolean);
-        finalTitle = parts.length > 0 ? parts.join(" - ") : "Новая страница";
+        finalTitle = parts.length > 0 ? parts.join(" - ") : t('pageBuilder', 'newPage');
       }
       
       const pageData = { 
@@ -288,7 +288,7 @@ export default function PageBuilder() {
       
       if (isEditing) {
         await api.put(`/pages/${pageId}`, pageData);
-        toast.success("Страница обновлена");
+        toast.success(t('pageBuilder', 'pageUpdated'));
       } else {
         const response = await api.post("/pages", pageData);
         // Add links if any
@@ -299,12 +299,12 @@ export default function PageBuilder() {
             active: link.active ?? true
           });
         }
-        toast.success("Страница создана");
+        toast.success(t('pageBuilder', 'pageCreated'));
         navigate(`/page/${response.data.id}/edit`);
         return;
       }
     } catch (error) {
-      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : "Не удалось сохранить страницу");
+      toast.error(typeof (error.response?.data?.detail) === "string" ? error.response.data.detail : t('errors', 'saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -312,7 +312,7 @@ export default function PageBuilder() {
 
   const addLink = async () => {
     if (!newLink.url) {
-      toast.error("Пожалуйста, введите URL");
+      toast.error(t('pageBuilder', 'enterUrl'));
       return;
     }
     
@@ -325,9 +325,9 @@ export default function PageBuilder() {
         });
         setLinks(prev => [...prev, response.data]);
         setNewLink({ platform: "spotify", url: "" });
-        toast.success("Ссылка добавлена");
+        toast.success(t('pageBuilder', 'linkAdded'));
       } catch (error) {
-        toast.error("Не удалось добавить ссылку");
+        toast.error(t('errors', 'generic'));
       }
     } else {
       setLinks(prev => [...prev, { 
@@ -347,7 +347,7 @@ export default function PageBuilder() {
         await api.put(`/pages/${pageId}/links/${linkId}`, { active: !active });
         setLinks(prev => prev.map(l => l.id === linkId ? { ...l, active: !active } : l));
       } catch (error) {
-        toast.error("Не удалось обновить ссылку");
+        toast.error(t('errors', 'generic'));
       }
     } else {
       setLinks(prev => prev.map(l => l.id === linkId ? { ...l, active: !active } : l));
