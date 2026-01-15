@@ -288,7 +288,7 @@ export default function AdminPanel() {
   const toggleUserVerify = async (userId, currentVerified) => {
     try {
       await api.put(`/admin/users/${userId}/verify`, { is_verified: !currentVerified });
-      toast.success(currentVerified ? "Верификация снята" : "Верифицирован");
+      toast.success(currentVerified ? t('admin', 'verificationRevoked') : t('admin', 'verified'));
       fetchData();
     } catch (error) {
       toast.error(getErrorMessage(error));
