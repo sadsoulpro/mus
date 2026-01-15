@@ -618,7 +618,7 @@ export default function AdminPanel() {
                       <div className="h-[200px] flex items-center justify-center text-muted-foreground">
                         <div className="text-center">
                           <Globe className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                          <p>Нет данных</p>
+                          <p>{t('admin', 'noData')}</p>
                         </div>
                       </div>
                     )}
@@ -636,7 +636,7 @@ export default function AdminPanel() {
                   >
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                       <PieChart className="w-4 h-4 text-purple-400" />
-                      Распределение по планам
+                      {t('admin', 'planDistribution')}
                     </h3>
                     <div className="flex items-center justify-center">
                       <ResponsiveContainer width="100%" height={180}>
