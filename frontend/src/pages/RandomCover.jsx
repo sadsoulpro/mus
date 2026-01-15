@@ -1215,7 +1215,7 @@ export default function RandomCover() {
                         className="flex-1 max-w-[140px]"
                       >
                         <Upload className="w-4 h-4 mr-1" />
-                        Фото
+                        {t('randomCover', 'photo')}
                       </Button>
                       <Button
                         size="sm"
@@ -1224,7 +1224,7 @@ export default function RandomCover() {
                         className="flex-1 max-w-[140px]"
                       >
                         <Type className="w-4 h-4 mr-1" />
-                        Текст
+                        {t('randomCover', 'text')}
                       </Button>
                       <Button
                         size="sm"
@@ -1237,7 +1237,7 @@ export default function RandomCover() {
                         ) : (
                           <>
                             <Download className="w-4 h-4 mr-1" />
-                            Скачать
+                            {t('randomCover', 'download')}
                           </>
                         )}
                       </Button>
@@ -1262,7 +1262,7 @@ export default function RandomCover() {
                       }`}
                     >
                       <ImageIcon className="w-4 h-4 mx-auto mb-1" />
-                      Фон
+                      {t('randomCover', 'background')}
                     </button>
                     <button
                       onClick={() => setActiveControlTab("text")}
@@ -1273,7 +1273,7 @@ export default function RandomCover() {
                       }`}
                     >
                       <Type className="w-4 h-4 mx-auto mb-1" />
-                      Текст
+                      {t('randomCover', 'text')}
                     </button>
                     <button
                       onClick={() => setActiveControlTab("actions")}
@@ -1284,7 +1284,7 @@ export default function RandomCover() {
                       }`}
                     >
                       <Settings2 className="w-4 h-4 mx-auto mb-1" />
-                      Действия
+                      {t('randomCover', 'actions')}
                     </button>
                   </div>
 
@@ -1294,7 +1294,7 @@ export default function RandomCover() {
                   }`}>
                     <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm lg:text-base">
                       <Upload className="w-4 h-4 text-primary" />
-                      Фоновое изображение
+                      {t('randomCover', 'backgroundImage')}
                     </h3>
                     <input
                       ref={fileInputRef}
