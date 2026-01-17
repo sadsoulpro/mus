@@ -795,6 +795,7 @@ export const translations = {
       upcNotFound: "No se encontró el lanzamiento por código UPC. Verifica el código.",
       scanError: "No se pudieron obtener enlaces. Verifica la URL e intenta de nuevo.",
       allLinksAdded: "Todos los enlaces disponibles ya están añadidos",
+      linksWillAppear: "Los enlaces aparecerán aquí",
       pageDesign: "Diseño de Página",
       darkTheme: "Oscuro",
       lightTheme: "Claro",
