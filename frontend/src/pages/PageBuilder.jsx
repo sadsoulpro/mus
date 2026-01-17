@@ -1014,8 +1014,8 @@ export default function PageBuilder() {
           <h2 className="text-lg font-semibold mb-4">{t('common', 'preview')}</h2>
           <div className="relative mx-auto w-[300px]">
             {/* Phone Frame */}
-            <div className="rounded-[40px] border-4 border-zinc-800 bg-card p-2 shadow-2xl">
-              <div className="rounded-[32px] overflow-hidden aspect-[9/16] relative">
+            <div className="rounded-[40px] border-4 border-border bg-card p-2 shadow-2xl">
+              <div className="rounded-[32px] overflow-hidden aspect-[9/16] relative bg-zinc-900">
                 {/* Background */}
                 <div 
                   className="absolute inset-0 bg-gradient-to-b from-purple-900/30 to-zinc-900"
@@ -1032,7 +1032,7 @@ export default function PageBuilder() {
                 {/* Content */}
                 <div className="relative p-6 pt-10 flex flex-col items-center text-center h-full">
                   {/* Cover */}
-                  <div className="w-24 h-24 rounded-xl bg-muted overflow-hidden mb-4 shadow-xl">
+                  <div className="w-24 h-24 rounded-xl bg-zinc-800 overflow-hidden mb-4 shadow-xl">
                     {formData.cover_image ? (
                       <img 
                         src={formData.cover_image.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${formData.cover_image}` : formData.cover_image}
@@ -1041,12 +1041,12 @@ export default function PageBuilder() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Music className="w-10 h-10 text-muted-foreground" />
+                        <Music className="w-10 h-10 text-zinc-600" />
                       </div>
                     )}
                   </div>
                   
-                  <h3 className="font-display text-lg uppercase">
+                  <h3 className="font-display text-lg uppercase text-white">
                     {formData.artist_name || t('pageBuilder', 'artistName')}
                   </h3>
                   <p className="text-sm text-zinc-400 mb-6">
@@ -1062,10 +1062,10 @@ export default function PageBuilder() {
                       return (
                         <div 
                           key={link.id}
-                          className="w-full py-3 px-4 rounded-xl bg-white/5 border border-border flex items-center gap-3"
+                          className="w-full py-3 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3"
                         >
                           <Icon className="w-5 h-5" style={{ color: platform.color }} />
-                          <span className="text-sm font-medium">{platform.name}</span>
+                          <span className="text-sm font-medium text-white">{platform.name}</span>
                         </div>
                       );
                     })}
