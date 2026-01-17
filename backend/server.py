@@ -1106,6 +1106,94 @@ async def delete_link(page_id: str, link_id: str, user: dict = Depends(get_curre
     
     return {"message": "Link deleted"}
 
+# ===================== WAITLIST =====================
+
+class WaitlistRequest(BaseModel):
+    email: EmailStr
+    feature: Optional[str] = ""
+    language: Optional[str] = "en"
+
+# Simple in-memory rate limiting (per IP)
+waitlist_rate_limit = {}
+WAITLIST_RATE_LIMIT_SECONDS = 60
+
+@api_router.post("/waitlist")
+async def add_to_waitlist(data: WaitlistRequest, request: Request):
+    """Add email to waitlist for PRO features"""
+    # Rate limiting by IP
+    client_ip = request.client.host if request.client else "unknown"
+    now = datetime.now(timezone.utc)
+    
+    if client_ip in waitlist_rate_limit:
+        last_request = waitlist_rate_limit[client_ip]
+        if (now - last_request).total_seconds() < WAITLIST_RATE_LIMIT_SECONDS:
+            raise HTTPException(status_code=429, detail="Too many requests. Please try again later.")
+    
+    waitlist_rate_limit[client_ip] = now
+    
+    # Check if email already exists
+    existing = await db.waitlist.find_one({"email": data.email.lower()})
+    if existing:
+        # Update features if different
+        if data.feature and data.feature not in existing.get("features", []):
+            await db.waitlist.update_one(
+                {"email": data.email.lower()},
+                {"$addToSet": {"features": data.feature}, "$set": {"updated_at": now.isoformat()}}
+            )
+        return {"success": True, "message": "Email updated"}
+    
+    # Create new waitlist entry
+    waitlist_entry = {
+        "id": str(uuid.uuid4()),
+        "email": data.email.lower(),
+        "features": [data.feature] if data.feature else [],
+        "language": data.language,
+        "created_at": now.isoformat(),
+        "ip": client_ip
+    }
+    await db.waitlist.insert_one(waitlist_entry)
+    
+    # Send confirmation email
+    if RESEND_API_KEY:
+        try:
+            # Email content based on language
+            subjects = {
+                "ru": "Спасибо за интерес к Muslink!",
+                "es": "¡Gracias por tu interés en Muslink!",
+                "en": "Thanks for your interest in Muslink!"
+            }
+            bodies = {
+                "ru": """
+                <h2>Спасибо за вашу заинтересованность!</h2>
+                <p>Мы добавили вас в список ожидания. Как только функция станет доступна, мы вам сообщим.</p>
+                <p>С наилучшими пожеланиями,<br>Команда Muslink</p>
+                """,
+                "es": """
+                <h2>¡Gracias por tu interés!</h2>
+                <p>Te hemos añadido a la lista de espera. Te avisaremos cuando la función esté disponible.</p>
+                <p>Saludos,<br>El equipo de Muslink</p>
+                """,
+                "en": """
+                <h2>Thanks for your interest!</h2>
+                <p>We've added you to our waitlist. We'll notify you when the feature becomes available.</p>
+                <p>Best regards,<br>The Muslink Team</p>
+                """
+            }
+            
+            lang = data.language if data.language in subjects else "en"
+            
+            resend.Emails.send({
+                "from": SENDER_EMAIL,
+                "to": data.email,
+                "subject": subjects[lang],
+                "html": bodies[lang]
+            })
+        except Exception as e:
+            logging.error(f"Failed to send waitlist confirmation email: {e}")
+    
+    logging.info(f"New waitlist entry: {data.email} for feature: {data.feature}")
+    return {"success": True, "message": "Added to waitlist"}
+
 # ===================== PUBLIC ROUTES =====================
 
 @api_router.get("/artist/{slug}")
