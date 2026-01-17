@@ -14,8 +14,10 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
+import MuslinkLogo from "@/components/MuslinkLogo";
 
 // Navigation items with translation keys
 const getNavItems = (t) => [
