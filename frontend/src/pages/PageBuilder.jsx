@@ -285,7 +285,8 @@ export default function PageBuilder() {
         ...formData, 
         slug: finalSlug,
         title: finalTitle,
-        qr_enabled: qrEnabled 
+        qr_enabled: qrEnabled,
+        page_theme: pageTheme
       };
       
       if (isEditing) {
