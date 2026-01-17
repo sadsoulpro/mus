@@ -1076,8 +1076,8 @@ export default function PageBuilder() {
                     })}
                     
                     {links.filter(l => l.active).length === 0 && (
-                      <div className="py-3 px-4 rounded-xl border border-dashed border-border text-xs text-muted-foreground">
-                        Здесь появятся ссылки
+                      <div className="py-3 px-4 rounded-xl border border-dashed border-white/20 text-xs text-zinc-400">
+                        {t('pageBuilder', 'linksWillAppear')}
                       </div>
                     )}
                   </div>
