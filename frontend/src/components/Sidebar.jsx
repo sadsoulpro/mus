@@ -37,8 +37,8 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
   const navItems = getNavItems(t);
 
   return (
-    <>
-      <nav className="flex-1 space-y-2">
+    <div className="flex flex-col h-full">
+      <nav className="flex-1 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPath === item.path || 
@@ -53,7 +53,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
               key={item.path}
               to={item.path}
               onClick={onNavigate}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${
                 isActive
                   ? "bg-white/5 text-foreground"
                   : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
@@ -72,7 +72,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
         })}
       </nav>
       
-      <div className="pt-6 border-t border-white/5">
+      <div className="pt-4 mt-4 border-t border-white/5">
         {/* Theme and Language Switchers */}
         <div className="px-4 py-2 mb-2 flex items-center gap-2">
           <ThemeToggle className="flex-shrink-0" />
@@ -84,7 +84,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
           <Link
             to="/admin"
             onClick={onNavigate}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors mb-2 ${
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors mb-2 ${
               currentPath === "/admin"
                 ? "bg-white/5 text-foreground"
                 : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
@@ -100,15 +100,15 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
             )}
           </Link>
         )}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <span className="text-primary font-semibold">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-primary font-semibold text-sm">
               {user?.username?.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1">
-              <p className="font-medium truncate">{user?.username}</p>
+              <p className="font-medium truncate text-sm">{user?.username}</p>
               {user?.verified && user?.show_verification_badge !== false && (
                 <BadgeCheck className="w-4 h-4 text-primary flex-shrink-0" />
               )}
@@ -137,7 +137,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
           {t('common', 'logout')}
         </Button>
       </div>
-    </>
+    </div>
   );
 }
 
