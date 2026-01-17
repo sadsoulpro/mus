@@ -14,6 +14,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell
 } from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ProFeatureModal from "@/components/ProFeatureModal";
 
 // Custom icons
 const ZvukIcon = (props) => (
