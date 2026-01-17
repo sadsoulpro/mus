@@ -52,6 +52,7 @@ export default function Domains() {
   const [artistName, setArtistName] = useState("");
   const [savingContacts, setSavingContacts] = useState(false);
   const [contactsLoading, setContactsLoading] = useState(true);
+  const [proModalOpen, setProModalOpen] = useState(false);
 
   useEffect(() => {
     fetchSubdomains();
