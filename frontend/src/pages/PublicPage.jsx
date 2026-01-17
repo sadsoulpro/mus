@@ -552,10 +552,12 @@ export default function PublicPage() {
             {typeof navigator !== 'undefined' && navigator.share && (
               <button
                 onClick={() => handleShare("social")}
-                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/30 rounded-lg text-xs sm:text-sm transition-all"
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/30 rounded-lg text-xs sm:text-sm transition-all ${
+                  isLightTheme ? 'text-primary' : ''
+                }`}
               >
                 <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-                <span>Поделиться</span>
+                <span className={isLightTheme ? 'text-primary' : ''}>Поделиться</span>
               </button>
             )}
           </motion.div>
@@ -569,13 +571,15 @@ export default function PublicPage() {
               className="mt-6 sm:mt-8 flex flex-col items-center"
               onClick={handleQRShare}
             >
-              <div className="p-2 sm:p-3 bg-white rounded-lg sm:rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform">
+              <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform ${
+                isLightTheme ? 'bg-gray-50 border border-gray-200' : 'bg-white'
+              }`}>
                 <QRCodeSVG
                   value={`${process.env.REACT_APP_BACKEND_URL}/api/qr/${page.id}`}
                   size={80}
                   level="M"
                   includeMargin={false}
-                  bgColor="#ffffff"
+                  bgColor={isLightTheme ? "#f9fafb" : "#ffffff"}
                   fgColor="#18181b"
                   className="sm:hidden"
                 />
@@ -584,12 +588,12 @@ export default function PublicPage() {
                   size={100}
                   level="M"
                   includeMargin={false}
-                  bgColor="#ffffff"
+                  bgColor={isLightTheme ? "#f9fafb" : "#ffffff"}
                   fgColor="#18181b"
                   className="hidden sm:block"
                 />
               </div>
-              <p className="text-[10px] sm:text-xs text-zinc-500 mt-2">Сканируйте, чтобы поделиться</p>
+              <p className={`text-[10px] sm:text-xs ${isLightTheme ? 'text-gray-500' : 'text-zinc-500'} mt-2`}>Сканируйте, чтобы поделиться</p>
             </motion.div>
           )}
         </div>
@@ -604,7 +608,9 @@ export default function PublicPage() {
           >
             <a 
               href="/" 
-              className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-400 transition-colors text-sm"
+              className={`inline-flex items-center gap-2 ${
+                isLightTheme ? 'text-gray-400 hover:text-gray-500' : 'text-zinc-500 hover:text-zinc-400'
+              } transition-colors text-sm`}
             >
               <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center">
                 <Music className="w-3 h-3 text-primary" />
