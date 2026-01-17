@@ -325,6 +325,13 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* PRO Feature Modal */}
+      <ProFeatureModal
+        open={proModalOpen}
+        onOpenChange={setProModalOpen}
+        featureName="More Pages"
+      />
     </Sidebar>
   );
 }
