@@ -1043,6 +1043,13 @@ export default function RandomCover() {
         </DialogContent>
       </Dialog>
 
+      {/* PRO Feature Modal */}
+      <ProFeatureModal
+        open={proModalOpen}
+        onOpenChange={setProModalOpen}
+        featureName="AI Image Generation"
+      />
+
       <div className="min-h-screen bg-background">
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
