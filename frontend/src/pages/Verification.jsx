@@ -19,8 +19,18 @@ export default function Verification() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [badgeLoading, setBadgeLoading] = useState(false);
+  const [proModalOpen, setProModalOpen] = useState(false);
   
   const canVerify = user?.plan_config?.can_verify_profile || user?.plan === 'pro';
+  
+  const handleUpgradeClick = () => {
+    const submittedEmail = localStorage.getItem('waitlist_email_submitted');
+    if (submittedEmail) {
+      toast.info(t('proModal', 'alreadySubmitted'));
+    } else {
+      setProModalOpen(true);
+    }
+  };
   
   const [form, setForm] = useState({ artist_name: "", social_links: "", description: "" });
 
