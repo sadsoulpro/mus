@@ -1,6 +1,7 @@
-// Muslink Logo SVG Component
+// Muslink Logo SVG Component - Fullcolor version
 export default function MuslinkLogo({ className = "", height = 32, theme = "dark" }) {
-  const fillColor = theme === "light" ? "#1a1a1a" : "#ffffff";
+  // Use dark blue for light theme, white for dark theme
+  const fillColor = theme === "light" ? "#121B44" : "#ffffff";
   
   return (
     <svg 
