@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { 
   Music, ArrowLeft, Upload, Plus, Trash2, 
   GripVertical, ExternalLink, Save, ChevronUp, ChevronDown,
-  QrCode, Download, Search, Loader2
+  QrCode, Download, Search, Loader2, Sun, Moon
 } from "lucide-react";
 import { FaSpotify, FaApple, FaYoutube, FaSoundcloud, FaLink, FaYandex, FaVk, FaAmazon, FaItunes, FaGoogle, FaNapster, FaBandcamp } from "react-icons/fa";
 import { SiTidal, SiPandora, SiAudiomack } from "react-icons/si";
