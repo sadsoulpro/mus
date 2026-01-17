@@ -58,7 +58,8 @@ export default function Dashboard() {
   };
 
   const copyLink = (slug) => {
-    const url = `${window.location.origin}/${slug}`;
+    // Use /api/s/{slug} for social sharing (has OG tags for bots)
+    const url = `${window.location.origin}/api/s/${slug}`;
     navigator.clipboard.writeText(url);
     toast.success(t('common', 'copied'));
   };
