@@ -2430,6 +2430,8 @@ export const translations = {
       successTitle: "You're on the list!",
       successMessage: "We'll notify you when this feature becomes available.",
       successToast: "Successfully added to waitlist!",
+      alreadySubmitted: "We've already received your email. You'll be notified when the feature is available.",
+      limitReached: "Limit reached. Upgrade to PRO to unlock more.",
     },
     ru: {
       title: "Скоро будет",
@@ -2443,6 +2445,8 @@ export const translations = {
       successTitle: "Вы в списке!",
       successMessage: "Мы уведомим вас, когда функция станет доступна.",
       successToast: "Вы успешно добавлены в список ожидания!",
+      alreadySubmitted: "Мы уже получили вашу почту, ожидайте уведомления о доступности функционала.",
+      limitReached: "Лимит достигнут, перейдите на PRO-подписку.",
     },
     es: {
       title: "Próximamente",
@@ -2456,6 +2460,8 @@ export const translations = {
       successTitle: "¡Estás en la lista!",
       successMessage: "Te notificaremos cuando esta función esté disponible.",
       successToast: "¡Añadido a la lista de espera!",
+      alreadySubmitted: "Ya hemos recibido tu correo. Te notificaremos cuando la función esté disponible.",
+      limitReached: "Límite alcanzado. Actualiza a PRO para desbloquear más.",
     },
   },
 
