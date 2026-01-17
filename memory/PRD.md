@@ -19,7 +19,18 @@ Application cloned from GitHub repository `https://github.com/sadsoulpro/prefina
 - Verification badge system
 - RandomCover - AI-powered cover art editor
 
-### Session Updates (2025-01-17) - Light Theme Fixes
+### Session Updates (2025-01-17) - Light Theme Fixes & Security
+
+#### Security Refactoring
+- Moved JWT_SECRET from hardcoded fallback to required environment variable
+- Moved OWNER_EMAIL from hardcoded value to required environment variable (.env)
+- Application now fails fast if required security config is missing
+
+#### Forgot Password Page Overhaul
+- Added full internationalization (EN, RU, ES) for `/forgot-password` page
+- Fixed light/dark mode support for forgot password page
+- Replaced old PNG logo with SVG MuslinkLogo component
+- Added proper translations in `forgotPassword` section of translations.js
 
 #### Public Page Theme Selector
 - Added page_theme field to pages collection (dark/light)
@@ -149,16 +160,18 @@ All pages now use CSS variables (`bg-background`, `bg-muted`, `border-border`, `
 - [x] Fixed PageBuilder Preview visibility in light mode
 - [x] Localized limit reached notifications (EN, RU, ES)
 - [x] "Already submitted" notification if user already in waitlist
+- [x] Forgot Password page i18n (EN, RU, ES)
+- [x] Forgot Password page light/dark mode support
+- [x] Forgot Password page SVG logo
+- [x] Security: JWT_SECRET moved to required .env variable
+- [x] Security: OWNER_EMAIL moved to required .env variable
 
 ## Pending/Future Tasks
 
 ### P2 - Minor Improvements
-- Fix mixed language in PageBuilder preview
+- Add CSV export for waitlist emails in Admin Panel
 - Add default OG image file to server
-
-### P2 - Security Improvements
-- Remove hardcoded JWT_SECRET fallback
-- Make OWNER_EMAIL configurable via .env
+- Create NGINX_DEPLOY.md documentation
 
 ### P3 - Cleanup
 - Optimize N+1 database queries in admin panel
