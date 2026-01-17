@@ -149,12 +149,12 @@ export default function Landing() {
               ) : (
                 <>
                   <Link to="/login">
-                    <Button variant="ghost" size="sm" data-testid="nav-login-btn">
+                    <Button size="sm" data-testid="nav-login-btn" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
                       {t('nav', 'login')}
                     </Button>
                   </Link>
-                  <Link to="/register">
-                    <Button size="sm" data-testid="nav-signup-btn" className="bg-primary hover:bg-primary/90">
+                  <Link to="/register" className="hidden sm:block">
+                    <Button size="sm" data-testid="nav-signup-btn" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
                       {t('nav', 'register')}
                     </Button>
                   </Link>
