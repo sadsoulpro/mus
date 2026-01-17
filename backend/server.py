@@ -2628,6 +2628,22 @@ async def admin_delete_subdomain(subdomain_id: str, user: dict = Depends(get_adm
     
     return {"success": True}
 
+# --- Waitlist Admin API ---
+
+@api_router.get("/admin/waitlist")
+async def admin_get_waitlist(user: dict = Depends(get_admin_user)):
+    """Get all waitlist emails - Admin only"""
+    emails = await db.waitlist.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return {"emails": emails, "total": len(emails)}
+
+@api_router.delete("/admin/waitlist/{email_id}")
+async def admin_delete_waitlist_email(email_id: str, user: dict = Depends(get_admin_user)):
+    """Delete waitlist email - Admin only"""
+    result = await db.waitlist.delete_one({"id": email_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Email not found")
+    return {"success": True}
+
 # --- Subdomain Resolution API ---
 
 @api_router.get("/resolve/{subdomain}")
