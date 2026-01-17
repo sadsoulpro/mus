@@ -12,6 +12,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts";
 import Sidebar from "@/components/Sidebar";
+import ProFeatureModal from "@/components/ProFeatureModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function GlobalAnalytics() {
@@ -19,11 +20,21 @@ export default function GlobalAnalytics() {
   const { t } = useLanguage();
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [proModalOpen, setProModalOpen] = useState(false);
   
   // Check if user has advanced analytics
   const hasAdvancedAnalytics = analytics?.has_advanced_analytics || 
     user?.plan_config?.has_advanced_analytics ||
     user?.plan === 'pro';
+
+  const handleUpgradeClick = () => {
+    const submittedEmail = localStorage.getItem('waitlist_email_submitted');
+    if (submittedEmail) {
+      toast.info(t('proModal', 'alreadySubmitted'));
+    } else {
+      setProModalOpen(true);
+    }
+  };
 
   useEffect(() => {
     fetchAnalytics();
