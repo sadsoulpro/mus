@@ -710,6 +710,7 @@ export const translations = {
       upcNotFound: "Не удалось найти релиз по UPC коду. Проверьте код.",
       scanError: "Не удалось получить ссылки. Проверьте URL и попробуйте снова.",
       allLinksAdded: "Все доступные ссылки уже добавлены",
+      linksWillAppear: "Здесь появятся ссылки",
       pageDesign: "Вид дизайна",
       darkTheme: "Тёмная",
       lightTheme: "Светлая",
