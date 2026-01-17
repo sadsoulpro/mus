@@ -288,9 +288,6 @@ function App() {
           <Route path="/verification" element={
             <ProtectedRoute><Verification /></ProtectedRoute>
           } />
-          <Route path="/pricing" element={
-            <ProtectedRoute><Pricing /></ProtectedRoute>
-          } />
           <Route path="/support" element={
             <ProtectedRoute><Support /></ProtectedRoute>
           } />
