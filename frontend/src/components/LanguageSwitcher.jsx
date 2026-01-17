@@ -20,7 +20,7 @@ const LanguageChip = ({ code, isActive, onClick, showCheck = false }) => (
   </button>
 );
 
-const LanguageSwitcher = ({ variant = 'default', className = '' }) => {
+const LanguageSwitcher = ({ variant = 'default', className = '', dropDirection = 'auto' }) => {
   const { language, setLanguage, languages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
