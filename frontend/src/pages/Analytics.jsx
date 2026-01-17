@@ -182,7 +182,7 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
@@ -203,9 +203,9 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/multilinks">
@@ -337,7 +337,7 @@ export default function Analytics() {
             })}
             
             {(!analytics.links || analytics.links.filter(l => l.clicks > 0).length === 0) && (
-              <div className="col-span-full text-center py-10 text-muted-foreground border border-dashed border-zinc-800 rounded-xl">
+              <div className="col-span-full text-center py-10 text-muted-foreground border border-dashed border-border rounded-xl">
                 <MousePointer className="w-8 h-8 mx-auto mb-2 opacity-30" />
                 <p>{t('analytics', 'noData')}</p>
               </div>
@@ -502,8 +502,8 @@ export default function Analytics() {
               transition={{ delay: 0.4 }}
               className="mb-6"
             >
-              <div className="relative p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 border border-border overflow-hidden">
-                <div className="absolute inset-0 backdrop-blur-sm bg-zinc-950/60 flex items-center justify-center z-10">
+              <div className="relative p-6 sm:p-10 rounded-2xl bg-card/80 border border-border overflow-hidden">
+                <div className="absolute inset-0 backdrop-blur-sm bg-background/60 flex items-center justify-center z-10">
                   <div className="text-center p-6">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
                       <Lock className="w-7 h-7 text-purple-400" />
