@@ -1940,6 +1940,13 @@ export const translations = {
       countryHongKong: "Hong Kong",
       countrySingapore: "Singapur",
       countryUnknown: "Desconocido",
+      // E-Mails (Waitlist)
+      waitlistEmails: "E-Mails (Lista de espera)",
+      waitlistDesc: "Usuarios interesados en funciones PRO",
+      noWaitlistEmails: "No hay emails en la lista de espera",
+      deleteEmailConfirm: "¿Eliminar este email de la lista de espera?",
+      emailDeleted: "Email eliminado",
+      total: "Total",
     },
   },
 
