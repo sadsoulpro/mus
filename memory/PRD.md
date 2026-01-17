@@ -138,6 +138,8 @@ All pages now use CSS variables (`bg-background`, `bg-muted`, `border-border`, `
 - [x] System theme preference detection
 - [x] Light mode fixes for RandomCover, Domains, AdminPanel pages
 - [x] Light mode fixes for Analytics page and Dashboard dropdown
+- [x] Public page theme selector (Dark/Light in PageBuilder)
+- [x] Fixed visibility of text and buttons on public pages in light mode
 
 ## Pending/Future Tasks
 
