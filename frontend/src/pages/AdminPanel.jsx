@@ -1540,6 +1540,78 @@ export default function AdminPanel() {
                 )}
               </TabsContent>
             )}
+
+            {/* E-Mails Tab */}
+            <TabsContent value="emails" className="mt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-6 rounded-2xl panel-card"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{t('admin', 'waitlistEmails')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('admin', 'waitlistDesc')}</p>
+                    </div>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {t('admin', 'total')}: {waitlistTotal}
+                  </span>
+                </div>
+
+                {waitlistEmails.length > 0 ? (
+                  <div className="space-y-3">
+                    {waitlistEmails.map((item) => (
+                      <div 
+                        key={item.id} 
+                        className="flex items-center justify-between p-4 rounded-xl bg-card/30 border border-border hover:border-primary/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                            <Mail className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{item.email}</p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                              {item.features?.length > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-primary">{item.features.join(', ')}</span>
+                                </>
+                              )}
+                              {item.language && (
+                                <>
+                                  <span>•</span>
+                                  <span className="uppercase">{item.language}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteWaitlistEmail(item.id)}
+                          className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 text-muted-foreground">
+                    <Mail className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>{t('admin', 'noWaitlistEmails')}</p>
+                  </div>
+                )}
+              </motion.div>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
