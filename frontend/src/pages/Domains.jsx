@@ -233,7 +233,7 @@ export default function Domains() {
               </div>
               
               {/* Usage indicator */}
-              <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-zinc-900/50 border border-white/5">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-xl panel-card">
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">{t('common', 'total')}</p>
                   <p className="text-lg font-bold">
@@ -258,7 +258,7 @@ export default function Domains() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 mb-6"
+            className="p-5 sm:p-6 rounded-2xl panel-card mb-6"
           >
             <h2 className="font-semibold mb-4 flex items-center gap-2">
               <Plus className="w-4 h-4 text-primary" />
@@ -473,7 +473,7 @@ export default function Domains() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="mt-6 p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="mt-6 p-5 sm:p-6 rounded-2xl panel-card"
           >
             <h2 className="font-semibold mb-4 flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary" />

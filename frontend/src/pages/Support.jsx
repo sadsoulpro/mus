@@ -304,7 +304,7 @@ export default function Support() {
                 className={`p-4 rounded-2xl ${
                   msg.sender_role === 'staff' 
                     ? 'bg-primary/10 border border-primary/20 ml-8' 
-                    : 'bg-zinc-900/50 border border-white/5 mr-8'
+                    : 'panel-card mr-8'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -371,7 +371,7 @@ export default function Support() {
 
         {/* Tabs: FAQ and Tickets */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-zinc-900/50 border border-white/5">
+          <TabsList className="panel-card">
             <TabsTrigger value="faq" className="gap-2">
               <HelpCircle className="w-4 h-4" />
               FAQ
@@ -396,7 +396,7 @@ export default function Support() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: categoryIndex * 0.1 }}
-                  className="p-4 sm:p-5 rounded-2xl bg-zinc-900/50 border border-white/5"
+                  className="p-4 sm:p-5 rounded-2xl panel-card"
                 >
                   {/* Category Header */}
                   <div className="mb-3">

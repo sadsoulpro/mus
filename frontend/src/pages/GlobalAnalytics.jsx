@@ -71,7 +71,7 @@ export default function GlobalAnalytics() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -89,7 +89,7 @@ export default function GlobalAnalytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
@@ -107,7 +107,7 @@ export default function GlobalAnalytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
@@ -125,7 +125,7 @@ export default function GlobalAnalytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
@@ -147,7 +147,7 @@ export default function GlobalAnalytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
@@ -185,7 +185,7 @@ export default function GlobalAnalytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+            className="p-4 sm:p-6 rounded-2xl panel-card"
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
@@ -245,7 +245,7 @@ export default function GlobalAnalytics() {
           )}
           
           {/* Countries */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className={`p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className={`p-4 sm:p-6 rounded-2xl panel-card ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'byCountry')}</h3>
@@ -283,7 +283,7 @@ export default function GlobalAnalytics() {
           </motion.div>
           
           {/* Cities */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className={`p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className={`p-4 sm:p-6 rounded-2xl panel-card ${!hasAdvancedAnalytics ? 'filter blur-sm' : ''}`}>
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <h3 className="text-base sm:text-lg font-semibold">{t('analytics', 'byCities')}</h3>
@@ -322,7 +322,7 @@ export default function GlobalAnalytics() {
         </div>
         
         {/* Pages Table */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 relative">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="p-4 sm:p-6 rounded-2xl panel-card relative">
           {/* PRO Overlay for pages table */}
           {!hasAdvancedAnalytics && (
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-zinc-900/60 backdrop-blur-md">

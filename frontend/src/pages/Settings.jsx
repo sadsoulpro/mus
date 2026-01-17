@@ -99,7 +99,7 @@ export default function Settings() {
         </div>
         
         {/* Profile Section */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 mb-4 sm:mb-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 sm:p-6 rounded-2xl panel-card mb-4 sm:mb-6">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
@@ -126,7 +126,7 @@ export default function Settings() {
         </motion.div>
         
         {/* Password Section */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 mb-4 sm:mb-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl panel-card mb-4 sm:mb-6">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
               <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />

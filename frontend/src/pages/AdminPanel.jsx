@@ -558,7 +558,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 backdrop-blur-sm"
+                    className="p-5 sm:p-6 rounded-2xl panel-card backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold flex items-center gap-2">
@@ -604,7 +604,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.35 }}
-                    className="p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 backdrop-blur-sm"
+                    className="p-5 sm:p-6 rounded-2xl panel-card backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold flex items-center gap-2">
@@ -658,7 +658,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+                    className="p-5 sm:p-6 rounded-2xl panel-card"
                   >
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                       <PieChart className="w-4 h-4 text-purple-400" />
@@ -699,7 +699,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.45 }}
-                    className="p-5 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+                    className="p-5 sm:p-6 rounded-2xl panel-card"
                   >
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                       <Activity className="w-4 h-4 text-emerald-400" />
@@ -968,7 +968,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.02 }}
-                    className="p-4 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all"
+                    className="p-4 rounded-2xl panel-card hover:border-white/10 transition-all"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                       <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -1051,7 +1051,7 @@ export default function AdminPanel() {
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900/50 border border-white/10 focus:border-primary focus:outline-none text-sm"
                     />
                   </div>
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/50 border border-white/5">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl panel-card">
                     <Globe className="w-4 h-4 text-blue-400" />
                     <span className="text-sm">{t('common', 'total')}: <span className="font-semibold">{subdomainsTotal}</span></span>
                   </div>
@@ -1177,7 +1177,7 @@ export default function AdminPanel() {
                     <option value="resolved">{t('admin', 'resolvedTickets')}</option>
                     <option value="closed">{t('admin', 'closedTickets')}</option>
                   </select>
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/50 border border-white/5">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl panel-card">
                     <MessageCircle className="w-4 h-4 text-blue-400" />
                     <span className="text-sm">{t('common', 'total')}: <span className="font-semibold">{ticketsTotal}</span></span>
                     {unreadTickets > 0 && (
@@ -1259,7 +1259,7 @@ export default function AdminPanel() {
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+                        className="p-6 rounded-2xl panel-card"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div>
@@ -1321,7 +1321,7 @@ export default function AdminPanel() {
                         </div>
                       </motion.div>
                     ) : (
-                      <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5 text-center text-muted-foreground">
+                      <div className="p-6 rounded-2xl panel-card text-center text-muted-foreground">
                         <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
                         <p>{t('admin', 'selectTicket')}</p>
                       </div>
@@ -1340,7 +1340,7 @@ export default function AdminPanel() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5"
+                    className="p-5 rounded-2xl panel-card"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                       <div className="flex-1">
@@ -1467,7 +1467,7 @@ export default function AdminPanel() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5 md:col-span-2"
+                      className="p-6 rounded-2xl panel-card md:col-span-2"
                     >
                       <h3 className="font-semibold mb-4 flex items-center gap-2">
                         <Globe className="w-5 h-5 text-blue-400" />
@@ -1490,7 +1490,7 @@ export default function AdminPanel() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5"
+                      className="p-6 rounded-2xl panel-card"
                     >
                       <h3 className="font-semibold mb-4 flex items-center gap-2">
                         <Clock className="w-5 h-5 text-emerald-400" />

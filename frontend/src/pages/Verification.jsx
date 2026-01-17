@@ -148,7 +148,7 @@ export default function Verification() {
         </div>
         
         {/* Current Status */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 mb-4 sm:mb-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 sm:p-6 rounded-2xl panel-card mb-4 sm:mb-6">
           <h2 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4">{t('verification', 'status')}</h2>
           {getStatusBadge()}
           {status?.verified && (
@@ -160,7 +160,7 @@ export default function Verification() {
         
         {/* Badge Settings */}
         {status?.verified && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5 mb-4 sm:mb-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl panel-card mb-4 sm:mb-6">
             <h2 className="font-semibold text-sm sm:text-base mb-3 sm:mb-4">{t('verification', 'showBadge')}</h2>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 bg-zinc-800/50 rounded-xl">
               <div className="flex items-center gap-3">
@@ -195,7 +195,7 @@ export default function Verification() {
         
         {/* Verification Form */}
         {!status?.verified && !status?.pending_request && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-4 sm:p-6 rounded-2xl panel-card">
             <h2 className="font-semibold text-sm sm:text-base mb-2">{t('verification', 'applyTitle')}</h2>
             <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
               {t('verification', 'applyDesc')}

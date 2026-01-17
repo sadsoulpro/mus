@@ -824,7 +824,7 @@ export default function PageBuilder() {
                     key={link.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-zinc-900/50 border border-white/5 w-full overflow-hidden"
+                    className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl panel-card w-full overflow-hidden"
                     data-testid={`link-item-${link.id}`}
                   >
                     {/* Move Up/Down Buttons */}
@@ -911,7 +911,7 @@ export default function PageBuilder() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="p-6 rounded-xl bg-zinc-900/50 border border-white/5"
+                className="p-6 rounded-xl panel-card"
               >
                 <div className="flex flex-col sm:flex-row items-center gap-6">
                   <div 

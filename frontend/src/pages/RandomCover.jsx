@@ -1114,7 +1114,7 @@ export default function RandomCover() {
 
           {/* Tabs: Editor / My Projects */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="bg-zinc-900/50 border border-white/5">
+            <TabsList className="panel-card">
               <TabsTrigger value="editor" className="gap-2" data-testid="editor-tab">
                 <ImageIcon className="w-4 h-4" />
                 {t('randomCover', 'editor')}

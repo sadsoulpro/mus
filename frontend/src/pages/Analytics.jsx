@@ -309,7 +309,7 @@ export default function Analytics() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + idx * 0.05 }}
-                  className="p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all"
+                  className="p-4 rounded-xl panel-card hover:border-white/10 transition-all"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div 
@@ -366,7 +366,7 @@ export default function Analytics() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Countries */}
-                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                  <div className="p-5 rounded-2xl panel-card">
                     <h3 className="font-medium mb-4 flex items-center gap-2 text-sm">
                       <Globe className="w-4 h-4 text-muted-foreground" />
                       {t('analytics', 'topCountries')}
@@ -408,7 +408,7 @@ export default function Analytics() {
                   </div>
                   
                   {/* Cities */}
-                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                  <div className="p-5 rounded-2xl panel-card">
                     <h3 className="font-medium mb-4 flex items-center gap-2 text-sm">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
                       {t('analytics', 'topCountries')}
@@ -466,7 +466,7 @@ export default function Analytics() {
                       PRO
                     </span>
                   </h2>
-                  <div className="p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                  <div className="p-5 rounded-2xl panel-card">
                     <ResponsiveContainer width="100%" height={250}>
                       <PieChart>
                         <Pie
