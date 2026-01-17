@@ -544,6 +544,15 @@ export default function AdminPanel() {
                     VPS
                   </TabsTrigger>
                 )}
+                <TabsTrigger value="emails" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white text-xs sm:text-sm px-3 sm:px-4">
+                  <Mail className="w-4 h-4 mr-1.5" />
+                  E-Mails
+                  {waitlistTotal > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-primary/20 rounded-full">
+                      {waitlistTotal}
+                    </span>
+                  )}
+                </TabsTrigger>
               </TabsList>
             </div>
 
