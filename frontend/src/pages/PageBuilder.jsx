@@ -782,6 +782,50 @@ export default function PageBuilder() {
             </div>
           </section>
           
+          {/* 3.5. Вид дизайна страницы */}
+          <section>
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{t('pageBuilder', 'pageDesign')}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPageTheme("dark")}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  pageTheme === "dark" 
+                    ? "border-primary bg-primary/10" 
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+                data-testid="theme-dark-btn"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center">
+                    <Moon className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm font-medium">{t('pageBuilder', 'darkTheme')}</span>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPageTheme("light")}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  pageTheme === "light" 
+                    ? "border-primary bg-primary/10" 
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+                data-testid="theme-light-btn"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                    <Sun className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <span className="text-sm font-medium">{t('pageBuilder', 'lightTheme')}</span>
+                </div>
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('pageBuilder', 'pageDesignHint')}
+            </p>
+          </section>
+          
           {/* 4. Ссылки на платформы */}
           <section className="overflow-hidden">
             <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{t('pageBuilder', 'platformLinks')}</h2>
