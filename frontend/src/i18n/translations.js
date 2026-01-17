@@ -387,6 +387,9 @@ export const translations = {
       newPassword: "New password",
       resetButton: "Reset password",
       passwordResetSuccess: "Password reset successfully! Please sign in.",
+      // Right side panel
+      sideTitle: "Create your smart link now",
+      sideSubtitle: "All your music. One link. All platforms.",
     },
     ru: {
       loginTitle: "С возвращением",
@@ -426,6 +429,9 @@ export const translations = {
       newPassword: "Новый пароль",
       resetButton: "Сбросить пароль",
       passwordResetSuccess: "Пароль успешно сброшен! Войдите в аккаунт.",
+      // Right side panel
+      sideTitle: "Создай свою мультиссылку уже сейчас",
+      sideSubtitle: "Вся твоя музыка. Одна ссылка. Все платформы.",
     },
     es: {
       loginTitle: "Bienvenido de nuevo",
@@ -465,6 +471,9 @@ export const translations = {
       newPassword: "Nueva contraseña",
       resetButton: "Restablecer contraseña",
       passwordResetSuccess: "¡Contraseña restablecida! Por favor inicia sesión.",
+      // Right side panel
+      sideTitle: "Crea tu enlace inteligente ahora",
+      sideSubtitle: "Toda tu música. Un enlace. Todas las plataformas.",
     },
   },
 
