@@ -210,9 +210,11 @@ export default function Dashboard() {
               </div>
               <h3 className="font-semibold mb-2">{t('dashboard', 'noPages')}</h3>
               <p className="text-muted-foreground mb-6">{t('dashboard', 'noPagesDesc')}</p>
-              <Link to="/page/new">
-                <Button className="bg-primary hover:bg-primary/90 rounded-full">
-                  <Plus className="w-4 h-4 mr-2" />
+              <Button 
+                className="bg-primary hover:bg-primary/90 rounded-full"
+                onClick={handleCreateClick}
+              >
+                <Plus className="w-4 h-4 mr-2" />
                   {t('dashboard', 'createNew')}
                 </Button>
               </Link>
