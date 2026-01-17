@@ -144,6 +144,7 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
 function MobileMenu({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { theme } = useTheme();
   
   const handleNavigate = () => {
     setOpen(false);
@@ -166,16 +167,12 @@ function MobileMenu({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
       </SheetTrigger>
       <SheetContent 
         side="left" 
-        className="w-72 bg-zinc-900 border-white/5 p-0"
+        className={`w-72 p-0 ${theme === 'dark' ? 'bg-zinc-900 border-white/5' : 'bg-white border-gray-200'}`}
       >
         <div className="flex flex-col h-full p-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-10">
-            <img 
-              src="/MyTrack-logo-main.svg" 
-              alt="MyTrack" 
-              className="h-8 w-auto"
-            />
+            <MuslinkLogo height={28} theme={theme} />
           </div>
           
           {/* Nav Content */}
