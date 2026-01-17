@@ -78,15 +78,15 @@ const LanguageSwitcher = ({ variant = 'default', className = '' }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute left-0 bottom-full mb-1 py-2 px-2 bg-card border border-border rounded-lg shadow-xl z-50"
+              className="absolute left-0 bottom-full mb-2 py-2 px-2 bg-card border border-border rounded-lg shadow-xl z-[100]"
             >
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-col gap-1">{/* Changed to vertical layout */}
                 {Object.values(languages).map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => handleSelect(lang.code)}
                     className={`
-                      flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-all
+                      flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap
                       ${language === lang.code
                         ? 'bg-primary/10 text-primary'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -95,16 +95,16 @@ const LanguageSwitcher = ({ variant = 'default', className = '' }) => {
                   >
                     <span 
                       className={`
-                        w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold uppercase
+                        w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold uppercase flex-shrink-0
                         ${language === lang.code ? 'bg-primary text-white' : 'bg-muted'}
                       `}
                       style={{ borderRadius: '4px' }}
                     >
                       {lang.code}
                     </span>
-                    <span className="hidden sm:inline">{lang.nativeName}</span>
+                    <span>{lang.nativeName}</span>
                     {language === lang.code && (
-                      <Check className="w-3 h-3 text-primary ml-auto" />
+                      <Check className="w-3.5 h-3.5 text-primary ml-auto" />
                     )}
                   </button>
                 ))}
