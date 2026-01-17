@@ -225,6 +225,27 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchWaitlistEmails = async () => {
+    try {
+      const response = await api.get("/admin/waitlist");
+      setWaitlistEmails(response.data.emails || []);
+      setWaitlistTotal(response.data.total || 0);
+    } catch (error) {
+      console.error("Failed to fetch waitlist emails");
+    }
+  };
+
+  const deleteWaitlistEmail = async (emailId) => {
+    if (!confirm(t('admin', 'deleteEmailConfirm'))) return;
+    try {
+      await api.delete(`/admin/waitlist/${emailId}`);
+      toast.success(t('admin', 'emailDeleted'));
+      fetchWaitlistEmails();
+    } catch (error) {
+      toast.error(t('errors', 'generic'));
+    }
+  };
+
   const toggleSubdomainAdmin = async (subdomainId, currentDisabled) => {
     try {
       // Backend expects is_active: if currently disabled, we want to enable (is_active: true)
