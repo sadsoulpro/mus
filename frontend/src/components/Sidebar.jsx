@@ -170,24 +170,26 @@ function MobileMenu({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
         side="left" 
         className={`w-72 p-0 ${theme === 'dark' ? 'bg-zinc-900 border-white/5' : 'bg-white border-gray-200'}`}
       >
-        <div className="flex flex-col h-full p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-10">
+        <div className="flex flex-col h-full">
+          {/* Header - Fixed */}
+          <div className="flex items-center gap-2 p-6 pb-4 flex-shrink-0">
             <MuslinkLogo height={28} theme={theme} />
           </div>
           
-          {/* Nav Content */}
-          <NavContent 
-            currentPath={location.pathname}
-            user={user}
-            onLogout={() => {
-              setOpen(false);
-              onLogout();
-            }}
-            onNavigate={handleNavigate}
-            unreadUserTickets={unreadUserTickets}
-            unreadStaffTickets={unreadStaffTickets}
-          />
+          {/* Scrollable Nav Content */}
+          <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <NavContent 
+              currentPath={location.pathname}
+              user={user}
+              onLogout={() => {
+                setOpen(false);
+                onLogout();
+              }}
+              onNavigate={handleNavigate}
+              unreadUserTickets={unreadUserTickets}
+              unreadStaffTickets={unreadStaffTickets}
+            />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
