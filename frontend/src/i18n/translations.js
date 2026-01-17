@@ -625,6 +625,7 @@ export const translations = {
       upcNotFound: "Could not find release by UPC code. Check the code.",
       scanError: "Could not get links. Check the URL and try again.",
       allLinksAdded: "All available links are already added",
+      linksWillAppear: "Links will appear here",
       pageDesign: "Page Design",
       darkTheme: "Dark",
       lightTheme: "Light",
