@@ -792,6 +792,7 @@ export const translations = {
       trackNotFound: "No se encontró la pista. Intenta con otro enlace.",
       upcNotFound: "No se encontró el lanzamiento por código UPC. Verifica el código.",
       scanError: "No se pudieron obtener enlaces. Verifica la URL e intenta de nuevo.",
+      allLinksAdded: "Todos los enlaces disponibles ya están añadidos",
       pageDesign: "Diseño de Página",
       darkTheme: "Oscuro",
       lightTheme: "Claro",
