@@ -199,17 +199,18 @@ function MobileMenu({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
 // Desktop Sidebar component
 function DesktopSidebar({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
   const location = useLocation();
+  const { theme } = useTheme();
   
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-zinc-900/50 border-r border-white/5 p-6 hidden lg:flex flex-col z-40">
+    <aside className={`fixed left-0 top-0 h-full w-64 p-6 hidden lg:flex flex-col z-40 border-r transition-colors ${
+      theme === 'dark' 
+        ? 'bg-zinc-900/50 border-white/5' 
+        : 'bg-white border-gray-200'
+    }`}>
       {/* Logo */}
       <div className="flex items-center gap-2 mb-10">
         <Link to="/multilinks">
-          <img 
-            src="/MyTrack-logo-main.svg" 
-            alt="MyTrack" 
-            className="h-8 w-auto"
-          />
+          <MuslinkLogo height={28} theme={theme} />
         </Link>
       </div>
       
