@@ -8,7 +8,9 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import MuslinkLogo from "@/components/MuslinkLogo";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { theme } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,11 +65,7 @@ export default function Register() {
           >
             <div className="flex items-center gap-2 mb-6 sm:mb-8">
               <Link to="/">
-                <img 
-                  src="/MyTrack-logo-main.svg" 
-                  alt="MyTrack" 
-                  className="h-8 sm:h-10 w-auto"
-                />
+                <MuslinkLogo height={32} theme={theme} />
               </Link>
             </div>
             
@@ -86,7 +85,7 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   data-testid="register-email-input"
-                  className="h-11 sm:h-12 bg-zinc-900 border-zinc-800 focus:border-primary"
+                  className="h-11 sm:h-12 bg-muted border-border focus:border-primary"
                 />
               </div>
               
@@ -100,7 +99,7 @@ export default function Register() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   data-testid="register-username-input"
-                  className="h-11 sm:h-12 bg-zinc-900 border-zinc-800 focus:border-primary"
+                  className="h-11 sm:h-12 bg-muted border-border focus:border-primary"
                 />
               </div>
               
@@ -114,7 +113,7 @@ export default function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   data-testid="register-password-input"
-                  className="h-11 sm:h-12 bg-zinc-900 border-zinc-800 focus:border-primary"
+                  className="h-11 sm:h-12 bg-muted border-border focus:border-primary"
                 />
                 <p className="text-xs text-muted-foreground">{t('auth', 'passwordMinLength')}</p>
               </div>
@@ -140,18 +139,20 @@ export default function Register() {
       </div>
       
       {/* Right Side - Visual (hidden on mobile/tablet) */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary/20 via-zinc-900 to-background items-center justify-center p-12">
+      <div className={`hidden lg:flex flex-1 ${
+        theme === 'dark' 
+          ? 'bg-gradient-to-br from-primary/20 via-zinc-900 to-background' 
+          : 'bg-gradient-to-br from-primary/10 via-gray-100 to-white'
+      } items-center justify-center p-12`}>
         <div className="text-center">
           <div className="w-32 h-32 xl:w-40 xl:h-40 flex items-center justify-center mx-auto mb-6">
-            <img 
-              src="/MyTrack-logo-main.svg" 
-              alt="MyTrack" 
-              className="h-20 xl:h-24 w-auto"
-            />
+            <MuslinkLogo height={80} theme={theme} />
           </div>
-          <h2 className="font-gilroy-600 text-2xl xl:text-3xl mb-4">{t('landing', 'heroTitle2')}</h2>
-          <p className="font-gilroy-300 text-muted-foreground max-w-sm">
-            {t('landing', 'heroSubtitle')}
+          <h2 className={`font-display text-2xl xl:text-3xl mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            {t('auth', 'sideTitle')}
+          </h2>
+          <p className={`max-w-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}`}>
+            {t('auth', 'sideSubtitle')}
           </p>
         </div>
       </div>
