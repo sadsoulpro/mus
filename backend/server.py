@@ -33,7 +33,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # JWT Config
-JWT_SECRET = os.environ.get('JWT_SECRET', 'bandlink-secret-key-change-in-production')
+JWT_SECRET = os.environ['JWT_SECRET']  # Required - no fallback for security
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
@@ -57,7 +57,7 @@ COVERS_DIR.mkdir(exist_ok=True)
 # ===================== RBAC CONFIGURATION =====================
 
 # Owner email - gets automatic owner role
-OWNER_EMAIL = "thedrumepic@gmail.com"
+OWNER_EMAIL = os.environ['OWNER_EMAIL']  # Required - configured in .env
 
 # Role hierarchy (higher index = more permissions)
 ROLE_HIERARCHY = {
