@@ -132,7 +132,7 @@ export default function Landing() {
             
             <div className="flex items-center gap-2 sm:gap-3">
               <ThemeToggle />
-              <LanguageSwitcher variant="compact" />
+              <LanguageSwitcher variant="compact" dropDirection="down" />
               {isAuthenticated ? (
                 <>
                   <Link to={user?.role === 'admin' || user?.role === 'owner' ? '/admin' : '/multilinks'}>
