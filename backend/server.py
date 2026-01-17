@@ -1408,6 +1408,41 @@ async def check_og_for_bots(slug: str, request: Request):
     
     return JSONResponse({"is_bot": False, "redirect": f"/{slug}"})
 
+# ===================== SHARE LINK ROUTE FOR SOCIAL MEDIA =====================
+# Use /api/s/{slug} for sharing links that bots will crawl correctly
+# Example: https://mus.link/api/s/artist-name (users share this link)
+
+@api_router.get("/s/{slug}")
+async def share_link_with_og(slug: str, request: Request):
+    """
+    Share link route with OG tags for social media bots.
+    - For bots: serve HTML with OG tags
+    - For regular users: redirect to the actual page immediately
+    """
+    user_agent = request.headers.get('user-agent', '')
+    frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+    
+    # Get page data
+    page_data = await get_page_for_og(slug)
+    
+    if not page_data:
+        # Page not found, redirect to home
+        return RedirectResponse(url=frontend_url, status_code=302)
+    
+    if is_bot(user_agent):
+        # Generate OG HTML for bots
+        html = generate_og_html(
+            slug=slug,
+            title=page_data['title'],
+            cover_image=page_data['cover_image'],
+            language=page_data['language']
+        )
+        logging.info(f"Serving OG for bot via /api/s/: {user_agent[:50]}... slug: {slug}")
+        return HTMLResponse(content=html)
+    
+    # For regular users, redirect to the actual page
+    return RedirectResponse(url=f"{frontend_url}/{slug}", status_code=302)
+
 # ===================== PUBLIC ROUTES =====================
 
 @api_router.get("/artist/{slug}")
