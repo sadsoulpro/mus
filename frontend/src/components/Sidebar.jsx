@@ -116,9 +116,10 @@ function NavContent({ currentPath, user, onLogout, onNavigate, unreadUserTickets
             <div className="flex items-center gap-2">
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               {user?.plan && (
-                <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
-                  user.plan === 'pro' ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300' :
-                  'bg-zinc-700 text-zinc-400'
+                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
+                  user.plan === 'pro' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
+                    : 'bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300'
                 }`}>
                   {user.plan === 'pro' ? 'PRO' : 'FREE'}
                 </span>
