@@ -229,8 +229,14 @@ function DesktopSidebar({ user, onLogout, unreadUserTickets, unreadStaffTickets 
 
 // Mobile Header component
 function MobileHeader({ user, onLogout, unreadUserTickets, unreadStaffTickets }) {
+  const { theme } = useTheme();
+  
   return (
-    <div className="flex items-center justify-between p-4 lg:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
+    <div className={`flex items-center justify-between p-4 lg:hidden sticky top-0 z-50 backdrop-blur-xl border-b transition-colors ${
+      theme === 'dark' 
+        ? 'bg-background/80 border-white/5' 
+        : 'bg-white/80 border-gray-200'
+    }`}>
       <div className="flex items-center gap-3">
         <MobileMenu 
           user={user} 
@@ -239,11 +245,7 @@ function MobileHeader({ user, onLogout, unreadUserTickets, unreadStaffTickets })
           unreadStaffTickets={unreadStaffTickets}
         />
         <Link to="/multilinks">
-          <img 
-            src="/MyTrack-logo-main.svg" 
-            alt="MyTrack" 
-            className="h-6 w-auto"
-          />
+          <MuslinkLogo height={24} theme={theme} />
         </Link>
       </div>
     </div>
