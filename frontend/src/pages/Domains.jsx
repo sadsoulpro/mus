@@ -13,6 +13,7 @@ import {
 import { FaTelegram, FaInstagram, FaVk, FaTiktok, FaTwitter, FaGlobe } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
+import ProFeatureModal from "@/components/ProFeatureModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const SOCIAL_PLATFORMS = [
