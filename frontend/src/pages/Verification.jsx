@@ -248,6 +248,13 @@ export default function Verification() {
         </motion.div>
         </div>
       </div>
+
+      {/* PRO Feature Modal */}
+      <ProFeatureModal
+        open={proModalOpen}
+        onOpenChange={setProModalOpen}
+        featureName="Profile Verification"
+      />
     </Sidebar>
   );
 }
