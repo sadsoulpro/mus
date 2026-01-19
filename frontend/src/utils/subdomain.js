@@ -1,6 +1,6 @@
-// Subdomain utilities for MyTrack
+// Subdomain utilities for Mus.Link
 
-const MAIN_DOMAIN = 'mytrack.cc';
+const MAIN_DOMAIN = 'mus.link';
 
 /**
  * Extract subdomain from current hostname

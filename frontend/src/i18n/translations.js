@@ -1,11 +1,11 @@
-// Centralized translations for MyTrack
+// Centralized translations for Mus.Link
 // Languages: EN (default), RU, ES
 
 export const translations = {
   // ==================== COMMON ====================
   common: {
     en: {
-      appName: "MyTrack",
+      appName: "Mus.Link",
       loading: "Loading...",
       save: "Save",
       cancel: "Cancel",
@@ -80,7 +80,7 @@ export const translations = {
       current: "Current",
     },
     ru: {
-      appName: "MyTrack",
+      appName: "Mus.Link",
       loading: "Загрузка...",
       save: "Сохранить",
       cancel: "Отмена",
@@ -155,7 +155,7 @@ export const translations = {
       current: "Текущий",
     },
     es: {
-      appName: "MyTrack",
+      appName: "Mus.Link",
       loading: "Cargando...",
       save: "Guardar",
       cancel: "Cancelar",

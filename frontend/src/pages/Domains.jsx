@@ -183,7 +183,7 @@ export default function Domains() {
   };
 
   const copyToClipboard = (subdomain) => {
-    const url = `${subdomain}.mytrack.cc`;
+    const url = `${subdomain}.mus.link`;
     navigator.clipboard.writeText(url);
     setCopiedId(subdomain);
     toast.success(t('common', 'copied'));
