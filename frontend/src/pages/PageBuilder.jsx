@@ -276,6 +276,7 @@ export default function PageBuilder() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setHasUnsavedChanges(true);
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
       
