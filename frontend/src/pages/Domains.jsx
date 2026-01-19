@@ -360,6 +360,16 @@ export default function Domains() {
                 </Button>
               </motion.div>
             )}
+
+            {/* Instructions */}
+            <div className="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <h3 className="font-semibold text-sm text-blue-400 mb-2">{t('domains', 'instructions')}</h3>
+              <ul className="text-xs text-muted-foreground space-y-1.5">
+                <li>• {t('domains', 'step1')}</li>
+                <li>• {t('domains', 'step2')}</li>
+                <li>• {t('domains', 'step3')}</li>
+              </ul>
+            </div>
           </motion.div>
 
           {/* Subdomains List */}
