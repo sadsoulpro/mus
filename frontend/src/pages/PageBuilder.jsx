@@ -640,19 +640,20 @@ export default function PageBuilder() {
         // Save immediately instead of waiting for debounce
         setTimeout(async () => {
           try {
-            let finalSlug = formData.slug?.trim();
+            let finalSlug = updatedFormData.slug?.trim() || formData.slug?.trim();
             if (!finalSlug) {
               finalSlug = generateRandomSlug();
             }
             
-            let finalTitle = formData.title?.trim();
+            let finalTitle = updatedFormData.title?.trim() || formData.title?.trim();
             if (!finalTitle) {
-              const parts = [formData.artist_name, formData.release_title].filter(Boolean);
+              const parts = [updatedFormData.artist_name || formData.artist_name, updatedFormData.release_title || formData.release_title].filter(Boolean);
               finalTitle = parts.length > 0 ? parts.join(" - ") : t('pageBuilder', 'newPage');
             }
             
             const pageData = { 
-              ...formData, 
+              ...formData,
+              ...updatedFormData,
               slug: finalSlug,
               title: finalTitle,
               qr_enabled: qrEnabled,
