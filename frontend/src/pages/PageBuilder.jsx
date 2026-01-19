@@ -697,7 +697,7 @@ export default function PageBuilder() {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       
       const link = document.createElement("a");
-      link.download = `${formData.slug || "qrcode"}-mytrack.png`;
+      link.download = `${formData.slug || "qrcode"}-muslink.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     };
