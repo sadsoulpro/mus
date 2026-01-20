@@ -381,8 +381,14 @@ export default function PageBuilder() {
       const response = await api.post("/upload", formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      setFormData(prev => ({ ...prev, cover_image: response.data.cover_url }));
+      const newCoverImage = response.data.cover_url;
+      setFormData(prev => ({ ...prev, cover_image: newCoverImage }));
       toast.success(t('common', 'success'));
+      
+      // Instant save after upload
+      if (isEditing) {
+        setTimeout(() => instantSave({ cover_image: newCoverImage }), 300);
+      }
     } catch (error) {
       toast.error(t('errors', 'uploadFailed'));
     } finally {
