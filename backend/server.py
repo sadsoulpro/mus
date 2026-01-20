@@ -389,6 +389,7 @@ class UserResponse(BaseModel):
     role: str
     status: str
     plan: str
+    plan_config: Optional[dict] = None
     is_verified: Optional[bool] = False
     is_banned: Optional[bool] = False
     verified: Optional[bool] = False
