@@ -171,9 +171,11 @@ All pages now use CSS variables (`bg-background`, `bg-muted`, `border-border`, `
 - [x] Auth pages side text localized (EN, RU, ES)
 - [x] Landing page: removed "Create" button for logged-in users
 - [x] PageBuilder: auto-save with notification (3 sec debounce)
+- [x] PageBuilder: immediate save after auto-fill links search
 - [x] Subdomains: changed domain from mytrack.cc to mus.link
 - [x] Subdomains: updated translations from "Custom Domains" to "Subdomains"
 - [x] Subdomains: added instructions about subdomain functionality
+- [x] Full rebranding: MyTrack → Mus.Link (all files, translations, FAQ)
 
 ## Pending/Future Tasks
 
