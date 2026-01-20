@@ -172,6 +172,8 @@ All pages now use CSS variables (`bg-background`, `bg-muted`, `border-border`, `
 - [x] Landing page: removed "Create" button for logged-in users
 - [x] PageBuilder: auto-save with notification (3 sec debounce)
 - [x] PageBuilder: immediate save after auto-fill links search
+- [x] PageBuilder: instant auto-save on any change (theme, QR, links, form fields)
+- [x] PageBuilder: delete page button with confirmation
 - [x] Subdomains: changed domain from mytrack.cc to mus.link
 - [x] Subdomains: updated translations from "Custom Domains" to "Subdomains"
 - [x] Subdomains: added instructions about subdomain functionality
