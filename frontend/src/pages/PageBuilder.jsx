@@ -1190,6 +1190,22 @@ export default function PageBuilder() {
               </p>
             )}
           </section>
+          
+          {/* Delete Page Section */}
+          {isEditing && (
+            <section className="mt-8 pt-6 border-t border-red-500/20">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={deletePage}
+                className="w-full rounded-xl"
+                data-testid="delete-page-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {t('pageBuilder', 'deletePage')}
+              </Button>
+            </section>
+          )}
         </div>
         
         {/* Live Preview */}
