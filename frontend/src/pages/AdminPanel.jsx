@@ -846,51 +846,65 @@ export default function AdminPanel() {
                         </div>
 
                         {/* Actions */}
-                        {user.role !== 'owner' && (
-                          <div className="flex items-center gap-2 pl-14 lg:pl-0 flex-wrap">
-                            <Button
-                              size="sm"
-                              variant={isVerified ? "outline" : "default"}
-                              onClick={() => toggleUserVerify(user.id, isVerified)}
-                              className="h-8 text-xs"
-                            >
-                              <BadgeCheck className="w-3.5 h-3.5 mr-1" />
-                              {isVerified ? t('admin', 'revoke') : t('admin', 'grant')}
-                            </Button>
-
-                            <select
-                              value={user.plan}
-                              onChange={(e) => updateUserPlan(user.id, e.target.value)}
-                              className="h-8 px-2 rounded-lg bg-muted border border-border text-xs cursor-pointer hover:border-primary/50 transition-colors"
-                            >
-                              <option value="free">Free</option>
-                              <option value="pro">Pro</option>
-                            </select>
-
-                            {isOwner && (
-                              <select
-                                value={user.role}
-                                onChange={(e) => updateUserRole(user.id, e.target.value)}
-                                className="h-8 px-2 rounded-lg bg-muted border border-border text-xs cursor-pointer hover:border-primary/50 transition-colors"
-                              >
-                                <option value="user">User</option>
-                                <option value="moderator">Mod</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            )}
-
-                            {user.role !== 'admin' && (
+                        <div className="flex items-center gap-2 pl-14 lg:pl-0 flex-wrap">
+                          {/* View Profile Button - Available for all users */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openUserProfile(user.id)}
+                            className="h-8 text-xs"
+                            title={t('admin', 'viewProfile') || 'Просмотр профиля'}
+                          >
+                            <Eye className="w-3.5 h-3.5 mr-1" />
+                            {t('admin', 'profile') || 'Профиль'}
+                          </Button>
+                          
+                          {user.role !== 'owner' && (
+                            <>
                               <Button
                                 size="sm"
-                                variant={isBanned ? "default" : "destructive"}
-                                onClick={() => toggleUserBan(user.id, isBanned)}
+                                variant={isVerified ? "outline" : "default"}
+                                onClick={() => toggleUserVerify(user.id, isVerified)}
                                 className="h-8 text-xs"
                               >
-                                {isBanned ? <Check className="w-3.5 h-3.5" /> : <Ban className="w-3.5 h-3.5" />}
+                                <BadgeCheck className="w-3.5 h-3.5 mr-1" />
+                                {isVerified ? t('admin', 'revoke') : t('admin', 'grant')}
                               </Button>
-                            )}
-                          </div>
-                        )}
+
+                              <select
+                                value={user.plan}
+                                onChange={(e) => updateUserPlan(user.id, e.target.value)}
+                                className="h-8 px-2 rounded-lg bg-muted border border-border text-xs cursor-pointer hover:border-primary/50 transition-colors"
+                              >
+                                <option value="free">Free</option>
+                                <option value="pro">Pro</option>
+                              </select>
+
+                              {isOwner && (
+                                <select
+                                  value={user.role}
+                                  onChange={(e) => updateUserRole(user.id, e.target.value)}
+                                  className="h-8 px-2 rounded-lg bg-muted border border-border text-xs cursor-pointer hover:border-primary/50 transition-colors"
+                                >
+                                  <option value="user">User</option>
+                                  <option value="moderator">Mod</option>
+                                  <option value="admin">Admin</option>
+                                </select>
+                              )}
+
+                              {user.role !== 'admin' && (
+                                <Button
+                                  size="sm"
+                                  variant={isBanned ? "default" : "destructive"}
+                                  onClick={() => toggleUserBan(user.id, isBanned)}
+                                  className="h-8 text-xs"
+                                >
+                                  {isBanned ? <Check className="w-3.5 h-3.5" /> : <Ban className="w-3.5 h-3.5" />}
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   );
