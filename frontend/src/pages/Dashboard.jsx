@@ -31,9 +31,12 @@ export default function Dashboard() {
   const { t } = useLanguage();
   const { theme } = useTheme();
 
-  // Get max pages from user plan
-  const maxPages = user?.plan_config?.max_pages || 3;
-  const canCreateMore = pages.length < maxPages;
+  // Get max pages from user plan config
+  // max_pages_limit: -1 means unlimited
+  const maxPagesLimit = user?.plan_config?.max_pages_limit;
+  const isUnlimited = maxPagesLimit === -1;
+  const maxPages = isUnlimited ? Infinity : (maxPagesLimit || 3);
+  const canCreateMore = isUnlimited || pages.length < maxPages;
 
   // Card styles based on theme
   const cardClass = theme === 'dark' 
