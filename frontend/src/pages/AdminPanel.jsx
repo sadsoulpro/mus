@@ -1844,7 +1844,7 @@ export default function AdminPanel() {
                                         <ExternalLink className="w-4 h-4" />
                                       </Button>
                                     </a>
-                                    <a href={`/page/${page.id}`} target="_blank" rel="noopener noreferrer">
+                                    <a href={`/page/${page.id}/edit`} target="_blank" rel="noopener noreferrer">
                                       <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" title={t('admin', 'editPage') || 'Редактировать'}>
                                         <Edit className="w-4 h-4" />
                                       </Button>
