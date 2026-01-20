@@ -64,6 +64,12 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [editingPlan, setEditingPlan] = useState(null);
   const [activeTab, setActiveTab] = useState("analytics");
+  
+  // User Profile Modal State
+  const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+  const [selectedUserPages, setSelectedUserPages] = useState([]);
+  const [loadingUserProfile, setLoadingUserProfile] = useState(false);
+  const [userProfileModalOpen, setUserProfileModalOpen] = useState(false);
 
   const isOwner = currentUser?.role === "owner";
   const isAdmin = currentUser?.role === "admin" || isOwner;
