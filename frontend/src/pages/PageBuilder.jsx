@@ -187,63 +187,128 @@ export default function PageBuilder() {
   const [scanningSource, setScanningSource] = useState(false);
   const [scanInput, setScanInput] = useState("");
   const [autoSaving, setAutoSaving] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const autoSaveTimerRef = useRef(null);
+  const [pageCreated, setPageCreated] = useState(false); // Track if page was created
   const qrRef = useRef(null);
+  const formDataRef = useRef(formData);
+  const pageThemeRef = useRef(pageTheme);
+  const qrEnabledRef = useRef(qrEnabled);
 
-  // Auto-save function
-  const autoSave = async () => {
-    if (!isEditing || !hasUnsavedChanges) return;
+  // Keep refs in sync
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+  
+  useEffect(() => {
+    pageThemeRef.current = pageTheme;
+  }, [pageTheme]);
+  
+  useEffect(() => {
+    qrEnabledRef.current = qrEnabled;
+  }, [qrEnabled]);
+
+  // Instant auto-save function
+  const instantSave = async (overrideData = {}) => {
+    // For new pages, create it first if not created yet
+    if (!isEditing && !pageCreated) {
+      return createPageFirst(overrideData);
+    }
+    
+    if (!isEditing && !pageId) return;
+    
+    const currentFormData = { ...formDataRef.current, ...overrideData };
     
     setAutoSaving(true);
     try {
-      let finalSlug = formData.slug?.trim();
+      let finalSlug = currentFormData.slug?.trim();
       if (!finalSlug) {
         finalSlug = generateRandomSlug();
       }
       
-      let finalTitle = formData.title?.trim();
+      let finalTitle = currentFormData.title?.trim();
       if (!finalTitle) {
-        const parts = [formData.artist_name, formData.release_title].filter(Boolean);
+        const parts = [currentFormData.artist_name, currentFormData.release_title].filter(Boolean);
         finalTitle = parts.length > 0 ? parts.join(" - ") : t('pageBuilder', 'newPage');
       }
       
       const pageData = { 
-        ...formData, 
+        ...currentFormData, 
         slug: finalSlug,
         title: finalTitle,
-        qr_enabled: qrEnabled,
-        page_theme: pageTheme
+        qr_enabled: qrEnabledRef.current,
+        page_theme: pageThemeRef.current
       };
       
       await api.put(`/pages/${pageId}`, pageData);
-      setHasUnsavedChanges(false);
-      toast.success(t('pageBuilder', 'autoSaved'), { duration: 2000 });
+      toast.success(t('pageBuilder', 'autoSaved'), { duration: 1500 });
     } catch (error) {
-      // Silently fail for auto-save, user can manually save
       console.error('Auto-save failed:', error);
+      toast.error(t('errors', 'saveFailed'), { duration: 2000 });
     } finally {
       setAutoSaving(false);
     }
   };
 
-  // Trigger auto-save after 3 seconds of inactivity
-  useEffect(() => {
-    if (isEditing && hasUnsavedChanges) {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
+  // Create page first for new pages
+  const createPageFirst = async (overrideData = {}) => {
+    if (pageCreated) return;
+    
+    const currentFormData = { ...formDataRef.current, ...overrideData };
+    
+    setAutoSaving(true);
+    try {
+      let finalSlug = currentFormData.slug?.trim();
+      if (!finalSlug) {
+        finalSlug = generateRandomSlug();
       }
-      autoSaveTimerRef.current = setTimeout(() => {
-        autoSave();
-      }, 3000);
+      
+      let finalTitle = currentFormData.title?.trim();
+      if (!finalTitle) {
+        const parts = [currentFormData.artist_name, currentFormData.release_title].filter(Boolean);
+        finalTitle = parts.length > 0 ? parts.join(" - ") : t('pageBuilder', 'newPage');
+      }
+      
+      const pageData = { 
+        ...currentFormData, 
+        slug: finalSlug,
+        title: finalTitle,
+        qr_enabled: qrEnabledRef.current,
+        page_theme: pageThemeRef.current
+      };
+      
+      const response = await api.post("/pages", pageData);
+      setPageCreated(true);
+      // Navigate to edit mode
+      navigate(`/page/${response.data.id}`, { replace: true });
+      toast.success(t('pageBuilder', 'pageCreated'), { duration: 1500 });
+    } catch (error) {
+      console.error('Create page failed:', error);
+      if (error.response?.data?.detail === "PAGE_LIMIT_REACHED") {
+        toast.error(t('errors', 'pageLimitReached'));
+      } else {
+        toast.error(t('errors', 'saveFailed'), { duration: 2000 });
+      }
+    } finally {
+      setAutoSaving(false);
+    }
+  };
+
+  // Delete page function
+  const deletePage = async () => {
+    if (!pageId) return;
+    
+    if (!window.confirm(t('pageBuilder', 'confirmDelete'))) {
+      return;
     }
     
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [formData, qrEnabled, pageTheme, hasUnsavedChanges, isEditing]);
+    try {
+      await api.delete(`/pages/${pageId}`);
+      toast.success(t('pageBuilder', 'pageDeleted'));
+      navigate('/multilinks');
+    } catch (error) {
+      console.error('Delete page failed:', error);
+      toast.error(t('errors', 'deleteFailed'));
+    }
+  };
 
   useEffect(() => {
     if (isEditing) {
