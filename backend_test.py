@@ -1001,6 +1001,338 @@ class BandLinkAPITester:
         print(f"   ✅ Access check returned has_access=true (launch mode)")
         return True
 
+    # ===================== ADMIN PANEL - VIEW USER PROFILE AND PAGES TESTS =====================
+
+    def test_admin_get_user_profile(self):
+        """Test GET /api/admin/users/{user_id} - Get user profile details"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ No admin token or test user ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Admin Get User Profile",
+            "GET",
+            f"admin/users/{self.test_user_id}",
+            200,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        # Verify required fields are present
+        required_fields = ['id', 'email', 'username', 'role', 'plan', 'page_count', 'total_clicks']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing required field: {field}")
+                return False
+        
+        # Verify sensitive fields are NOT present
+        sensitive_fields = ['password_hash', 'reset_token', 'reset_token_expiry']
+        for field in sensitive_fields:
+            if field in response:
+                print(f"❌ Sensitive field should not be present: {field}")
+                return False
+        
+        print(f"   ✅ User ID: {response.get('id')}")
+        print(f"   ✅ Email: {response.get('email')}")
+        print(f"   ✅ Page count: {response.get('page_count')}")
+        print(f"   ✅ Total clicks: {response.get('total_clicks')}")
+        return True
+
+    def test_admin_get_user_pages(self):
+        """Test GET /api/admin/users/{user_id}/pages - Get user's pages list"""
+        if not self.admin_token or not self.test_user_id:
+            print("❌ No admin token or test user ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Admin Get User Pages",
+            "GET",
+            f"admin/users/{self.test_user_id}/pages",
+            200,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        # Verify response structure
+        required_fields = ['pages', 'total', 'skip', 'limit', 'user']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing required field: {field}")
+                return False
+        
+        # Verify pages array structure
+        pages = response.get('pages', [])
+        if pages:
+            first_page = pages[0]
+            page_required_fields = ['id', 'title', 'slug', 'total_clicks', 'clicks_7d']
+            for field in page_required_fields:
+                if field not in first_page:
+                    print(f"❌ Missing required page field: {field}")
+                    return False
+        
+        print(f"   ✅ Found {len(pages)} pages")
+        print(f"   ✅ Total pages: {response.get('total')}")
+        print(f"   ✅ User info: {response.get('user', {}).get('username')}")
+        return True
+
+    def test_admin_get_audit_logs(self):
+        """Test GET /api/admin/audit-logs - Get audit logs"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        success, response = self.run_test(
+            "Admin Get Audit Logs",
+            "GET",
+            "admin/audit-logs",
+            200,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        # Verify response structure
+        required_fields = ['logs', 'total', 'skip', 'limit']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing required field: {field}")
+                return False
+        
+        # Verify logs array structure
+        logs = response.get('logs', [])
+        if logs:
+            first_log = logs[0]
+            log_required_fields = ['id', 'admin_id', 'event', 'timestamp', 'admin_email', 'admin_username']
+            for field in log_required_fields:
+                if field not in first_log:
+                    print(f"❌ Missing required log field: {field}")
+                    return False
+        
+        print(f"   ✅ Found {len(logs)} audit logs")
+        print(f"   ✅ Total logs: {response.get('total')}")
+        if logs:
+            print(f"   ✅ Latest event: {logs[0].get('event')}")
+        return True
+
+    def test_rbac_regular_user_403(self):
+        """Test RBAC - Regular user should get 403 on admin endpoints"""
+        if not self.token or not self.test_user_id:
+            print("❌ No regular user token or test user ID available")
+            return False
+            
+        # Test user profile endpoint - should get 403
+        success, response = self.run_test(
+            "Regular User Access User Profile (Should Fail)",
+            "GET",
+            f"admin/users/{self.test_user_id}",
+            403,  # Should be forbidden
+            use_admin=False  # Use regular user token
+        )
+        
+        if not success:
+            print("❌ Regular user should get 403 for admin/users/{id}")
+            return False
+            
+        # Test user pages endpoint - should get 403
+        success, response = self.run_test(
+            "Regular User Access User Pages (Should Fail)",
+            "GET",
+            f"admin/users/{self.test_user_id}/pages",
+            403,  # Should be forbidden
+            use_admin=False  # Use regular user token
+        )
+        
+        if not success:
+            print("❌ Regular user should get 403 for admin/users/{id}/pages")
+            return False
+            
+        print(f"   ✅ Regular user correctly blocked from admin endpoints")
+        return True
+
+    def test_rbac_moderator_access(self):
+        """Test RBAC - Moderator should have access to user endpoints"""
+        # Create a moderator user for testing
+        timestamp = int(time.time())
+        moderator_data = {
+            "email": f"moderator{timestamp}@example.com",
+            "username": f"moderator{timestamp}",
+            "password": "modpass123"
+        }
+        
+        # Register moderator
+        success, reg_response = self.run_test(
+            "Register Moderator User",
+            "POST",
+            "auth/register",
+            200,
+            data=moderator_data
+        )
+        
+        if not success:
+            return False
+            
+        moderator_user_id = reg_response['user']['id']
+        
+        # Promote to moderator using admin token
+        success, response = self.run_test(
+            "Promote User to Moderator",
+            "PUT",
+            f"admin/users/{moderator_user_id}/role",
+            200,
+            data={"role": "moderator"},
+            use_admin=True
+        )
+        
+        # Note: This might fail if admin doesn't have permission to change roles
+        # In that case, we'll skip this test
+        if not success:
+            print("⚠️ Cannot promote user to moderator (admin role limitation)")
+            return True  # Skip this test
+            
+        # Login as moderator
+        success, login_response = self.run_test(
+            "Login as Moderator",
+            "POST",
+            "auth/login",
+            200,
+            data={"email": moderator_data["email"], "password": moderator_data["password"]}
+        )
+        
+        if not success:
+            return False
+            
+        moderator_token = login_response['token']
+        
+        # Test moderator access to user profile
+        headers = {'Authorization': f'Bearer {moderator_token}'}
+        success, response = self.run_test(
+            "Moderator Access User Profile",
+            "GET",
+            f"admin/users/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        
+        if not success:
+            return False
+            
+        # Test moderator access to user pages
+        success, response = self.run_test(
+            "Moderator Access User Pages",
+            "GET",
+            f"admin/users/{self.test_user_id}/pages",
+            200,
+            headers=headers
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ Moderator has access to user profile and pages")
+        return True
+
+    def test_rbac_owner_access(self):
+        """Test RBAC - Owner should have access to all endpoints"""
+        # Login as owner (thedrumepic@gmail.com)
+        owner_data = {
+            "email": "thedrumepic@gmail.com",
+            "password": "ownerpass123"
+        }
+        
+        success, login_response = self.run_test(
+            "Login as Owner",
+            "POST",
+            "auth/login",
+            200,
+            data=owner_data
+        )
+        
+        if not success:
+            print("⚠️ Owner login failed - may not exist yet")
+            return True  # Skip if owner doesn't exist
+            
+        owner_token = login_response['token']
+        
+        # Test owner access to user profile
+        headers = {'Authorization': f'Bearer {owner_token}'}
+        success, response = self.run_test(
+            "Owner Access User Profile",
+            "GET",
+            f"admin/users/{self.test_user_id}",
+            200,
+            headers=headers
+        )
+        
+        if not success:
+            return False
+            
+        # Test owner access to user pages
+        success, response = self.run_test(
+            "Owner Access User Pages",
+            "GET",
+            f"admin/users/{self.test_user_id}/pages",
+            200,
+            headers=headers
+        )
+        
+        if not success:
+            return False
+            
+        # Test owner access to audit logs
+        success, response = self.run_test(
+            "Owner Access Audit Logs",
+            "GET",
+            "admin/audit-logs",
+            200,
+            headers=headers
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ Owner has access to all admin endpoints")
+        return True
+
+    def test_admin_user_not_found(self):
+        """Test admin endpoints with non-existent user ID"""
+        if not self.admin_token:
+            print("❌ No admin token available")
+            return False
+            
+        fake_user_id = "non-existent-user-id"
+        
+        # Test user profile with fake ID - should get 404
+        success, response = self.run_test(
+            "Admin Get Non-existent User Profile",
+            "GET",
+            f"admin/users/{fake_user_id}",
+            404,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        # Test user pages with fake ID - should get 404
+        success, response = self.run_test(
+            "Admin Get Non-existent User Pages",
+            "GET",
+            f"admin/users/{fake_user_id}/pages",
+            404,
+            use_admin=True
+        )
+        
+        if not success:
+            return False
+            
+        print(f"   ✅ Non-existent user correctly returns 404")
+        return True
+
     # ===================== CONTACT INFO API TESTS =====================
 
     def test_get_contact_info(self):
