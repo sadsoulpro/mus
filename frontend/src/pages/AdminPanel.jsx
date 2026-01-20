@@ -241,6 +241,31 @@ export default function AdminPanel() {
     }
   };
 
+  // Fetch user profile and their pages
+  const openUserProfile = async (userId) => {
+    setLoadingUserProfile(true);
+    setUserProfileModalOpen(true);
+    try {
+      const [profileRes, pagesRes] = await Promise.all([
+        api.get(`/admin/users/${userId}`),
+        api.get(`/admin/users/${userId}/pages`)
+      ]);
+      setSelectedUserProfile(profileRes.data);
+      setSelectedUserPages(pagesRes.data.pages || []);
+    } catch (error) {
+      toast.error(t('admin', 'profileLoadError') || 'Ошибка загрузки профиля');
+      setUserProfileModalOpen(false);
+    } finally {
+      setLoadingUserProfile(false);
+    }
+  };
+
+  const closeUserProfile = () => {
+    setUserProfileModalOpen(false);
+    setSelectedUserProfile(null);
+    setSelectedUserPages([]);
+  };
+
   const deleteWaitlistEmail = async (emailId) => {
     if (!confirm(t('admin', 'deleteEmailConfirm'))) return;
     try {
