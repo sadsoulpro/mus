@@ -1660,6 +1660,225 @@ export default function AdminPanel() {
           </Tabs>
         </div>
       </div>
+      
+      {/* User Profile Modal */}
+      <AnimatePresence>
+        {userProfileModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={closeUserProfile}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-2xl border border-border shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {loadingUserProfile ? (
+                <div className="p-12 flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-4"></div>
+                  <p className="text-muted-foreground">{t('common', 'loading')}</p>
+                </div>
+              ) : selectedUserProfile ? (
+                <>
+                  {/* Header */}
+                  <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 border-b border-border bg-card/95 backdrop-blur-sm">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={closeUserProfile}
+                        className="rounded-xl"
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                      </Button>
+                      <div>
+                        <h2 className="text-lg font-bold flex items-center gap-2">
+                          {selectedUserProfile.username}
+                          {(selectedUserProfile.is_verified || selectedUserProfile.verified) && (
+                            <BadgeCheck className="w-5 h-5 text-primary" />
+                          )}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">{selectedUserProfile.email}</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={closeUserProfile} className="rounded-xl">
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </div>
+
+                  {/* Profile Content */}
+                  <div className="p-4 sm:p-6 space-y-6">
+                    {/* User Info Cards */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                        <p className="text-xs text-muted-foreground mb-1">{t('admin', 'role') || 'Роль'}</p>
+                        <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs border ${ROLE_CONFIG[selectedUserProfile.role]?.color}`}>
+                          {(() => {
+                            const RIcon = ROLE_CONFIG[selectedUserProfile.role]?.icon || Users;
+                            return <RIcon className="w-3.5 h-3.5" />;
+                          })()}
+                          {t('admin', ROLE_CONFIG[selectedUserProfile.role]?.labelKey)}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                        <p className="text-xs text-muted-foreground mb-1">{t('admin', 'plan') || 'План'}</p>
+                        <span className={`inline-block px-2 py-1 rounded-lg text-xs ${PLAN_CONFIG[selectedUserProfile.plan]?.color}`}>
+                          {PLAN_CONFIG[selectedUserProfile.plan]?.label}
+                        </span>
+                      </div>
+                      <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                        <p className="text-xs text-muted-foreground mb-1">{t('admin', 'pagesCount') || 'Страниц'}</p>
+                        <p className="text-lg font-bold">{selectedUserProfile.page_count || 0}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                        <p className="text-xs text-muted-foreground mb-1">{t('admin', 'totalClicks') || 'Всего кликов'}</p>
+                        <p className="text-lg font-bold">{selectedUserProfile.total_clicks || 0}</p>
+                      </div>
+                    </div>
+
+                    {/* Additional Info */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">{t('admin', 'registrationDate') || 'Дата регистрации'}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedUserProfile.created_at ? new Date(selectedUserProfile.created_at).toLocaleDateString('ru-RU', {
+                            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                          }) : '—'}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Shield className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">{t('admin', 'status') || 'Статус'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {selectedUserProfile.is_banned ? (
+                            <span className="px-2 py-1 rounded-lg text-xs bg-red-500/20 text-red-400 border border-red-500/30">
+                              {t('admin', 'banned') || 'Заблокирован'}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 rounded-lg text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                              {t('admin', 'active') || 'Активен'}
+                            </span>
+                          )}
+                          {(selectedUserProfile.is_verified || selectedUserProfile.verified) && (
+                            <span className="px-2 py-1 rounded-lg text-xs bg-primary/20 text-primary border border-primary/30">
+                              {t('admin', 'verifiedBadge') || 'Верифицирован'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* User Pages Section */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <FileText className="w-5 h-5 text-primary" />
+                        <h3 className="text-lg font-semibold">
+                          {t('admin', 'userPages') || 'Страницы пользователя'} ({selectedUserPages.length})
+                        </h3>
+                      </div>
+
+                      {selectedUserPages.length > 0 ? (
+                        <div className="space-y-3">
+                          {selectedUserPages.map((page, i) => (
+                            <motion.div
+                              key={page.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: i * 0.05 }}
+                              className="p-4 rounded-xl bg-muted/30 border border-border hover:border-primary/30 transition-all"
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                {/* Cover & Info */}
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <div className="w-14 h-14 rounded-xl bg-muted overflow-hidden flex-shrink-0">
+                                    {page.cover_image ? (
+                                      <img 
+                                        src={page.cover_image.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${page.cover_image}` : page.cover_image}
+                                        alt={page.title} 
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Music className="w-6 h-6 text-zinc-600" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <p className="font-semibold truncate">{page.title || 'Без названия'}</p>
+                                      <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                                        page.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                                      }`}>
+                                        {page.status === 'active' ? t('admin', 'active') || 'Активна' : t('admin', 'disabled') || 'Отключена'}
+                                      </span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">/{page.slug}</p>
+                                  </div>
+                                </div>
+
+                                {/* Stats */}
+                                <div className="flex items-center gap-4 pl-[68px] sm:pl-0">
+                                  <div className="flex items-center gap-4 text-sm">
+                                    <span className="flex items-center gap-1 text-muted-foreground" title={t('admin', 'totalClicks') || 'Всего кликов'}>
+                                      <MousePointer className="w-4 h-4" /> {page.total_clicks || 0}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-muted-foreground" title={t('admin', 'clicks7d') || 'За 7 дней'}>
+                                      <TrendingUp className="w-4 h-4" /> {page.clicks_7d || 0}
+                                    </span>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="flex items-center gap-2">
+                                    <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer">
+                                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" title={t('admin', 'viewPublicPage') || 'Открыть страницу'}>
+                                        <ExternalLink className="w-4 h-4" />
+                                      </Button>
+                                    </a>
+                                    <a href={`/page/${page.id}`} target="_blank" rel="noopener noreferrer">
+                                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" title={t('admin', 'editPage') || 'Редактировать'}>
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Page Created Date */}
+                              <div className="mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground pl-[68px] sm:pl-0">
+                                {t('admin', 'created') || 'Создана'}: {page.created_at ? new Date(page.created_at).toLocaleDateString('ru-RU') : '—'}
+                                {page.updated_at && (
+                                  <span className="ml-3">
+                                    {t('admin', 'updated') || 'Обновлена'}: {new Date(page.updated_at).toLocaleDateString('ru-RU')}
+                                  </span>
+                                )}
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12 rounded-xl bg-muted/20 border border-dashed border-border">
+                          <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+                          <p className="text-muted-foreground">{t('admin', 'noPages') || 'Пользователь ещё не создал страниц'}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Sidebar>
   );
 }
