@@ -2430,7 +2430,106 @@ async def admin_get_user(user_id: str, user: dict = Depends(get_admin_user)):
         page_ids = [p["id"] for p in pages]
         target_user["total_clicks"] = await db.clicks.count_documents({"page_id": {"$in": page_ids}})
     
+    # Log admin view action
+    await log_admin_action(user["id"], "ADMIN_VIEW_USER_PROFILE", {"target_user_id": user_id})
+    
     return target_user
+
+@api_router.get("/admin/users/{user_id}/pages")
+async def admin_get_user_pages(
+    user_id: str,
+    skip: int = 0,
+    limit: int = 50,
+    admin_user: dict = Depends(get_admin_user)
+):
+    """Get all pages created by a user - Admin/Moderator panel"""
+    # Verify target user exists
+    target_user = await db.users.find_one({"id": user_id}, {"_id": 0, "id": 1, "username": 1})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get user's pages with stats
+    pages_cursor = db.pages.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit)
+    
+    pages = await pages_cursor.to_list(limit)
+    total = await db.pages.count_documents({"user_id": user_id})
+    
+    # Add click count for each page
+    for page in pages:
+        page["total_clicks"] = await db.clicks.count_documents({"page_id": page["id"]})
+        # Get last 7 days clicks
+        seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+        page["clicks_7d"] = await db.clicks.count_documents({
+            "page_id": page["id"],
+            "timestamp": {"$gte": seven_days_ago.isoformat()}
+        })
+    
+    # Log admin view action
+    await log_admin_action(admin_user["id"], "ADMIN_VIEW_USER_PAGES", {
+        "target_user_id": user_id,
+        "pages_count": len(pages)
+    })
+    
+    return {
+        "pages": pages,
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "user": target_user
+    }
+
+# ===================== AUDIT LOG HELPER =====================
+
+async def log_admin_action(admin_id: str, event: str, details: dict = None):
+    """Log admin actions for audit trail"""
+    log_entry = {
+        "id": str(uuid.uuid4()),
+        "admin_id": admin_id,
+        "event": event,
+        "details": details or {},
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "ip_address": None  # Can be populated from request if needed
+    }
+    await db.audit_logs.insert_one(log_entry)
+    logging.info(f"AUDIT: {event} by admin {admin_id} - {details}")
+
+@api_router.get("/admin/audit-logs")
+async def admin_get_audit_logs(
+    skip: int = 0,
+    limit: int = 100,
+    event: Optional[str] = None,
+    admin_id: Optional[str] = None,
+    user: dict = Depends(get_admin_user)
+):
+    """Get audit logs - Admin panel"""
+    # Only owner and admin can view audit logs
+    if not has_role_permission(user.get("role", "user"), "admin"):
+        raise HTTPException(status_code=403, detail="Only admin/owner can view audit logs")
+    
+    query = {}
+    if event:
+        query["event"] = event
+    if admin_id:
+        query["admin_id"] = admin_id
+    
+    logs = await db.audit_logs.find(query, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.audit_logs.count_documents(query)
+    
+    # Enrich with admin info
+    for log in logs:
+        admin = await db.users.find_one({"id": log["admin_id"]}, {"_id": 0, "email": 1, "username": 1})
+        log["admin_email"] = admin.get("email") if admin else "Unknown"
+        log["admin_username"] = admin.get("username") if admin else "Unknown"
+    
+    return {
+        "logs": logs,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
 
 # --- Access Check API ---
 
