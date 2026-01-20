@@ -729,6 +729,9 @@ export const translations = {
       darkTheme: "Тёмная",
       lightTheme: "Светлая",
       pageDesignHint: "Выберите тему для вашей публичной страницы",
+      deletePage: "Удалить страницу",
+      confirmDelete: "Вы уверены, что хотите удалить эту страницу?",
+      pageDeleted: "Страница успешно удалена",
     },
     es: {
       title: "Constructor de página",
