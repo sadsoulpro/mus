@@ -1288,9 +1288,8 @@ async def reorder_links(page_id: str, data: LinkReorder, user: dict = Depends(ge
 
 @api_router.put("/pages/{page_id}/links/{link_id}")
 async def update_link(page_id: str, link_id: str, data: LinkUpdate, user: dict = Depends(get_current_user)):
-    page = await db.pages.find_one({"id": page_id, "user_id": user["id"]})
-    if not page:
-        raise HTTPException(status_code=404, detail="Page not found")
+    # Use admin access check
+    page = await get_page_with_admin_access(page_id, user)
     
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
     if update_data:
