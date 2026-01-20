@@ -844,7 +844,7 @@ export default function PageBuilder() {
             <h1 className="font-semibold text-sm sm:text-base truncate">{isEditing ? t('pageBuilder', 'editing') : t('pageBuilder', 'newPage')}</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {isEditing && formData.slug && (
+            {(isEditing || pageCreated) && formData.slug && (
               <a href={`/${formData.slug}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="rounded-full" data-testid="view-public-page-btn">
                   <ExternalLink className="w-4 h-4 sm:mr-2" />
