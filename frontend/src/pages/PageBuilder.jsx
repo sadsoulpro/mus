@@ -265,9 +265,9 @@ export default function PageBuilder() {
     }
   };
 
-  // Create page first for new pages (returns page ID, doesn't navigate)
+  // Create page first for new pages (returns page ID, NO navigation - stays on same page)
   const createPageFirst = async (overrideData = {}, linksToAdd = []) => {
-    if (pageCreated) return null;
+    if (pageCreated) return createdPageId;
     
     const currentFormData = { ...formDataRef.current, ...overrideData };
     
@@ -296,21 +296,30 @@ export default function PageBuilder() {
       const newPageId = response.data.id;
       
       // Add links to the created page
+      const createdLinks = [];
       if (linksToAdd.length > 0) {
         for (const linkData of linksToAdd) {
           try {
-            await api.post(`/pages/${newPageId}/links`, {
+            const linkResponse = await api.post(`/pages/${newPageId}/links`, {
               platform: linkData.platform,
               url: linkData.url,
               active: true
             });
+            createdLinks.push(linkResponse.data);
           } catch (error) {
             console.error(`Failed to add ${linkData.platform} link to new page`);
           }
         }
       }
       
+      // Update links state with server-created links (with real IDs)
+      if (createdLinks.length > 0) {
+        setLinks(createdLinks);
+      }
+      
       setPageCreated(true);
+      setCreatedPageId(newPageId);
+      
       // Update form data with final values
       setFormData(prev => ({
         ...prev,
@@ -320,10 +329,7 @@ export default function PageBuilder() {
       
       toast.success(t('pageBuilder', 'pageCreated'), { duration: 1500 });
       
-      // Navigate to edit mode AFTER everything is saved
-      setTimeout(() => {
-        navigate(`/page/${newPageId}`, { replace: true });
-      }, 500);
+      // NO navigation - stay on the same page, user can click "View Page" button
       
       return newPageId;
     } catch (error) {
