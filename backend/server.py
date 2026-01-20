@@ -721,6 +721,9 @@ async def login(data: UserLogin):
     if user.get("status") == "blocked":
         raise HTTPException(status_code=403, detail="Account blocked")
     
+    # Get plan config
+    plan_config = await get_plan_config(user.get("plan", "free"))
+    
     token = create_token(user["id"], user["role"])
     return {
         "token": token,
@@ -731,6 +734,7 @@ async def login(data: UserLogin):
             "role": user["role"],
             "status": user["status"],
             "plan": user.get("plan", "free"),
+            "plan_config": plan_config,
             "is_verified": user.get("is_verified", False),
             "is_banned": user.get("is_banned", False),
             "verified": user.get("verified", False),
